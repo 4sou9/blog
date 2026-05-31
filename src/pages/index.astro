@@ -14,7 +14,7 @@ const fmt = (d) =>
     {posts.map((post) => (
       <li>
         <div class="post-date">{fmt(post.data.pubDate)}</div>
-        <a class="post-title" href={`${base}${post.id}/`}>{post.data.title}</a>
+        <a class="post-title" href={`${base}/${post.id}/`}>{post.data.title}</a>
       </li>
     ))}
   </ol>
