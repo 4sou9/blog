@@ -6,19 +6,16 @@ const base = import.meta.env.BASE_URL;
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
-const recent = posts.slice(0, 7);
 const fmt = (d) =>
   `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 ---
 <Base>
   <ol class="post-list">
-    {recent.map((post) => (
+    {posts.map((post) => (
       <li>
         <div class="post-date">{fmt(post.data.pubDate)}</div>
-        <a class="post-title" href={`${base}articles/${post.id}/`}>{post.data.title}</a>
-        {post.data.description && <div class="post-desc">{post.data.description}</div>}
+        <a class="post-title" href={`${base}${post.id}/`}>{post.data.title}</a>
       </li>
     ))}
   </ol>
-  <a class="more" href={`${base}articles`}>すべての記事一覧へ →</a>
 </Base>
