@@ -23,10 +23,11 @@ body {
 }
 
 a { color: var(--link); text-decoration: none; }
+a:visited { color: var(--muted); }
 a:hover { text-decoration: underline; }
 
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0 0 2.5rem; }
-.site-title a { color: var(--fg); }
+.site-title a, .site-title a:visited { color: var(--fg); }
 
 .post-list { list-style: none; padding: 0; margin: 0; }
 .post-list li { margin-bottom: 1.6rem; }
@@ -50,8 +51,8 @@ a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 .prose input[type="checkbox"]:checked {
-  background: var(--link);
-  border-color: var(--link);
+  background: transparent;
+  border-color: var(--fg);
 }
 .prose input[type="checkbox"]:checked::after {
   content: '';
@@ -60,7 +61,7 @@ a:hover { text-decoration: underline; }
   top: -1px;
   width: 4px;
   height: 7px;
-  border: 2px solid #fff;
+  border: 2px solid var(--fg);
   border-top: none;
   border-left: none;
   transform: rotate(45deg);
