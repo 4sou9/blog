@@ -52,6 +52,20 @@ pubDate: '2026-06-01'
 
 ---
 
+## X（Twitter）埋め込み
+
+[https://x.com/astrodotbuild/status/1907134689020248286](https://x.com/astrodotbuild/status/1907134689020248286)
+
+---
+
+## OGPリンクカード
+
+[https://astro.build](https://astro.build)
+
+[https://github.com/withastro/astro](https://github.com/withastro/astro)
+
+---
+
 ## コードブロック
 
 ```js
