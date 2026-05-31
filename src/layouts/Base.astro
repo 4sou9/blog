@@ -1,0 +1,19 @@
+---
+import { SITE_TITLE } from '../consts';
+import '../styles/global.css';
+const base = import.meta.env.BASE_URL;
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} - ${SITE_TITLE}` : SITE_TITLE}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body>
+    <header class="site-title"><a href={base}>{SITE_TITLE}</a></header>
+    <main><slot /></main>
+  </body>
+</html>
