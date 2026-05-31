@@ -54,7 +54,7 @@ pubDate: '2026-06-01'
 
 ## X（Twitter）埋め込み
 
-[https://x.com/astrodotbuild/status/1907134689020248286](https://x.com/astrodotbuild/status/1907134689020248286)
+[https://x.com/jack/status/20](https://x.com/jack/status/20)
 
 ---
 
