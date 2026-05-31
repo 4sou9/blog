@@ -46,9 +46,9 @@ pubDate: '2026-06-01'
 
 ---
 
-## 動画リンク（埋め込み非対応のためリンク）
+## 動画（YouTube埋め込み）
 
-[YouTube: Big Buck Bunny](https://www.youtube.com/watch?v=aqz-KE-bpKQ)
+[https://www.youtube.com/watch?v=aqz-KE-bpKQ](https://www.youtube.com/watch?v=aqz-KE-bpKQ)
 
 ---
 
