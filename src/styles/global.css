@@ -37,6 +37,35 @@ a:hover { text-decoration: underline; }
 .prose h1 { font-size: 1.5rem; margin: 0 0 0.4rem; }
 .prose img { max-width: 100%; height: auto; }
 .prose pre { background: #21252c; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+.prose input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 0.85em;
+  height: 0.85em;
+  border: 1.5px solid var(--muted);
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 0.3em;
+  position: relative;
+  flex-shrink: 0;
+}
+.prose input[type="checkbox"]:checked {
+  background: var(--link);
+  border-color: var(--link);
+}
+.prose input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: -1px;
+  width: 4px;
+  height: 7px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
 .prose table { border-collapse: collapse; width: 100%; }
 .prose th, .prose td { border: 1px solid var(--faint); padding: 0.4rem 0.8rem; text-align: left; }
 .prose th { background: #21252c; }
