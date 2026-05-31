@@ -19,7 +19,7 @@ export default function rehypeTwitter() {
         tagName: 'blockquote',
         properties: { className: ['twitter-tweet'] },
         children: [
-          { type: 'element', tagName: 'a', properties: { href }, children: [] },
+          { type: 'element', tagName: 'a', properties: { href }, children: [{ type: 'text', value: href }] },
         ],
       };
       hasEmbed = true;
