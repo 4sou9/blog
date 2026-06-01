@@ -5,10 +5,15 @@ const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com|steampowered\.com/;
 async function fetchOgp(url) {
   try {
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; blog-ogp/1.0)' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ja,en;q=0.9',
+      },
       signal: AbortSignal.timeout(8000),
     });
     const html = await res.text();
+    if (html.includes('cf-mitigated') || html.includes('jschl-answer') || html.includes('Just a moment')) return null;
     const get = (...patterns) => {
       for (const p of patterns) {
         const m = html.match(p);

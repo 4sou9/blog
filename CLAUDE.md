@@ -24,8 +24,8 @@ Astro static blog ("ねこのメモ") deployed to GitHub Pages.
 - `src/layouts/Base.astro` — single shared layout; handles `<head>`, OGP meta tags, and site header. Site title is hardcoded here.
 
 **Content**
-- `src/content/blog/` — Markdown files, naming convention `YYYY-MM-DD-slug.md`
-- Frontmatter schema (`src/content.config.ts`): `title` (required), `pubDate` (required, coerced to Date), `description` (optional)
+- `src/content/blog/` — 画像なし記事は `YYYY-MM-DD-slug.md`、画像あり記事はサブフォルダ `YYYY-MM-DD-slug/index.md` + 画像ファイル（両形式混在可）
+- Frontmatter schema (`src/content.config.ts`): `title` (required), `pubDate` (required, coerced to Date), `description` (optional), `unlisted` (optional, 一覧非表示)
 
 **Custom rehype plugins** (`src/plugins/`)
 - `rehype-youtube.js` — bare YouTube URLs on their own line → `<iframe>` embed
