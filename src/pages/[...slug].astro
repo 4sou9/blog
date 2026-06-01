@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import fs from 'node:fs';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -9,10 +10,39 @@ export async function getStaticPaths() {
 
 const post = Astro.props;
 const { Content } = await render(post);
+
+function extractExcerpt(id) {
+  const candidates = [
+    `./src/content/blog/${id}.md`,
+    `./src/content/blog/${id}/index.md`,
+  ];
+  for (const p of candidates) {
+    try {
+      const raw = fs.readFileSync(p, 'utf-8').replace(/^---[\s\S]*?---\r?\n/, '');
+      const parts = [];
+      for (const line of raw.split(/\r?\n/)) {
+        if (parts.join('').length >= 120) break;
+        const t = line.trim()
+          .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+          .replace(/^#+\s+/, '')
+          .replace(/^[-*+]\s+/, '')
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+          .replace(/[*_`~]/g, '')
+          .replace(/`[^`]*`/g, '')
+          .trim();
+        if (t.length > 1) parts.push(t);
+      }
+      const result = parts.join(' ').trim().slice(0, 120);
+      if (result.length > 4) return result;
+    } catch {}
+  }
+}
+
+const autoDescription = post.data.description || extractExcerpt(post.id);
 const fmt = (d) =>
   `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 ---
-<Base title={post.data.title} description={post.data.description}>
+<Base title={post.data.title} description={autoDescription}>
   <article class="prose">
     <div class="post-date">{fmt(post.data.pubDate)}</div>
     <h1>{post.data.title}</h1>
