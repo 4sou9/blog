@@ -6,15 +6,17 @@ export async function GET(context) {
     .filter((p) => !p.data.unlisted)
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
   return rss({
     title: 'ねこのメモ',
-    description: '日々の技術メモや気になったことを書き留めるブログ。',
+    description: '備忘録です',
     site: context.site,
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.pubDate,
       description: post.data.description,
-      link: `/${post.id}/`,
+      link: new URL(`${base}${post.id}/`, context.site).href,
     })),
   });
 }
