@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 
-const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com/;
+const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com|steampowered\.com/;
 
 async function fetchOgp(url) {
   try {

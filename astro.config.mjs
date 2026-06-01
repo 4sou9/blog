@@ -3,6 +3,7 @@
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
+import rehypeSteam from './src/plugins/rehype-steam.js';
 import rehypeTwitter from './src/plugins/rehype-twitter.js';
 import rehypeYoutube from './src/plugins/rehype-youtube.js';
 
@@ -12,6 +13,6 @@ export default defineConfig({
 	integrations: [sitemap()],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
-		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeOgpCard],
+		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeSteam, rehypeOgpCard],
 	},
 });
