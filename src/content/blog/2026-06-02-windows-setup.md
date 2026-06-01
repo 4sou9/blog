@@ -33,81 +33,15 @@ https://motu.com/en-us/download/product/408/#3110
 
 https://aquavoice.com/download
 
-## スクリプト実行
-
-以下の内容を `run.bat` として保存する。PS1ファイルをこのbatにドラッグ＆ドロップすると、管理者権限で実行できる。
-
-```bat
-@echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
-pause
-```
-
-以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
-
-```powershell
-$packageIds = @(
-    # ブラウザ
-    'Google.Chrome'
-
-    # VPN
-    'NordSecurity.NordVPN'
-
-    # ゲーム
-    'Valve.Steam'
-    'EpicGames.EpicGamesLauncher'
-    'PlayStation.PlayStationAccessories'
-
-    # ビデオ
-    'MPC-BE.MPC-BE'
-
-    # コミュニケーション
-    'Discord.Discord'
-    'RomTenma.Siki'
-
-    # 開発
-    'Microsoft.VisualStudioCode'
-    'Git.Git'
-    'Microsoft.PowerShell'
-    'OpenJS.NodeJS'
-    'GitHub.cli'
-
-    # ユーティリティ
-    'Microsoft.PowerToys'
-    'M2Team.NanaZip'
-)
-
-foreach ($packageId in $packageIds) {
-    winget install -e --id $packageId --accept-source-agreements --accept-package-agreements
-}
-```
-
-以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。電源・マウスの初期設定を行う（スクリプト内で管理者権限に自動昇格する）。
-
-```powershell
-# 管理者権限の昇格
-$principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process pwsh -Verb RunAs -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath)
-    exit
-}
-
-# 電源設定
-powercfg -x monitor-timeout-ac 5   # 5分後にモニターをオフ
-powercfg -x standby-timeout-ac 0   # スリープしない
-
-# マウス加速を無効化
-$mouse = 'HKCU:\Control Panel\Mouse'
-Set-ItemProperty -Path $mouse -Name MouseSpeed      -Value '0'
-Set-ItemProperty -Path $mouse -Name MouseThreshold1 -Value '0'
-Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
-```
-
 ## Win11Debloat
 
-以下のページから `Win11Debloat.ps1` をダウンロードし、`run.bat` にドラッグして実行する。起動後に「Custom」を選択し、以下の内容をJSONファイルとして保存したものを読み込む。
+管理者権限でPowerShellを起動し、以下のワンライナーを実行する。起動後に「Custom」を選択し、以下の内容をJSONファイルとして保存したものを読み込む。
 
 https://github.com/Raphire/Win11Debloat
+
+```powershell
+& ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
+```
 
 ```json
 {
@@ -186,3 +120,74 @@ https://github.com/Raphire/Win11Debloat
     "Version": "1.0"
 }
 ```
+
+## スクリプト実行
+
+以下の内容を `run.bat` として保存する。PS1ファイルをこのbatにドラッグ＆ドロップすると、管理者権限で実行できる。
+
+```bat
+@echo off
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
+pause
+```
+
+以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
+
+```powershell
+$packageIds = @(
+    # ブラウザ
+    'Google.Chrome'
+
+    # VPN
+    'NordSecurity.NordVPN'
+
+    # ゲーム
+    'Valve.Steam'
+    'EpicGames.EpicGamesLauncher'
+    'PlayStation.PlayStationAccessories'
+
+    # ビデオ
+    'MPC-BE.MPC-BE'
+
+    # コミュニケーション
+    'Discord.Discord'
+    'RomTenma.Siki'
+
+    # 開発
+    'Microsoft.VisualStudioCode'
+    'Git.Git'
+    'Microsoft.PowerShell'
+    'OpenJS.NodeJS'
+    'GitHub.cli'
+
+    # ユーティリティ
+    'Microsoft.PowerToys'
+    'M2Team.NanaZip'
+)
+
+foreach ($packageId in $packageIds) {
+    winget install -e --id $packageId --accept-source-agreements --accept-package-agreements
+}
+```
+
+以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。電源・マウスの初期設定を行う（スクリプト内で管理者権限に自動昇格する）。
+
+```powershell
+# 管理者権限の昇格
+$principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Start-Process pwsh -Verb RunAs -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath)
+    exit
+}
+
+# 電源設定
+powercfg -x monitor-timeout-ac 5   # 5分後にモニターをオフ
+powercfg -x standby-timeout-ac 0   # スリープしない
+
+# マウス加速を無効化
+$mouse = 'HKCU:\Control Panel\Mouse'
+Set-ItemProperty -Path $mouse -Name MouseSpeed      -Value '0'
+Set-ItemProperty -Path $mouse -Name MouseThreshold1 -Value '0'
+Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
+```
+

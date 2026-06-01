@@ -1,6 +1,6 @@
 ---
 title: '現在加入中のサブスク'
-pubDate: '2026-06-02'
+pubDate: '2026-05-08'
 ---
 
 ## [Claude](https://claude.ai/)
