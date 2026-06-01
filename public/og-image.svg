@@ -1,0 +1,5 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#1a1a0e"/>
+  <text x="80" y="300" font-family="system-ui, sans-serif" font-size="88" font-weight="600" fill="#f4f5f7">ねこのメモ</text>
+  <text x="84" y="380" font-family="system-ui, sans-serif" font-size="36" fill="#aab2bd">備忘録です</text>
+</svg>

@@ -1,5 +1,5 @@
 :root {
-  --bg: #2c313a;
+  --bg: #1a1a0e;
   --fg: #f4f5f7;
   --muted: #aab2bd;
   --faint: #828b97;
@@ -22,7 +22,7 @@ body {
   background: var(--bg);
 }
 
-a { color: var(--link); text-decoration: none; }
+a { color: var(--fg); text-decoration: none; }
 a:visited { color: var(--muted); }
 a:hover { text-decoration: underline; }
 
@@ -37,7 +37,7 @@ a:hover { text-decoration: underline; }
 .prose { margin-top: 2rem; }
 .prose h1 { font-size: 1.5rem; margin: 0 0 0.4rem; }
 .prose img { max-width: 100%; height: auto; }
-.prose pre { background: #21252c; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+.prose pre { padding: 1rem; border-radius: 6px; overflow-x: auto; }
 .prose input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;

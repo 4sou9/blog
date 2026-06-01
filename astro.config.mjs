@@ -11,6 +11,7 @@ export default defineConfig({
 	base: '/blog',
 	integrations: [sitemap()],
 	markdown: {
+		shikiConfig: { theme: 'github-dark' },
 		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeOgpCard],
 	},
 });
