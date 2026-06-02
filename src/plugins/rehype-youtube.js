@@ -3,8 +3,11 @@ import { visit } from 'unist-util-visit';
 export default function rehypeYoutube() {
   return (tree) => {
     visit(tree, 'element', (node, index, parent) => {
-      if (node.tagName !== 'a' || !parent) return;
-      const href = node.properties?.href ?? '';
+      if (node.tagName !== 'p' || !parent) return;
+      if (node.children.length !== 1) return;
+      const child = node.children[0];
+      if (child.type !== 'element' || child.tagName !== 'a') return;
+      const href = child.properties?.href ?? '';
       let id = null;
       try {
         const url = new URL(href);

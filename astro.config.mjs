@@ -6,7 +6,6 @@ import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
 import rehypeSteam from './src/plugins/rehype-steam.js';
 import rehypeTwitter from './src/plugins/rehype-twitter.js';
 import rehypeYoutube from './src/plugins/rehype-youtube.js';
-import { remarkExcerpt } from './src/plugins/remark-excerpt.js';
 
 export default defineConfig({
 	site: 'https://4sou9.github.io',
@@ -14,7 +13,6 @@ export default defineConfig({
 	integrations: [sitemap()],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
-		remarkPlugins: [remarkExcerpt],
 		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeSteam, rehypeOgpCard],
 	},
 });
