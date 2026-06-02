@@ -358,3 +358,9 @@ gh auth login
 ```powershell
 irm https://claude.ai/install.ps1 | iex
 ```
+
+インストール後、パスを通す。
+
+```powershell
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$($env:USERPROFILE)\.local\bin", "User")
+```
