@@ -54,3 +54,6 @@ a:hover { text-decoration: underline; }
 .ogp-title { font-weight: 500; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ogp-desc { font-size: 0.78rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .ogp-url { font-size: 0.75rem; color: var(--faint); margin-top: auto; }
+
+/* github-dark のコメント色 #6A737D はコントラスト比 3.04:1 で不足するため上書き */
+pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
