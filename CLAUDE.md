@@ -38,3 +38,5 @@ The embed plugins all use the same pattern: a `<p>` with a single `<a>` whose te
 - `src/styles/global.css` — single CSS file, dark theme via CSS custom properties (`--bg`, `--fg`, `--muted`, `--faint`, `--link`)
 
 **BASE_URL** is used throughout for GitHub Pages subdirectory compatibility.
+`import.meta.env.BASE_URL` equals `/blog` (no trailing slash) in this project.
+Always write `${base}/path` — never remove the `/` separator.
