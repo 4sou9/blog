@@ -2,6 +2,7 @@
 
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
+import rehypeFigure from './src/plugins/rehype-figure.js';
 import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
 import rehypeSteam from './src/plugins/rehype-steam.js';
 import rehypeTwitter from './src/plugins/rehype-twitter.js';
@@ -15,6 +16,6 @@ export default defineConfig({
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
 		remarkPlugins: [remarkExcerpt],
-		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeSteam, rehypeOgpCard],
+		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeSteam, rehypeOgpCard, rehypeFigure],
 	},
 });
