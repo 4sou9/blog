@@ -3,6 +3,9 @@ title: '個人的Windowsセットアップ'
 pubDate: '2026-06-02'
 ---
 
+内容を理解した上で実行してね。
+操作を誤るとパソコンが爆発します。
+
 ## インストール
 
 Rufusでブートメディアを作成してWindowsをクリーンインストールする。
@@ -11,25 +14,27 @@ https://rufus.ie/ja/
 
 ## ディスプレイ設定
 
-設定 → ディスプレイ → 解像度とリフレッシュレートを最適な値に設定する。
+1. デスクトップで右クリック → ディスプレイ設定
+2. ディスプレイの解像度を最適な値に変更
+3. ディスプレイの詳細設定 → リフレッシュレートの選択を最適な値に変更
 
 ## 手動インストール
 
 wingetで取得できないドライバ・ソフトウェアを手動でインストールする。
 
-**Nvidia App**
+Nvidia App
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
 
-**Nvidia Broadcast**
+Nvidia Broadcast
 
 https://www.nvidia.com/ja-jp/geforce/broadcasting/broadcast-app/
 
-**MOTU M Series**
+MOTU M Series
 
 https://motu.com/en-us/download/product/408/#3110
 
-**Aqua Voice**
+Aqua Voice
 
 https://aquavoice.com/download
 
@@ -144,7 +149,6 @@ $packageIds = @(
     # ゲーム
     'Valve.Steam'
     'EpicGames.EpicGamesLauncher'
-    'PlayStation.PlayStationAccessories'
 
     # ビデオ
     'MPC-BE.MPC-BE'
@@ -190,4 +194,8 @@ Set-ItemProperty -Path $mouse -Name MouseSpeed      -Value '0'
 Set-ItemProperty -Path $mouse -Name MouseThreshold1 -Value '0'
 Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 ```
+
+## PowerToys — キーリマップ
+
+PowerToys → Keyboard Manager → キーの再マップ で Caps Lock を別のキーに割り当てる。
 
