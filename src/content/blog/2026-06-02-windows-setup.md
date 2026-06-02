@@ -343,6 +343,6 @@ gh auth login
 ## Claude Code
 
 ```powershell
-npm install -g @anthropic-ai/claude-code
+irm https://claude.ai/install.ps1 | iex
 ```
 
