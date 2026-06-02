@@ -3,9 +3,7 @@ title: '個人的Windows11セットアップ'
 pubDate: '2026-06-02'
 ---
 
-内容を理解した上で実行してね。
-
-操作を誤るとパソコンが爆発します。
+内容を理解した上で実行してね。操作を誤るとパソコンが爆発します。
 
 ## windows11をインストール
 
@@ -35,9 +33,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
 pause
 ```
 
-以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。
-
-wingetでソフトウェアをまとめてインストールする。
+以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
 
 ```powershell
 $packageIds = @(
@@ -75,9 +71,7 @@ foreach ($packageId in $packageIds) {
 }
 ```
 
-以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。
-
-電源・マウスの初期設定を行う。
+以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。電源・マウスの初期設定を行う。
 
 ```powershell
 # 管理者権限の昇格
@@ -102,14 +96,9 @@ Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 
 wingetで取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
 
-
-Nvidia App（GeForce Driver のインストールもここから行う）
+Nvidia App（GeForce Driver、Nvidia Broadcastのインストールもここから行う）
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
-
-Nvidia Broadcast
-
-https://www.nvidia.com/ja-jp/geforce/broadcasting/broadcast-app/
 
 MOTU M Series
 
@@ -121,9 +110,7 @@ https://aquavoice.com/download
 
 ## 一括でソフトのアンインストールと設定変更
 
-レジストリの編集やソフトのアンインストールを行う。
-
-スクリプトを作ってもよかったけどWindowsの仕様変更についていくのが面倒なので更新頻度が高く保守されているツールを使うのがよさげ。
+レジストリの編集やソフトのアンインストールを行う。スクリプトを作ってもよかったけどWindowsの仕様変更についていくのが面倒なのでオープンソースで保守されているツールを使うのがよさそう。
 
 https://github.com/Raphire/Win11Debloat
 
@@ -132,8 +119,6 @@ PowerShellで以下のワンライナーを実行。
 ```powershell
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
 ```
-
-起動後の操作:
 
 1. 右上の ≡ をクリック → Import config
 2. 以下の内容をJSONファイルとして保存したものを読み込む
@@ -366,10 +351,8 @@ irm https://claude.ai/install.ps1 | iex
 
 ## Caps Lockを消す
 
-ゲーム中滅茶苦茶いい位置にいる割に邪魔しかしないCaps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。
-
-Ctrlとかグレ投げる用にGキーとか設定しがち。
+Caps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。CtrlとかGキーとか設定しがち。
 
 ## スタートアップの整理
 
-タスクマネージャーから不要なアプリを無効化。
+不要なソフトを無効化。
