@@ -12,9 +12,10 @@ Rufusでブートメディアを作成してWindowsをクリーンインスト�
 
 https://rufus.ie/ja/
 
-![Rufusのセットアップ画面](./setup.png)
-
-「Windows ユーザーエクスペリエンス」でローカルアカウントのみを選択するとMicrosoftアカウントなしでセットアップできる。
+<figure>
+  <img src="./setup.png" alt="Rufusのセットアップ画面">
+  <figcaption>「Windows ユーザーエクスペリエンス」でローカルアカウントのみを選択するとMicrosoftアカウントなしでセットアップできる。</figcaption>
+</figure>
 
 ## ディスプレイ設定
 
