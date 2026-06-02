@@ -4,11 +4,12 @@ pubDate: '2026-06-02'
 ---
 
 内容を理解した上で実行してね。
+
 操作を誤るとパソコンが爆発します。
 
 ## インストール
 
-Rufusでブートメディアを作成してWindowsをクリーンインストールする。
+Rufusでブートメディアを作成してWindows11をインストール。
 
 https://rufus.ie/ja/
 
@@ -16,14 +17,11 @@ https://rufus.ie/ja/
 
 ## ディスプレイ設定
 
-1. デスクトップで右クリック → ディスプレイ設定
-   - 解像度を推奨値に変更
-   - 拡大縮小を適切な値に変更
-   - ディスプレイの詳細設定 → リフレッシュレートを最高値に変更
+解像度、拡大縮小、リフレッシュレートを変更。
 
 ## Windows Update
 
-設定 → Windows Update → 更新プログラムの確認 → 再起動を繰り返し、残った更新がなくなるまで当てる。
+更新がなくなるまで当てる。
 
 ## スクリプト実行
 
@@ -98,6 +96,7 @@ Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 
 wingetで取得できないドライバ・ソフトウェアを手動でインストールする。
 
+
 Nvidia App（GeForce Driver のインストールもここから行う）
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
@@ -116,9 +115,9 @@ https://aquavoice.com/download
 
 ## Win11Debloat
 
-管理者権限でPowerShellを起動し、以下のワンライナーを実行する。
-
 https://github.com/Raphire/Win11Debloat
+
+PowerShellで以下のワンライナーを実行する。
 
 ```powershell
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
@@ -327,14 +326,6 @@ https://github.com/Raphire/Win11Debloat
 }
 ```
 
-## PowerToys — キーリマップ
-
-PowerToys → Keyboard Manager → キーの再マップ で Caps Lock を別のキーに割り当てる。
-
-## スタートアップの整理
-
-タスクマネージャー → スタートアップ タブ → 不要なアプリを右クリックして無効化する。
-
 ## Git
 
 ```powershell
@@ -349,7 +340,7 @@ git config --global core.autocrlf true
 gh auth login
 ```
 
-対話に従い、SSH で認証する。
+色々出るけどEnter連打する。
 
 ## Claude Code
 
@@ -357,8 +348,10 @@ gh auth login
 irm https://claude.ai/install.ps1 | iex
 ```
 
-インストール後、パスを通す。
+## PowerToys — キーリマップ
 
-```powershell
-[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";$($env:USERPROFILE)\.local\bin", "User")
-```
+PowerToys → Keyboard Manager → キーの再マップ で Caps Lock を別のキーに割り当てる。
+
+## スタートアップの整理
+
+タスクマネージャー → スタートアップ タブ → 不要なアプリを右クリックして無効化する。
