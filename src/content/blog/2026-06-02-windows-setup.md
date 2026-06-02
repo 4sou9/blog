@@ -1,5 +1,5 @@
 ---
-title: '個人的Windowsセットアップ'
+title: '個人的Windows 11セットアップ'
 pubDate: '2026-06-02'
 ---
 
@@ -12,17 +12,21 @@ Rufusでブートメディアを作成してWindowsをクリーンインスト�
 
 https://rufus.ie/ja/
 
+## Windows Update
+
+設定 → Windows Update → 更新プログラムの確認 → 再起動を繰り返し、残った更新がなくなるまで当てる。
+
 ## ディスプレイ設定
 
 1. デスクトップで右クリック → ディスプレイ設定
-2. ディスプレイの解像度を最適な値に変更
-3. ディスプレイの詳細設定 → リフレッシュレートの選択を最適な値に変更
+   - 解像度を推奨値に変更
+   - ディスプレイの詳細設定 → リフレッシュレートを最高値に変更
 
 ## 手動インストール
 
 wingetで取得できないドライバ・ソフトウェアを手動でインストールする。
 
-Nvidia App
+Nvidia App（GeForce Driver のインストールもここから行う）
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
 
@@ -198,4 +202,30 @@ Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 ## PowerToys — キーリマップ
 
 PowerToys → Keyboard Manager → キーの再マップ で Caps Lock を別のキーに割り当てる。
+
+## スタートアップの整理
+
+タスクマネージャー → スタートアップ タブ → 不要なアプリを右クリックして無効化する。
+
+## Git
+
+```powershell
+git config --global user.name "名前"
+git config --global user.email "メールアドレス"
+git config --global core.autocrlf true
+```
+
+## GitHub CLI
+
+```powershell
+gh auth login
+```
+
+対話に従い、SSH で認証する。
+
+## Claude Code
+
+```powershell
+npm install -g @anthropic-ai/claude-code
+```
 
