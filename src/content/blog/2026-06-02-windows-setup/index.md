@@ -1,5 +1,5 @@
 ---
-title: '個人的Windows 11セットアップ'
+title: '個人的Windows11セットアップ'
 pubDate: '2026-06-02'
 ---
 
@@ -7,13 +7,13 @@ pubDate: '2026-06-02'
 
 操作を誤るとパソコンが爆発します。
 
-## インストール
+## windows11をインストール
 
-Rufusでブートメディアを作成してWindows11をインストール。
+Rufusでブートメディアを作成してインストール。
 
 https://rufus.ie/ja/
 
-![Rufusのセットアップ画面](./setup.png "「Windows ユーザーエクスペリエンス」でローカルアカウントのみを選択するとMicrosoftアカウントなしでセットアップできる。")
+![Rufusのセットアップ画面](./setup.png "ローカルアカウントの作成やBitLockerを無効にカスタムできて便利。")
 
 ## ディスプレイ設定
 
@@ -23,9 +23,11 @@ https://rufus.ie/ja/
 
 更新がなくなるまで当てる。
 
-## スクリプト実行
+## ソフトウェアのインストールと設定
 
-以下の内容を `run.bat` として保存する。PS1ファイルをこのbatにドラッグ＆ドロップすると、管理者権限で実行できる。
+以下の内容を `run.bat` として保存。
+
+PS1ファイルをこのbatにドラッグ＆ドロップすると、管理者権限で実行できる。
 
 ```bat
 @echo off
@@ -33,7 +35,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
 pause
 ```
 
-以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
+以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。
+
+wingetでソフトウェアをまとめてインストールする。
 
 ```powershell
 $packageIds = @(
@@ -71,7 +75,9 @@ foreach ($packageId in $packageIds) {
 }
 ```
 
-以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。電源・マウスの初期設定を行う（スクリプト内で管理者権限に自動昇格する）。
+以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。
+
+電源・マウスの初期設定を行う。
 
 ```powershell
 # 管理者権限の昇格
@@ -94,7 +100,7 @@ Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 
 ## 手動インストール
 
-wingetで取得できないドライバ・ソフトウェアを手動でインストールする。
+wingetで取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
 
 
 Nvidia App（GeForce Driver のインストールもここから行う）
@@ -113,11 +119,15 @@ Aqua Voice
 
 https://aquavoice.com/download
 
-## Win11Debloat
+## 一括でソフトのアンインストールと設定変更
+
+レジストリの編集やソフトのアンインストールを行う。
+
+スクリプトを作ってもよかったけどWindowsの仕様変更についていくのが面倒なので更新頻度が高く保守されているツールを使うのがよさげ。
 
 https://github.com/Raphire/Win11Debloat
 
-PowerShellで以下のワンライナーを実行する。
+PowerShellで以下のワンライナーを実行。
 
 ```powershell
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
@@ -348,10 +358,18 @@ gh auth login
 irm https://claude.ai/install.ps1 | iex
 ```
 
-## PowerToys — キーリマップ
+パスを通す
 
-PowerToys → Keyboard Manager → キーの再マップ で Caps Lock を別のキーに割り当てる。
+```powershell
+[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";" + (Join-Path $HOME ".local\bin"), "User")
+```
+
+## Caps Lockを消す
+
+ゲーム中滅茶苦茶いい位置にいる割に邪魔しかしないCaps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。
+
+Ctrlとかグレ投げる用にGキーとか設定しがち。
 
 ## スタートアップの整理
 
-タスクマネージャー → スタートアップ タブ → 不要なアプリを右クリックして無効化する。
+タスクマネージャーから不要なアプリを無効化。
