@@ -72,7 +72,7 @@ export const GET: APIRoute = async ({ props }) => {
     },
     {
       width: 1200,
-      height: 1200,
+      height: 630,
       fonts: [{ name: 'Noto Sans JP', data: fontData, weight: 700, style: 'normal' }],
     }
   );
