@@ -20,6 +20,7 @@ const ogImage = slug
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
     <meta name="description" content={pageDescription} />
+    <style>html{background:#1a1a1a}</style>
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
     <meta property="og:url" content={Astro.url} />
@@ -43,6 +44,7 @@ const ogImage = slug
           label.className = 'code-lang';
           label.textContent = lang;
           wrapper.appendChild(label);
+          pre.style.paddingTop = '2rem';
         }
 
         const btn = document.createElement('button');
