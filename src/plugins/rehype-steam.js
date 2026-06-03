@@ -27,7 +27,6 @@ export default function rehypeSteam() {
         },
         children: [],
       };
-      console.log('[rehype-steam] properties:', JSON.stringify(iframe.properties));
       parent.children[index] = iframe;
     });
   };
