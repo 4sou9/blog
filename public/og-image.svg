@@ -1,5 +1,19 @@
-<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="630" fill="#1a1a0e"/>
-  <text x="80" y="300" font-family="system-ui, sans-serif" font-size="88" font-weight="600" fill="#f4f5f7">ねこのメモ</text>
-  <text x="84" y="380" font-family="system-ui, sans-serif" font-size="36" fill="#aab2bd">備忘録です</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1200 630">
+  <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #f6e200;
+      }
+
+      .st1 {
+        fill: #1a1a1a;
+      }
+    </style>
+  </defs>
+  <rect class="st1" width="1200" height="630"/>
+  <path class="st0" d="M600,11.37l353.9,612.95H246.1L600,11.37M600,0L236.27,630h727.47L600,0h0Z"/>
+  <path class="st0" d="M600,117.36l262.97,455.46H337.03L600,117.36M600,105.99l-272.8,472.51h545.6L600,105.99h0Z"/>
+  <path class="st0" d="M600,221.37l172.04,297.98h-344.07l172.04-297.98M600,210l-181.87,315.03h363.73l-181.87-315.03h0Z"/>
 </svg>

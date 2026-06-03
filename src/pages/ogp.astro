@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+
+const base = import.meta.env.BASE_URL;
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.unlisted)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OGP Preview</title>
+    <style>
+      body { background: #111; color: #ccc; font-family: sans-serif; padding: 2rem; margin: 0; }
+      h1 { font-size: 1.2rem; margin-bottom: 1.5rem; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+      .card a { display: block; text-decoration: none; color: inherit; }
+      .card img { width: 100%; aspect-ratio: 1200/630; display: block; border-radius: 6px; }
+      .card .title { font-size: 0.8rem; margin-top: 0.4rem; opacity: 0.7; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    </style>
+  </head>
+  <body>
+    <h1>OGP Preview</h1>
+    <div class="grid">
+      <div class="card">
+        <a href={`${base}/og-image.svg`} target="_blank">
+          <img src={`${base}/og-image.svg`} alt="サイトトップ" />
+          <div class="title">サイトトップ</div>
+        </a>
+      </div>
+      {posts.map((post) => (
+        <div class="card">
+          <a href={`${base}/og/${post.id}.png`} target="_blank">
+            <img src={`${base}/og/${post.id}.png`} alt={post.data.title} loading="lazy" />
+            <div class="title">{post.data.title}</div>
+          </a>
+        </div>
+      ))}
+    </div>
+  </body>
+</html>
