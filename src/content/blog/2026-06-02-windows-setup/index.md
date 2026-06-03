@@ -33,7 +33,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
 pause
 ```
 
-以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
+コメント部分に日本語があると文字化けするため、エンコードはANSIで以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
 
 ```powershell
 $packageIds = @(
@@ -92,6 +92,8 @@ Set-ItemProperty -Path $mouse -Name MouseThreshold1 -Value '0'
 Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
 ```
 
+生でコンソールにぶち込んでもいいけどファイルと残しておくとアップデートが楽。
+
 ## 手動インストール
 
 wingetで取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
@@ -114,11 +116,13 @@ https://motu.com/en-us/download/product/408/#3110
 
 https://github.com/Raphire/Win11Debloat
 
-PowerShellで以下のワンライナーを実行。
+以下のワンライナーを実行。
 
 ```powershell
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
 ```
+
+GUIが立ち上がるので操作を行う。
 
 1. 右上の ≡ をクリック → Import config
 2. 以下の内容をJSONファイルとして保存したものを読み込む
@@ -334,8 +338,6 @@ git config --global core.autocrlf true
 ```powershell
 gh auth login
 ```
-
-色々出るけどEnter連打する。
 
 ## Claude Code
 
