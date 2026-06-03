@@ -2,6 +2,22 @@
 
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
+
+function watchPlugins() {
+	return {
+		name: 'watch-plugins',
+		hooks: {
+			'astro:server:setup': ({ server }) => {
+				server.watcher.add('src/plugins/**/*.js');
+				server.watcher.on('change', (file) => {
+					if (file.includes('src/plugins')) {
+						server.restart();
+					}
+				});
+			},
+		},
+	};
+}
 import rehypeBtn from './src/plugins/rehype-btn.js';
 import rehypeFigure from './src/plugins/rehype-figure.js';
 import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
@@ -13,7 +29,7 @@ import { remarkExcerpt } from './src/plugins/remark-excerpt.js';
 export default defineConfig({
 	site: 'https://4sou9.github.io',
 	base: '/blog',
-	integrations: [sitemap()],
+	integrations: [sitemap(), watchPlugins()],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
 		remarkPlugins: [remarkExcerpt, rehypeBtn],

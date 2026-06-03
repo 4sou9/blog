@@ -14,7 +14,7 @@ const autoDescription = post.data.description ?? remarkPluginFrontmatter.excerpt
 const fmt = (d) =>
   `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 ---
-<Base title={post.data.title} description={autoDescription}>
+<Base title={post.data.title} description={autoDescription} slug={post.id}>
   <article class="prose">
     <div class="post-date">{fmt(post.data.pubDate)}</div>
     <h1>{post.data.title}</h1>
