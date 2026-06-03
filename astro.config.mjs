@@ -12,7 +12,9 @@ function getUnlistedSlugs() {
     if (!entry.name.endsWith('.md')) continue;
     const filePath = join(entry.parentPath ?? entry.path, entry.name);
     const content = readFileSync(filePath, 'utf-8');
-    if (!content.includes('unlisted: true')) continue;
+    const fmEnd = content.indexOf('---', 3);
+    const fm = fmEnd === -1 ? content : content.slice(0, fmEnd);
+    if (!fm.includes('unlisted: true')) continue;
     const rel = filePath.replace(dir + '\\', '').replace(dir + '/', '');
     const slug = rel.replace(/[\\/]index\.md$/, '').replace(/\.md$/, '');
     slugs.push(slug);
@@ -52,7 +54,7 @@ export default defineConfig({
 		sitemap({
 			filter: (page) =>
 				!unlistedSlugs.some((slug) => page.includes(`/blog/${slug}/`)) &&
-				!page.includes('/blog/ogp'),
+				!page.includes('/blog/ogp/'),
 		}),
 		watchPlugins(),
 	],

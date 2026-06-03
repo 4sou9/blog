@@ -12,6 +12,7 @@ const posts = (await getCollection('blog'))
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>OGP Preview</title>
+    <meta name="robots" content="noindex" />
     <style>
       body { background: #111; color: #ccc; font-family: sans-serif; padding: 2rem; margin: 0; }
       h1 { font-size: 1.2rem; margin-bottom: 1.5rem; }
@@ -33,7 +34,7 @@ const posts = (await getCollection('blog'))
       {posts.map((post) => (
         <div class="card">
           <a href={`${base}/og/${post.id}.png`} target="_blank">
-            <img src={`${base}/og/${post.id}.png`} alt={post.data.title} loading="lazy" />
+            <img src={`${base}/og/${post.id}.png`} alt={post.data.title} />
             <div class="title">{post.data.title}</div>
           </a>
         </div>
