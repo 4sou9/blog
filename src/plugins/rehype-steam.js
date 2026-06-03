@@ -14,11 +14,12 @@ export default function rehypeSteam() {
       if (!match) return;
 
       const appId = match[1];
-      parent.children[index] = {
+      const iframe = {
         type: 'element',
         tagName: 'iframe',
         properties: {
           src: `https://store.steampowered.com/widget/${appId}/`,
+          title: href,
           width: '100%',
           height: '190',
           style: 'border:none;margin:1rem 0;display:block;',
@@ -26,6 +27,8 @@ export default function rehypeSteam() {
         },
         children: [],
       };
+      console.log('[rehype-steam] properties:', JSON.stringify(iframe.properties));
+      parent.children[index] = iframe;
     });
   };
 }

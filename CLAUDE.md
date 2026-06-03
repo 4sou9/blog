@@ -21,8 +21,28 @@ Astro static blog ("ねこのメモ") deployed to GitHub Pages.
 **Rehype plugins** (`src/plugins/`)
 - `rehype-youtube.js` — YouTube URL → `<iframe>` embed
 - `rehype-twitter.js` — Twitter/X URL → embed widget
-- `rehype-ogp-card.js` — bare URL → OGP card (build time)
+- `rehype-steam.js` — Steam store URL → Steam widget `<iframe>`（高さ190px）
+- `rehype-ogp-card.js` — bare URL → OGP card (build time)。`steampowered.com` はスキップ済み
 
-Pattern: Markdown上で単独行の裸URL → `<p><a href=url>url</a></p>` を検知して変換。
+**埋め込みの書き方**: Markdown上で単独行の裸URL（リンクテキスト≠hrefだと変換されない）
+
+```
+# YouTube
+https://www.youtube.com/watch?v=VIDEO_ID
+
+# Twitter/X
+https://twitter.com/user/status/STATUS_ID
+
+# Steam ストアページ
+https://store.steampowered.com/app/APP_ID/
+
+# その他URL → OGPカード
+https://example.com/
+```
 
 **BASE_URL**: `import.meta.env.BASE_URL` = `/blog`（trailing slash なし）。常に `${base}/path` と書く。
+
+**ボタンリンク**: リンクタイトルに `"btn"` を指定するとボタン風スタイルになる（`rehype-btn.js`）。
+```
+[テキスト](https://example.com "btn")
+```
