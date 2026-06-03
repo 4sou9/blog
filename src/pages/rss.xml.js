@@ -15,7 +15,7 @@ export async function GET(context) {
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.pubDate,
-      description: post.data.description,
+      description: post.data.description ?? post.data.excerpt,
       link: new URL(`${base}${post.id}/`, context.site).href,
     })),
   });
