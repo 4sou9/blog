@@ -8,9 +8,9 @@ export async function getStaticPaths() {
 }
 
 const post = Astro.props;
-const { Content } = await render(post);
+const { Content, remarkPluginFrontmatter } = await render(post);
 
-const autoDescription = post.data.description ?? post.data.excerpt;
+const autoDescription = post.data.description ?? remarkPluginFrontmatter.excerpt;
 const fmt = (d) =>
   `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 ---
