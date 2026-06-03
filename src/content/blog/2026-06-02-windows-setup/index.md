@@ -100,17 +100,17 @@ Nvidia App（GeForce Driver、Nvidia Broadcastのインストールもここか�
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
 
-MOTU M Series
-
-https://motu.com/en-us/download/product/408/#3110
-
 Aqua Voice
 
 https://aquavoice.com/download
 
+MOTU M Series
+
+https://motu.com/en-us/download/product/408/#3110
+
 ## ソフトのアンインストールと設定変更
 
-レジストリの編集やソフトのアンインストールを行う。スクリプトを作っても良いがWindowsの仕様変更についていくのが面倒なのでオープンソースで長期に渡り保守されているツールを使うのがよさげ。
+レジストリの編集やソフトのアンインストールを行う。Windowsの仕様変更についていくのが面倒なので、オープンソースで長期間保守されているツールを使うのがよさげ。
 
 https://github.com/Raphire/Win11Debloat
 

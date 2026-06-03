@@ -58,8 +58,11 @@ function makeCard(href, ogp) {
     children: [
       ...(ogp.image ? [{
         type: 'element',
-        tagName: 'img',
-        properties: { src: ogp.image, alt: '', className: ['ogp-image'], width: 160, height: 84, loading: 'lazy' },
+        tagName: 'div',
+        properties: {
+          className: ['ogp-image'],
+          style: `background-image:url(${ogp.image})`,
+        },
         children: [],
       }] : []),
       {

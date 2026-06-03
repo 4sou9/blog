@@ -1,5 +1,5 @@
 ---
-title: 'NekoNyanSoft ストアページ＆パッチ一覧'
+title: 'NekoNyanSoft R18パッチ'
 pubDate: '2026-06-03'
 ---
 
