@@ -23,6 +23,7 @@ export default function rehypeYoutube() {
         tagName: 'iframe',
         properties: {
           src: `https://www.youtube.com/embed/${id}`,
+          title: href,
           width: '100%',
           style: 'aspect-ratio:16/9;border:none;margin:1rem 0;display:block;',
           allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
