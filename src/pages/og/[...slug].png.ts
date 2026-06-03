@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ props }) => {
                 textAlign: 'center',
                 wordBreak: 'break-word',
                 overflowWrap: 'break-word',
-                width: '100%',
+                maxWidth: 500,
               },
               children: title,
             },
