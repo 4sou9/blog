@@ -40,6 +40,8 @@ https://store.steampowered.com/app/APP_ID/
 https://example.com/
 ```
 
+**キャッシュ削除**: dev環境と本番で動作が異なる場合は `.astro` と `node_modules/.vite` を削除して再起動。プラグイン変更はdev serverの再起動が必要（`watchPlugins`が自動再起動するが効かない場合も）。
+
 **BASE_URL**: `import.meta.env.BASE_URL` = `/blog`（trailing slash なし）。常に `${base}/path` と書く。
 
 **ボタンリンク**: リンクタイトルに `"btn"` を指定するとボタン風スタイルになる（`rehype-btn.js`）。

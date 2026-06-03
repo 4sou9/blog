@@ -10,7 +10,7 @@ function watchPlugins() {
 			'astro:server:setup': ({ server }) => {
 				server.watcher.add('src/plugins/**/*.js');
 				server.watcher.on('change', (file) => {
-					if (file.includes('src/plugins')) {
+					if (file.replace(/\\/g, '/').includes('src/plugins')) {
 						server.restart();
 					}
 				});

@@ -22,4 +22,20 @@ https://astro.build/
 
 ## ボタンリンク
 
-[ダウンロード](https://cdn.nekonyansoft.com/patch/aokana/aokana_perfectedition+r18_patch.zip "btn")
+[ダウンロード](https://4sou9.github.io/blog/ "btn")
+
+## blog
+
+https://4sou9.github.io/blog/
+
+https://4sou9.github.io/blog/sandbox/
+
+https://4sou9.github.io/blog/memo/
+
+https://4sou9.github.io/blog/2026-06-03-nekonyan-patches/
+
+https://4sou9.github.io/blog/2026-06-02-windows-setup/
+
+https://4sou9.github.io/blog/2026-06-01-e/
+
+https://4sou9.github.io/blog/2026-05-08-subscriptions/
