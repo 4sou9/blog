@@ -108,9 +108,9 @@ Aqua Voice
 
 https://aquavoice.com/download
 
-## 一括でソフトのアンインストールと設定変更
+## ソフトのアンインストールと設定変更
 
-レジストリの編集やソフトのアンインストールを行う。スクリプトを作ってもよかったけどWindowsの仕様変更についていくのが面倒なのでオープンソースで保守されているツールを使うのがよさそう。
+レジストリの編集やソフトのアンインストールを行う。スクリプトを作っても良いがWindowsの仕様変更についていくのが面倒なのでオープンソースで長期に渡り保守されているツールを使うのがよさげ。
 
 https://github.com/Raphire/Win11Debloat
 
@@ -351,7 +351,7 @@ irm https://claude.ai/install.ps1 | iex
 
 ## Caps Lockを消す
 
-Caps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。CtrlとかGキーとか設定しがち。
+Caps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。
 
 ## スタートアップの整理
 
