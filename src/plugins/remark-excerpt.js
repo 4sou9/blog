@@ -5,6 +5,19 @@ function nodeText(node) {
   return '';
 }
 
+export function textExcerpt(body = '', max = 120) {
+  const text = body
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('```') && !l.startsWith('!') && !l.startsWith('http') && !l.startsWith('---'))
+    .map(l => l.startsWith('#')
+      ? l.replace(/^#+\s*/, '')
+      : l.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_`~]/g, ''))
+    .filter(l => l.length > 1)
+    .join(' ');
+  return text.slice(0, max).trim() || undefined;
+}
+
 export function remarkExcerpt() {
   return (tree, file) => {
     const parts = [];

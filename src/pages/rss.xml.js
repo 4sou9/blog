@@ -1,18 +1,6 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
-
-function extractExcerpt(body = '', max = 120) {
-  const text = body
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('```') && !l.startsWith('!') && !l.startsWith('http') && !l.startsWith('---'))
-    .map(l => l.startsWith('#')
-      ? l.replace(/^#+\s*/, '')
-      : l.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_`~]/g, ''))
-    .filter(l => l.length > 1)
-    .join(' ');
-  return text.slice(0, max).trim() || undefined;
-}
+import { textExcerpt } from '../plugins/remark-excerpt.js';
 
 export async function GET(context) {
   const posts = (await getCollection('blog'))
@@ -28,7 +16,7 @@ export async function GET(context) {
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.pubDate,
-      description: post.data.description ?? extractExcerpt(post.body),
+      description: post.data.description ?? textExcerpt(post.body),
       link: new URL(`${base}${post.id}/`, context.site).href,
     })),
   });

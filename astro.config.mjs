@@ -39,7 +39,7 @@ function watchPlugins() {
 		},
 	};
 }
-import rehypeBtn from './src/plugins/rehype-btn.js';
+import remarkBtn from './src/plugins/remark-btn.js';
 import rehypeFigure from './src/plugins/rehype-figure.js';
 import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
 import rehypeSteam from './src/plugins/rehype-steam.js';
@@ -60,7 +60,7 @@ export default defineConfig({
 	],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
-		remarkPlugins: [remarkExcerpt, rehypeBtn],
+		remarkPlugins: [remarkExcerpt, remarkBtn],
 		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeSteam, rehypeOgpCard, rehypeFigure],
 	},
 });

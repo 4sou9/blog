@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { textExcerpt } from '../plugins/remark-excerpt.js';
 
 const base = import.meta.env.BASE_URL;
 const posts = (await getCollection('blog'))
@@ -20,6 +21,7 @@ const posts = (await getCollection('blog'))
       .card a { display: block; text-decoration: none; color: inherit; }
       .card img { width: 100%; aspect-ratio: 1200/630; display: block; border-radius: 6px; }
       .card .title { font-size: 0.8rem; margin-top: 0.4rem; opacity: 0.7; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .card .desc { font-size: 0.75rem; margin-top: 0.2rem; opacity: 0.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     </style>
   </head>
   <body>
@@ -29,16 +31,21 @@ const posts = (await getCollection('blog'))
         <a href={`${base}/og-image.svg`} target="_blank">
           <img src={`${base}/og-image.svg`} alt="サイトトップ" />
           <div class="title">サイトトップ</div>
+          <div class="desc">備忘録です</div>
         </a>
       </div>
-      {posts.map((post) => (
-        <div class="card">
-          <a href={`${base}/og/${post.id}.png`} target="_blank">
-            <img src={`${base}/og/${post.id}.png`} alt={post.data.title} />
-            <div class="title">{post.data.title}</div>
-          </a>
-        </div>
-      ))}
+      {posts.map((post) => {
+        const desc = post.data.description ?? textExcerpt(post.body);
+        return (
+          <div class="card">
+            <a href={`${base}/og/${post.id}.png`} target="_blank">
+              <img src={`${base}/og/${post.id}.png`} alt={post.data.title} />
+              <div class="title">{post.data.title}</div>
+              {desc && <div class="desc">{desc}</div>}
+            </a>
+          </div>
+        );
+      })}
     </div>
   </body>
 </html>
