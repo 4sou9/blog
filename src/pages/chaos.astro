@@ -1,0 +1,361 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>?</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #000;
+      cursor: crosshair;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.45;
+    }
+
+    #scanlines {
+      position: fixed; inset: 0; z-index: 1;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+    }
+
+    #vignette {
+      position: fixed; inset: 0; z-index: 1;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.85) 100%);
+      pointer-events: none;
+    }
+
+    /* ---- fragments ---- */
+    .frag {
+      position: fixed;
+      font-family: monospace;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+      line-height: 1.4;
+      white-space: pre;
+    }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(var(--dx1), var(--dy1)); }
+      50%  { transform: translate(var(--dx2), var(--dy2)); }
+      75%  { transform: translate(var(--dx1), 0); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: var(--op); }
+      48%, 52% { opacity: calc(var(--op) * 0.15); }
+    }
+
+    @keyframes flicker2 {
+      0%, 100% { opacity: var(--op); }
+      20%, 22% { opacity: 0; }
+      60%, 63% { opacity: calc(var(--op) * 0.5); }
+    }
+
+    /* ---- core ---- */
+    #core {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      font-family: monospace;
+      font-size: clamp(4rem, 14vw, 11rem);
+      color: #e8e8e8;
+      line-height: 1;
+      text-align: center;
+      cursor: pointer;
+      transition: color 0.1s;
+      mix-blend-mode: difference;
+    }
+
+    @keyframes core-glitch {
+      0%, 90%  { clip-path: none; transform: translate(-50%, -50%); }
+      91%      { clip-path: polygon(0 0, 100% 0, 100% 30%, 0 30%);
+                 transform: translate(calc(-50% - 4px), -50%); color: #ff0033; }
+      92%      { clip-path: polygon(0 40%, 100% 40%, 100% 70%, 0 70%);
+                 transform: translate(calc(-50% + 4px), -50%); color: #00ff41; }
+      93%      { clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+                 transform: translate(calc(-50% - 2px), calc(-50% + 2px)); }
+      94%, 100%{ clip-path: none; transform: translate(-50%, -50%); color: #e8e8e8; }
+    }
+
+    #core { animation: core-glitch 5s infinite; }
+
+    /* ---- trail ---- */
+    .trail {
+      position: fixed;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 20;
+      animation: trail-out 0.9s forwards;
+    }
+    @keyframes trail-out {
+      to { opacity: 0; transform: scale(0); }
+    }
+
+    /* ---- burst ---- */
+    .burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 20;
+      font-family: monospace;
+      font-size: 0.75rem;
+      animation: burst-out 0.9s forwards;
+    }
+    @keyframes burst-out {
+      to { opacity: 0; transform: translate(var(--tx), var(--ty)); }
+    }
+
+    /* ---- secret message ---- */
+    #secret {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #1a1a1a;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 4s;
+      white-space: nowrap;
+    }
+
+    /* ---- nav ---- */
+    #nav {
+      position: fixed;
+      bottom: 1.2rem; right: 1.5rem;
+      z-index: 30;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: #111;
+      text-decoration: none;
+      transition: color 0.4s;
+    }
+    #nav:hover { color: #444; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="scanlines"></div>
+  <div id="vignette"></div>
+
+  <div id="core">ノイズ</div>
+  <div id="secret"></div>
+
+  <!-- scattered fragments -->
+  <div class="frag" data-x="7"  data-y="8"  data-color="#1c3a1c" data-size="0.75">404</div>
+  <div class="frag" data-x="78" data-y="6"  data-color="#00ff41" data-size="0.7" >接続中...</div>
+  <div class="frag" data-x="4"  data-y="78" data-color="#1c3a1c" data-size="0.8" >エラー</div>
+  <div class="frag" data-x="82" data-y="82" data-color="#ff0033" data-size="0.65">SIGNAL LOST</div>
+  <div class="frag" data-x="46" data-y="12" data-color="#2a2a2a" data-size="0.65">35.6762° N&#10;139.6503° E</div>
+  <div class="frag" data-x="18" data-y="42" data-color="#1c3a1c" data-size="0.75">0xDEAD</div>
+  <div class="frag" data-x="68" data-y="28" data-color="#00ff41" data-size="1.1" >▓▒░</div>
+  <div class="frag" data-x="12" data-y="62" data-color="#1c3a1c" data-size="0.7" >データが&#10;失われました</div>
+  <div class="frag" data-x="72" data-y="58" data-color="#ff0033" data-size="0.65">[REDACTED]</div>
+  <div class="frag" data-x="38" data-y="78" data-color="#222"    data-size="0.8" >null</div>
+  <div class="frag" data-x="88" data-y="36" data-color="#1c3a1c" data-size="0.7" >■■□□■</div>
+  <div class="frag" data-x="3"  data-y="30" data-color="#00ff41" data-size="0.65">...</div>
+  <div class="frag" data-x="56" data-y="88" data-color="#1c3a1c" data-size="0.75">未定義</div>
+  <div class="frag" data-x="28" data-y="16" data-color="#ff0033" data-size="0.65">WARNING</div>
+  <div class="frag" data-x="84" data-y="72" data-color="#1c3a1c" data-size="0.7" >010110&#10;110100</div>
+  <div class="frag" data-x="50" data-y="5"  data-color="#222"    data-size="0.65">_</div>
+  <div class="frag" data-x="92" data-y="18" data-color="#1c3a1c" data-size="0.7" >///</div>
+  <div class="frag" data-x="22" data-y="90" data-color="#ff0033" data-size="0.65">OVERFLOW</div>
+  <div class="frag" data-x="60" data-y="45" data-color="#1a2a1a" data-size="0.7" >0000 0000&#10;1111 0101</div>
+  <div class="frag" data-x="8"  data-y="50" data-color="#00ff41" data-size="0.65">???</div>
+
+  <a href={base} id="nav">←</a>
+
+  <script>
+    // ---------- canvas rain ----------
+    const canvas = document.getElementById('c');
+    const ctx    = canvas.getContext('2d');
+    let W, H, cols, drops;
+
+    const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789@#¥$%&*[]{}|<>?!~';
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      cols  = Math.floor(W / 16);
+      drops = Array.from({ length: cols }, () => Math.random() * -80);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function rain() {
+      ctx.fillStyle = 'rgba(0,0,0,0.055)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.font = '14px monospace';
+
+      for (let i = 0; i < cols; i++) {
+        const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+        const x  = i * 16;
+        const y  = drops[i] * 16;
+        const r  = Math.random();
+
+        ctx.fillStyle = r < 0.015 ? '#ffffff'
+                      : r < 0.04  ? '#ff0033'
+                      : r < 0.15  ? '#00ff41'
+                      :              '#003300';
+        ctx.fillText(ch, x, y);
+
+        if (y > H && Math.random() > 0.972) drops[i] = 0;
+        drops[i] += 0.4 + Math.random() * 0.6;
+      }
+      requestAnimationFrame(rain);
+    }
+    rain();
+
+    // ---------- scatter fragments ----------
+    const frags = document.querySelectorAll('.frag');
+    frags.forEach((el) => {
+      const x    = parseFloat(el.dataset.x);
+      const y    = parseFloat(el.dataset.y);
+      const col  = el.dataset.color;
+      const size = parseFloat(el.dataset.size);
+
+      el.style.left     = x + 'vw';
+      el.style.top      = y + 'vh';
+      el.style.color    = col;
+      el.style.fontSize = size + 'rem';
+
+      const dx1 = (Math.random() - 0.5) * 50 + 'px';
+      const dy1 = (Math.random() - 0.5) * 35 + 'px';
+      const dx2 = (Math.random() - 0.5) * 70 + 'px';
+      const dy2 = (Math.random() - 0.5) * 50 + 'px';
+      const op  = (0.25 + Math.random() * 0.55).toFixed(2);
+
+      el.style.setProperty('--dx1', dx1);
+      el.style.setProperty('--dy1', dy1);
+      el.style.setProperty('--dx2', dx2);
+      el.style.setProperty('--dy2', dy2);
+      el.style.setProperty('--op', op);
+
+      const anim   = Math.random() < 0.5 ? 'flicker' : 'flicker2';
+      const dDrift = 12 + Math.random() * 22;
+      const dFlick = 2  + Math.random() * 5;
+      const delay  = -(Math.random() * 20);
+
+      el.style.animation = `drift ${dDrift}s ${delay}s ease-in-out infinite, ${anim} ${dFlick}s ${Math.random() * 3}s ease-in-out infinite`;
+      el.style.opacity   = op;
+    });
+
+    // ---------- mouse trail ----------
+    let lastT = 0;
+    document.addEventListener('mousemove', (e) => {
+      const now = Date.now();
+      if (now - lastT < 40) return;
+      lastT = now;
+
+      const d   = document.createElement('div');
+      d.className = 'trail';
+      d.style.left       = (e.clientX - 1) + 'px';
+      d.style.top        = (e.clientY - 1) + 'px';
+      d.style.background = Math.random() < 0.2 ? '#ff0033' : '#00ff41';
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 900);
+    });
+
+    // ---------- core parallax ----------
+    document.addEventListener('mousemove', (e) => {
+      const cx = window.innerWidth  / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx * 18;
+      const dy = (e.clientY - cy) / cy * 12;
+      core.style.textShadow =
+        `${-dx}px ${-dy}px 0 rgba(255,0,51,0.6), ${dx}px ${dy}px 0 rgba(0,255,65,0.5)`;
+    });
+
+    // ---------- click burst + core react ----------
+    const core       = document.getElementById('core');
+    const coreWords  = ['ノイズ', 'エラー', '???', 'null', '░░░', '▓▓▓', '…', 'LOST', '崩壊', '∅'];
+    const burstPool  = '!@#$%アイウエオ01▓░'.split('');
+
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'nav') return;
+
+      for (let i = 0; i < 10; i++) {
+        const el    = document.createElement('div');
+        el.className = 'burst';
+        el.textContent = burstPool[Math.floor(Math.random() * burstPool.length)];
+        el.style.left  = e.clientX + 'px';
+        el.style.top   = e.clientY + 'px';
+
+        const angle = (i / 10) * Math.PI * 2;
+        const dist  = 35 + Math.random() * 55;
+        el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+        el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+        el.style.color = Math.random() < 0.3 ? '#ff0033' : '#00ff41';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+      }
+
+      const word = coreWords[Math.floor(Math.random() * coreWords.length)];
+      core.textContent = word;
+      setTimeout(() => { core.textContent = 'ノイズ'; },
+        2000 + Math.random() * 3000);
+    });
+
+    // ---------- random fragment flash ----------
+    setInterval(() => {
+      const el  = frags[Math.floor(Math.random() * frags.length)];
+      const was = el.style.color;
+      el.style.transition = 'none';
+      el.style.color      = '#fff';
+      el.style.opacity    = '1';
+      setTimeout(() => {
+        el.style.transition = 'color 1.2s, opacity 1.2s';
+        el.style.color      = was;
+        el.style.opacity    = el.style.getPropertyValue('--op');
+      }, 80 + Math.random() * 150);
+    }, 1200);
+
+    // ---------- 30s easter egg ----------
+    const secret = document.getElementById('secret');
+    const secrets = ['まだいるの', 'もう行って', 'ここには何もない', '…', 'エラー 0x0000'];
+    let secretIdx = 0;
+    function showSecret() {
+      secret.textContent = secrets[secretIdx++ % secrets.length];
+      secret.style.opacity = '1';
+      setTimeout(() => {
+        secret.style.opacity = '0';
+        setTimeout(showSecret, 20000 + Math.random() * 40000);
+      }, 4000);
+    }
+    setTimeout(showSecret, 30000);
+
+    // ---------- key reactions ----------
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.body.style.filter = 'invert(1)';
+        setTimeout(() => { document.body.style.filter = ''; }, 300);
+      }
+      if (e.key === ' ') {
+        core.textContent = coreWords[Math.floor(Math.random() * coreWords.length)];
+        setTimeout(() => { core.textContent = 'ノイズ'; }, 1500);
+      }
+    });
+  </script>
+</body>
+</html>
