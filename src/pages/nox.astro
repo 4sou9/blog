@@ -1,769 +1,686 @@
 ---
 const base = import.meta.env.BASE_URL;
+
+const brow  = (ns: number[]) => ns.map((n,i) => ({n, t:80, l:5+12*i, w:8,  layer:'sm', anim:'blink', delay:+(i*.35).toFixed(2)}));
+const lcol  = (ns: number[]) => ns.map((n,i) => ({n, t:6+14*i,    l:3,  w:8,  layer:'sm', anim:'blink', delay:+(i*.35).toFixed(2)}));
+const rcol  = (ns: number[]) => ns.map((n,i) => ({n, t:6+14*i,    l:90, w:8,  layer:'sm', anim:'blink', delay:+(i*.35).toFixed(2)}));
+const rclst = (ns: number[]) => ns.map((n,i) => ({n, t:i<3?70:82, l:62+10*(i%3), w:7, layer:'sm', anim:'blink', delay:[0,.4,.8,.2,.6,1.0][i]}));
+
+// Rooms 1–7 only — room 0 is custom monitor theme
+const rooms = [
+  { id:'r1', ac:'#0088ee', label:'01',
+    shapes:[ {n:10,t:5,l:32,w:38,layer:'hi',anim:'flick'}, {n:11,t:50,l:5,w:18,layer:'md',anim:'jump-r'}, {n:12,t:42,l:70,w:18,layer:'md',anim:'wink'}, ...rclst([13,14,15,16,17,18]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·01'},{t:8,l:74,txt:'144.220 MHz'},{t:88,l:5,txt:'SIGNAL ACQUIRED'},{t:46,l:34,txt:'≋≋≋≋≋',op:.14},{t:22,l:5,txt:'NOISE: −0.03 dB',op:.10},{t:60,l:38,txt:'0x7F / 0xFF',op:.10},{t:84,l:72,txt:'SOURCE: UNKNOWN',op:.08} ],
+    syms:[ {t:40,l:24,sz:22,sym:'g-arc',op:.18},{t:65,l:40,sz:18,sym:'g-orb',op:.12} ] },
+  { id:'r2', ac:'#00aa44', label:'02',
+    shapes:[ {n:19,t:5,l:35,w:38,layer:'hi',anim:'flick'}, {n:20,t:48,l:74,w:18,layer:'md',anim:'wink'}, {n:21,t:55,l:54,w:18,layer:'md',anim:'jump'}, ...lcol([22,23,24,25,26,27]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·02'},{t:7,l:74,txt:'ARCHIVE ACCESS GRANTED'},{t:91,l:14,txt:'128 RECORDS / INTEGRITY 94.7%'},{t:44,l:38,txt:'◈',op:.16},{t:28,l:74,txt:'0x4E7F',op:.10},{t:60,l:58,txt:'CHECKSUM: OK',op:.08} ],
+    syms:[ {t:38,l:70,sz:24,sym:'g-hex',op:.20},{t:68,l:60,sz:18,sym:'g-prx',op:.12} ] },
+  { id:'r3', ac:'#ee2233', label:'03',
+    shapes:[ {n:28,t:5,l:22,w:38,layer:'hi',anim:'flick-fast'}, {n:29,t:52,l:64,w:18,layer:'md',anim:'jump-r'}, {n:30,t:44,l:5,w:18,layer:'md',anim:'wink'}, ...brow([31,32,33,34,35,36]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·03'},{t:8,l:64,txt:'ANOMALY DETECTED — CAUTION'},{t:90,l:5,txt:'ERR: 0xDEAD — SECTOR.03'},{t:40,l:26,txt:'⚠',op:.22},{t:20,l:64,txt:'CRITICAL',op:.12},{t:62,l:42,txt:'PROTOCOL: VOID',op:.08} ],
+    syms:[ {t:42,l:48,sz:26,sym:'g-prx',op:.20},{t:70,l:40,sz:18,sym:'g-orb',op:.12} ] },
+  { id:'r4', ac:'#00bbcc', label:'04',
+    shapes:[ {n:37,t:5,l:40,w:38,layer:'hi',anim:'flick'}, {n:38,t:50,l:5,w:18,layer:'md',anim:'jump'}, {n:39,t:42,l:74,w:18,layer:'md',anim:'wink'}, ...rclst([40,41,42,43,44,45]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·04'},{t:8,l:80,txt:'8 NODES ACTIVE'},{t:90,l:5,txt:'LATENCY: 0.4ms / LOSS: 0.0%'},{t:44,l:42,txt:'⬡',op:.16},{t:58,l:38,txt:'DEPTH: ∞',op:.10} ],
+    syms:[ {t:38,l:28,sz:24,sym:'g-orb',op:.18},{t:65,l:50,sz:18,sym:'g-hex',op:.12} ] },
+  { id:'r5', ac:'#8822ff', label:'05',
+    shapes:[ {n:46,t:5,l:26,w:38,layer:'hi',anim:'flick'}, {n:47,t:50,l:68,w:18,layer:'md',anim:'jump-r'}, {n:48,t:58,l:46,w:18,layer:'md',anim:'wink'}, ...brow([49,50,51,52,53,54]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·05'},{t:8,l:68,txt:'ENCRYPTED — CLEARANCE REQUIRED'},{t:90,l:5,txt:'AES-256 / ATTEMPTS: ∞'},{t:44,l:28,txt:'⚿',op:.18},{t:65,l:52,txt:'CIPHER: ████████',op:.08} ],
+    syms:[ {t:42,l:68,sz:26,sym:'g-orb',op:.22},{t:72,l:38,sz:18,sym:'g-arc',op:.12} ] },
+  { id:'r6', ac:'#00aaaa', label:'06',
+    shapes:[ {n:55,t:5,l:20,w:38,layer:'hi',anim:'flick'}, {n:56,t:48,l:62,w:18,layer:'md',anim:'wink'}, {n:57,t:58,l:42,w:18,layer:'md',anim:'jump'}, ...rcol([58,59,60,61,62,63]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·06'},{t:8,l:62,txt:'DIAGNOSTIC — ANALYSIS ACTIVE'},{t:90,l:5,txt:'RANGE: ∞ m / VECTOR: LOCKED'},{t:44,l:22,txt:'◎',op:.16},{t:34,l:5,txt:'RES: MAX',op:.10} ],
+    syms:[ {t:38,l:60,sz:24,sym:'g-hex',op:.20},{t:70,l:30,sz:18,sym:'g-arc',op:.12} ] },
+  { id:'r7', ac:'#ddaa22', label:'07',
+    shapes:[ {n:64,t:5,l:30,w:38,layer:'hi',anim:'flick'}, {n:65,t:50,l:4,w:18,layer:'md',anim:'jump-r'}, {n:66,t:42,l:70,w:18,layer:'md',anim:'wink'}, ...lcol([67,68,69,70,71,72]) ],
+    frags:[ {t:3,l:3,txt:'SECTOR·07'},{t:8,l:70,txt:'TERMINUS — END OF SEQUENCE'},{t:90,l:14,txt:'BEYOND: UNKNOWN / DEPTH: MAX'},{t:44,l:32,txt:'∅ ∅ ∅',op:.18},{t:68,l:50,txt:'∅ ∅ ∅  END  ∅ ∅ ∅',op:.08} ],
+    syms:[ {t:38,l:58,sz:24,sym:'g-prx',op:.18},{t:70,l:40,sz:18,sym:'g-hex',op:.12} ] },
+];
+
+// Icon rows: true = alive (blinks), false = invisible gap
+const iconRows = [
+  Array(15).fill(true),
+  [true,true,true,true,true,true,true,true,true,true,true,false,true,false,true],
+  [true,true,true,false,false,true,false,true,false,false,true,false,false,false,false],
+];
+// Quasi-random delays via golden-ratio distribution
+const icoDelay = (ri: number, ci: number) =>
+  (((ri * 7 + ci) * 0.618033 % 1) * 3.4).toFixed(2);
 ---
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>∅</title>
   <style>
-    :root { --bg:#03050d; --pg:rgba(4,10,26,0.94); --txt:#5a7090; --dim:#18283e; }
+    :root{--bg:#03050d;}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
-              font-family:monospace;color:var(--txt);font-size:12px;}
-
+              font-family:monospace;cursor:crosshair;}
     #c{position:fixed;inset:0;z-index:0;pointer-events:none;}
-    #flash{position:fixed;inset:0;z-index:50;pointer-events:none;
-           opacity:0;background:#fff;transition:opacity 0.45s;}
+    #flash{position:fixed;inset:0;z-index:200;pointer-events:none;
+           opacity:0;background:#000;transition:opacity .55s;}
+    #tap{position:fixed;inset:0;z-index:100;}
+    #back{position:fixed;z-index:300;bottom:.8rem;right:1.1rem;
+          color:rgba(255,255,255,.05);font-size:10px;text-decoration:none;
+          font-family:monospace;letter-spacing:.1em;transition:color .5s;}
+    #back:hover{color:rgba(255,255,255,.32);}
+    .rm{display:none;position:fixed;inset:0;z-index:10;overflow:hidden;}
+    .rm.on{display:block;}
 
-    /* ── rooms ─────────────────────────────── */
-    .rm{display:none;position:fixed;inset:0;z-index:2;
-        grid-template-rows:44px 1fr 58px;
-        grid-template-columns:186px 1fr 162px;
-        grid-template-areas:"hd hd hd" "sl ct sr" "ft ft ft";}
-    .rm.on{display:grid;}
+    /* ── Rooms 1-7 shape system ──────────── */
+    .sh{position:absolute;pointer-events:none;display:block;}
+    .sh-hi{opacity:.38;--op:.38;z-index:3;}
+    .sh-md{opacity:.20;--op:.20;z-index:2;}
+    .sh-sm{opacity:.14;--op:.14;z-index:1;}
+    #r1 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(177deg) saturate(8) brightness(.8);}
+    #r2 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(107deg) saturate(7) brightness(.7);}
+    #r3 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(317deg) saturate(7) brightness(.9);}
+    #r4 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(148deg) saturate(8) brightness(.8);}
+    #r5 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(230deg) saturate(9) brightness(.6);}
+    #r6 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(143deg) saturate(7) brightness(.7);}
+    #r7 .sh{filter:brightness(0) invert(1) sepia(1) hue-rotate(7deg)   saturate(3) brightness(1.2);}
+    .frag{position:absolute;font-size:9px;letter-spacing:.09em;color:var(--ac);opacity:.15;pointer-events:none;white-space:nowrap;}
+    .sym{position:absolute;pointer-events:none;fill:none;stroke:var(--ac);stroke-width:.9;}
+    .rid{position:absolute;bottom:10px;right:14px;font-size:9px;letter-spacing:.18em;color:var(--ac);opacity:.18;pointer-events:none;}
 
-    /* panel with notch top-right */
-    .panel{background:var(--pg);border:1px solid var(--ac,var(--dim));
-           position:relative;}
-    .panel::after{content:'';position:absolute;top:-1px;right:-1px;
-                  border-style:solid;border-width:0 12px 12px 0;
-                  border-color:transparent var(--bg) transparent transparent;}
+    /* ── Animations ──────────────────────── */
+    @keyframes flick{0%,10%,12%,43%,47%,78%,83%,100%{opacity:var(--op,.38);}11%,44%,45%,79%,80%,81%,82%{opacity:0;}}
+    @keyframes flick-fast{0%,6%,8%,26%,29%,53%,57%,100%{opacity:var(--op,.38);}7%,27%,28%,54%,55%,56%{opacity:0;}}
+    @keyframes blink{0%,44%,56%,100%{opacity:var(--op,.14);}45%,55%{opacity:0;}}
+    @keyframes wink{0%,50%,100%{opacity:var(--op,.20);}52%,94%{opacity:0;}}
+    @keyframes jump{0%,32%{transform:translate(0,0);opacity:var(--op,.20);}33%{opacity:0;}33.3%{transform:translate(14vw,-9vh);opacity:0;}34%,65%{transform:translate(14vw,-9vh);opacity:var(--op,.20);}66%{opacity:0;}66.3%{transform:translate(-9vw,12vh);opacity:0;}67%,99%{transform:translate(-9vw,12vh);opacity:var(--op,.20);}99.4%{opacity:0;}99.7%{transform:translate(0,0);opacity:0;}100%{opacity:var(--op,.20);}}
+    @keyframes jump-r{0%,32%{transform:translate(0,0);opacity:var(--op,.20);}33%{opacity:0;}33.3%{transform:translate(-12vw,8vh);opacity:0;}34%,65%{transform:translate(-12vw,8vh);opacity:var(--op,.20);}66%{opacity:0;}66.3%{transform:translate(8vw,-14vh);opacity:0;}67%,99%{transform:translate(8vw,-14vh);opacity:var(--op,.20);}99.4%{opacity:0;}99.7%{transform:translate(0,0);opacity:0;}100%{opacity:var(--op,.20);}}
+    .flick{animation:flick 5.4s ease-in-out infinite;}
+    .flick-fast{animation:flick-fast 3.6s ease-in-out infinite;}
+    .blink{animation:blink 2.0s ease-in-out infinite;}
+    .wink{animation:wink 6.5s ease-in-out infinite;}
+    .jump{animation:jump 7.5s linear infinite;}
+    .jump-r{animation:jump-r 8.5s linear infinite;}
 
-    /* header */
-    .rm-hd{grid-area:hd;border-bottom:1px solid var(--ac,var(--dim));
-           background:var(--pg);display:flex;align-items:center;
-           padding:0 16px;gap:24px;letter-spacing:.12em;font-size:11px;}
-    .rm-hd .rid{color:var(--ac);font-weight:bold;}
-    .rm-hd .coord{opacity:.5;flex:1;}
-    .rm-hd .clk{opacity:.38;font-variant-numeric:tabular-nums;}
+    /* ══════════════════════════════════════
+       ROOM 0 — CRT MONITOR THEME
+    ══════════════════════════════════════ */
+    #r0{background:#000;}
 
-    /* side panels */
-    .sl{grid-area:sl;border-right:1px solid var(--ac,var(--dim));
-        display:flex;flex-direction:column;}
-    .sr{grid-area:sr;border-left:1px solid var(--ac,var(--dim));
-        display:flex;flex-direction:column;overflow:hidden;}
-
-    .stat{display:flex;align-items:center;gap:9px;padding:10px 12px;
-          border-bottom:1px solid var(--ac,var(--dim));opacity:.65;}
-    .stat:last-child{border-bottom:none;margin-top:auto;}
-    .stat .lbl{opacity:.5;line-height:1.6;}
-    .stat .val{color:var(--ac);}
-
-    .data-block{padding:10px 14px;border-bottom:1px solid var(--ac,var(--dim));
-                opacity:.58;line-height:1.85;}
-    .data-block:last-child{border-bottom:none;}
-    .data-block .key{opacity:.45;}
-    .data-block .dval{color:var(--ac);}
-
-    /* center */
-    .ct{grid-area:ct;display:flex;flex-direction:column;
-        align-items:center;justify-content:center;gap:22px;
-        position:relative;overflow:hidden;}
-    .ct-lbl{font-size:10px;letter-spacing:.32em;opacity:.38;text-align:center;}
-
-    /* footer */
-    .rm-ft{grid-area:ft;border-top:1px solid var(--ac,var(--dim));
-           background:var(--pg);display:flex;align-items:center;
-           justify-content:space-between;padding:0 20px;}
-    .nav-btn{display:flex;align-items:center;gap:9px;
-             background:none;border:1px solid var(--ac,var(--dim));
-             color:var(--ac);padding:6px 14px;cursor:pointer;
-             font-family:monospace;font-size:11px;letter-spacing:.15em;
-             transition:background .18s,box-shadow .18s;position:relative;}
-    .nav-btn::after{content:'';position:absolute;top:-1px;right:-1px;
-                    border-style:solid;border-width:0 8px 8px 0;
-                    border-color:transparent var(--bg) transparent transparent;}
-    .nav-btn:hover{background:rgba(255,255,255,.05);
-                   box-shadow:0 0 14px var(--ac);}
-    .rm-ctr{font-size:10px;letter-spacing:.22em;opacity:.32;}
-
-    /* icon sizing helpers */
-    svg.ic{display:block;}
-
-    /* animations */
-    @keyframes rot-s {to{transform:rotate(360deg);}}
-    @keyframes rot-r {to{transform:rotate(-360deg);}}
-    @keyframes pls   {0%,100%{opacity:.9}50%{opacity:.18}}
-    @keyframes pls2  {0%,100%{opacity:.65}50%{opacity:.95}}
-    .rot-s {animation:rot-s 22s linear infinite;transform-origin:center;}
-    .rot-r {animation:rot-r 16s linear infinite;transform-origin:center;}
-    .pls   {animation:pls  1.6s ease-in-out infinite;}
-    .pls2  {animation:pls2 3s   ease-in-out infinite;}
-
-    /* R1 fan animated */
-    @keyframes fan-spread{
-      0%,100%{transform:scaleX(1) scaleY(1);}
-      50%    {transform:scaleX(1.04) scaleY(0.96);}
+    /* Letterbox bars */
+    .mon-bar{
+      position:absolute;left:0;right:0;height:68px;
+      background:#040407;z-index:30;
     }
-    #r1 .fan-anim{animation:fan-spread 4s ease-in-out infinite;transform-origin:left center;}
+    .mon-bar.top{top:0;}
+    .mon-bar.btm{bottom:0;}
+    .mon-lbl{
+      position:absolute;font-size:8px;line-height:1.6;
+      color:rgba(180,60,60,.45);letter-spacing:.05em;pointer-events:none;
+    }
 
-    /* data grid */
-    .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-    .dgrid .cell{display:flex;flex-direction:column;align-items:center;gap:5px;
-                 opacity:.28;transition:opacity .3s;}
-    .dgrid .cell.lit{opacity:.85;}
-    .dgrid .cell span{font-size:9px;letter-spacing:.08em;opacity:.7;}
+    /* Screen area */
+    .mon-wrap{
+      position:absolute;top:68px;bottom:68px;left:0;right:0;overflow:hidden;
+    }
+    @keyframes mon-flicker{
+      0%,91%,100%{opacity:1;}
+      92%{opacity:.96;}94%{opacity:.99;}96%{opacity:.93;}98%{opacity:.97;}
+    }
+    .mon-screen{
+      position:absolute;inset:0;
+      background:#050505;
+      animation:mon-flicker 9s linear infinite;
+    }
+    .tc-bg{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;}
+    /* Scanlines */
+    .mon-screen::before{
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:20;
+      background:repeating-linear-gradient(
+        0deg,transparent 0,transparent 3px,rgba(0,0,0,.16) 3px,rgba(0,0,0,.16) 4px
+      );
+    }
+    /* Corner bracket markers */
+    .mon-corner{
+      position:absolute;width:22px;height:22px;z-index:22;
+      border-color:rgba(160,185,255,.38);border-style:solid;
+    }
+    .mon-corner.tl{top:8px;left:10px;border-width:1px 0 0 1px;}
+    .mon-corner.tr{top:8px;right:10px;border-width:1px 1px 0 0;}
+    .mon-corner.bl{bottom:8px;left:10px;border-width:0 0 1px 1px;}
+    .mon-corner.br{bottom:8px;right:10px;border-width:0 1px 1px 0;}
+    .mon-corner::after{
+      content:'+';position:absolute;font-size:8px;font-family:monospace;
+      color:rgba(160,185,255,.3);
+    }
+    .mon-corner.tl::after{bottom:-6px;right:-4px;}
+    .mon-corner.tr::after{bottom:-6px;left:-4px;}
+    .mon-corner.bl::after{top:-6px;right:-4px;}
+    .mon-corner.br::after{top:-6px;left:-4px;}
 
-    /* pbar */
-    .pbar{width:100%;height:2px;background:rgba(255,255,255,.07);position:relative;}
-    .pbar::after{content:'';position:absolute;top:0;left:0;height:100%;
-                 background:var(--ac);width:var(--w,60%);}
+    /* Side decoration shapes — 2 fixed-size, red, top-left */
+    .mon-deco{
+      position:absolute;pointer-events:none;
+      width:72px;height:72px;
+      filter:brightness(0) invert(1) sepia(1) hue-rotate(323deg) saturate(22) brightness(1.05);
+      z-index:5;
+    }
+    /* .bc は JS で直接 opacity を操作するので CSS 不要 */
 
-    /* enc text */
-    .enc{font-size:10px;letter-spacing:.06em;opacity:.45;line-height:2.1;
-         text-align:center;max-width:300px;word-break:break-all;}
+    /* Red block noise canvas */
+    #rn{position:absolute;inset:0;pointer-events:none;width:100%;height:100%;z-index:2;}
+    /* Glitch canvas */
+    #gc{position:absolute;inset:0;pointer-events:none;width:100%;height:100%;z-index:19;}
 
-    /* back */
-    #back{position:fixed;z-index:20;bottom:.9rem;right:1.2rem;
-          color:rgba(255,255,255,.06);font-family:monospace;font-size:10px;
-          text-decoration:none;letter-spacing:.1em;transition:color .4s;}
-    #back:hover{color:rgba(255,255,255,.38);}
+    /* Center console */
+    .con{
+      position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      width:min(580px,68vw);
+      background:rgba(6,6,12,.94);
+      z-index:25;
+    }
+    .con-hdr{
+      background:#cc3322;padding:5px 12px;
+      font-size:10px;font-weight:bold;letter-spacing:.12em;
+      color:#08080e;line-height:1.65;
+    }
+    .con-hdr span{display:block;font-weight:normal;opacity:.75;font-size:9px;}
+    .con-body{
+      padding:16px 20px;font-size:11.5px;
+      color:#dd3322;letter-spacing:.08em;line-height:1.85;
+    }
+    .con-body p{margin:0;}
+    .con-body .gap{height:.6em;}
+    .con-icons{margin-top:10px;display:flex;flex-direction:column;gap:2px;}
+    .ci-row{display:flex;gap:2px;}
+    .ci{display:block;flex-shrink:0;}
+    /* Icon perpetual irregular blink */
+    @keyframes ico-blink{
+      0%,12%,14%,42%,45%,67%,70%,87%,91%,100%{opacity:.72;}
+      13%,43%,44%,68%,69%,88%,89%,90%         {opacity:0;}
+    }
+    .ci.alive{animation:ico-blink 3.4s linear infinite;}
   </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="flash"></div>
+<div id="tap"></div>
 <a href={base} id="back">⌂</a>
 
-<!-- ═══════════════════════════════════════════
-     GEOMETRIC SYMBOL SPRITE
-     12 symbols — all currentColor, butt linecap,
-     thin strokes, no rounded ends
-     ═══════════════════════════════════════════ -->
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-
-<!-- g-fid : fiducial / calibration target -->
-<symbol id="g-fid" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <line x1="0"  y1="24" x2="20" y2="24" stroke-width=".9"/>
-  <line x1="28" y1="24" x2="48" y2="24" stroke-width=".9"/>
-  <line x1="24" y1="0"  x2="24" y2="20" stroke-width=".9"/>
-  <line x1="24" y1="28" x2="24" y2="48" stroke-width=".9"/>
-  <path d="M5 13 L5 5 L13 5"   stroke-width=".9"/>
-  <path d="M35 5 L43 5 L43 13" stroke-width=".9"/>
-  <path d="M5 35 L5 43 L13 43" stroke-width=".9"/>
-  <path d="M35 43 L43 43 L43 35" stroke-width=".9"/>
-  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+<symbol id="g-orb" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <circle cx="24" cy="24" r="20" stroke-width=".9"/>
+  <ellipse cx="24" cy="24" rx="20" ry="7.5" stroke-width=".75"/>
+  <ellipse cx="24" cy="24" rx="7.5" ry="20" stroke-width=".75"/>
+  <circle cx="24" cy="24" r="3" fill="currentColor" stroke="none"/>
+  <line x1="24" y1="4"  x2="24" y2="8"  stroke-width=".7" opacity=".5"/>
+  <line x1="24" y1="40" x2="24" y2="44" stroke-width=".7" opacity=".5"/>
+  <line x1="4"  y1="24" x2="8"  y2="24" stroke-width=".7" opacity=".5"/>
+  <line x1="40" y1="24" x2="44" y2="24" stroke-width=".7" opacity=".5"/>
 </symbol>
-
-<!-- g-sup : superimposed rotated squares -->
-<symbol id="g-sup" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <rect x="9" y="9" width="30" height="30" stroke-width=".9"/>
-  <polygon points="24,5 43,24 24,43 5,24" stroke-width=".9"/>
-  <line x1="24" y1="9"  x2="24" y2="14" stroke-width=".7" opacity=".4"/>
-  <line x1="24" y1="34" x2="24" y2="39" stroke-width=".7" opacity=".4"/>
-  <line x1="9"  y1="24" x2="14" y2="24" stroke-width=".7" opacity=".4"/>
-  <line x1="34" y1="24" x2="39" y2="24" stroke-width=".7" opacity=".4"/>
+<symbol id="g-prx" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <polygon points="24,3 45,24 24,45 3,24" stroke-width=".9"/>
+  <polygon points="24,9 39,24 24,39 9,24" stroke-width=".8"/>
+  <polygon points="24,16 32,24 24,32 16,24" stroke-width=".8"/>
+  <line x1="24" y1="3"  x2="24" y2="16" stroke-width=".6" opacity=".4"/>
+  <line x1="24" y1="32" x2="24" y2="45" stroke-width=".6" opacity=".4"/>
+  <line x1="3"  y1="24" x2="16" y2="24" stroke-width=".6" opacity=".4"/>
+  <line x1="32" y1="24" x2="45" y2="24" stroke-width=".6" opacity=".4"/>
   <rect x="22.5" y="22.5" width="3" height="3" fill="currentColor" stroke="none"/>
 </symbol>
-
-<!-- g-cut : section cut indicator -->
-<symbol id="g-cut" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <line x1="4"  y1="24" x2="44" y2="24" stroke-width="1.2"/>
-  <line x1="4"  y1="16" x2="4"  y2="32" stroke-width="1.2"/>
-  <line x1="44" y1="16" x2="44" y2="32" stroke-width="1.2"/>
-  <line x1="13" y1="12" x2="18" y2="24" stroke-width=".75"/>
-  <line x1="22" y1="12" x2="27" y2="24" stroke-width=".75"/>
-  <line x1="31" y1="12" x2="36" y2="24" stroke-width=".75"/>
-  <line x1="18" y1="24" x2="23" y2="36" stroke-width=".75"/>
-  <line x1="27" y1="24" x2="32" y2="36" stroke-width=".75"/>
-</symbol>
-
-<!-- g-jct : junction node -->
-<symbol id="g-jct" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <rect x="20" y="20" width="8" height="8" stroke-width="1.1"/>
-  <line x1="24" y1="2"  x2="24" y2="20" stroke-width=".9"/>
-  <line x1="24" y1="28" x2="24" y2="46" stroke-width=".9"/>
-  <line x1="2"  y1="24" x2="20" y2="24" stroke-width=".9"/>
-  <line x1="28" y1="24" x2="46" y2="24" stroke-width=".9"/>
-  <rect x="21" y="1"  width="6" height="4" fill="currentColor" stroke="none"/>
-  <rect x="21" y="43" width="6" height="4" fill="currentColor" stroke="none"/>
-  <rect x="1"  y="21" width="4" height="6" fill="currentColor" stroke="none"/>
-  <rect x="43" y="21" width="4" height="6" fill="currentColor" stroke="none"/>
-</symbol>
-
-<!-- g-dff : differential / asymmetric plates -->
-<symbol id="g-dff" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <rect x="6"  y="13" width="36" height="5"  stroke-width=".9"/>
-  <rect x="6"  y="30" width="24" height="5"  stroke-width=".9"/>
-  <line x1="24" y1="4"  x2="24" y2="13" stroke-width=".9"/>
-  <line x1="14" y1="35" x2="14" y2="44" stroke-width=".9"/>
-  <line x1="6"  y1="13" x2="6"  y2="30" stroke-width=".6" opacity=".45"/>
-  <line x1="42" y1="13" x2="42" y2="18" stroke-width=".6" opacity=".45"/>
-</symbol>
-
-<!-- g-cqs : concentric squares with axis -->
-<symbol id="g-cqs" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <rect x="4"  y="4"  width="40" height="40" stroke-width=".8"/>
-  <rect x="13" y="13" width="22" height="22" stroke-width=".8"/>
-  <rect x="20" y="20" width="8"  height="8"  stroke-width=".8"/>
-  <line x1="24" y1="0"  x2="24" y2="48" stroke-width=".7"/>
-  <line x1="0"  y1="24" x2="48" y2="24" stroke-width=".7"/>
+<symbol id="g-hex" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <polygon points="24,4 40,14 40,34 24,44 8,34 8,14" stroke-width=".9"/>
+  <polygon points="24,12 34,17.5 34,30.5 24,36 14,30.5 14,17.5" stroke-width=".75"/>
+  <line x1="24" y1="4"  x2="24" y2="12"   stroke-width=".6" opacity=".45"/>
+  <line x1="40" y1="14" x2="34" y2="17.5" stroke-width=".6" opacity=".45"/>
+  <line x1="40" y1="34" x2="34" y2="30.5" stroke-width=".6" opacity=".45"/>
+  <line x1="24" y1="44" x2="24" y2="36"   stroke-width=".6" opacity=".45"/>
+  <line x1="8"  y1="34" x2="14" y2="30.5" stroke-width=".6" opacity=".45"/>
+  <line x1="8"  y1="14" x2="14" y2="17.5" stroke-width=".6" opacity=".45"/>
   <rect x="22.5" y="22.5" width="3" height="3" fill="currentColor" stroke="none"/>
 </symbol>
-
-<!-- g-brk : opposing bracket frame -->
-<symbol id="g-brk" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <path d="M18 4 L8 4 L8 44 L18 44"  stroke-width=".9"/>
-  <path d="M30 4 L40 4 L40 44 L30 44" stroke-width=".9"/>
-  <line x1="8" y1="15" x2="40" y2="15" stroke-width=".65" opacity=".4"/>
-  <line x1="8" y1="24" x2="40" y2="24" stroke-width=".65" opacity=".4"/>
-  <line x1="8" y1="33" x2="40" y2="33" stroke-width=".65" opacity=".4"/>
-  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+<symbol id="g-arc" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <path d="M5,44 A39,39 0 0,1 44,5"  stroke-width=".9"/>
+  <path d="M5,44 A27,27 0 0,1 32,17" stroke-width=".8"/>
+  <path d="M5,44 A15,15 0 0,1 20,29" stroke-width=".8"/>
+  <line x1="5" y1="44" x2="44" y2="5"  stroke-width=".6" opacity=".4"/>
+  <line x1="5" y1="44" x2="32" y2="17" stroke-width=".6" opacity=".4"/>
+  <line x1="5" y1="44" x2="20" y2="29" stroke-width=".6" opacity=".4"/>
+  <rect x="3"  y="42" width="4" height="4" fill="currentColor" stroke="none"/>
+  <rect x="2"  y="3"  width="4" height="4" stroke-width=".8"/>
+  <rect x="42" y="2"  width="4" height="4" stroke-width=".8"/>
 </symbol>
-
-<!-- g-stp : step / staircase sequence -->
-<symbol id="g-stp" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <polyline points="4,44 4,36 12,36 12,28 20,28 20,20 28,20 28,12 36,12 36,4 44,4"
-            stroke-width=".9"/>
-  <rect x="3"  y="35" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
-  <rect x="11" y="27" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
-  <rect x="19" y="19" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
-  <rect x="27" y="11" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
-  <rect x="35" y="3"  width="2.5" height="2.5" fill="currentColor" stroke="none"/>
-  <!-- tick marks perpendicular to steps -->
-  <line x1="8"  y1="36" x2="8"  y2="34" stroke-width=".7" opacity=".5"/>
-  <line x1="16" y1="28" x2="16" y2="26" stroke-width=".7" opacity=".5"/>
-  <line x1="24" y1="20" x2="24" y2="18" stroke-width=".7" opacity=".5"/>
-  <line x1="32" y1="12" x2="32" y2="10" stroke-width=".7" opacity=".5"/>
-  <line x1="40" y1="4"  x2="40" y2="2"  stroke-width=".7" opacity=".5"/>
+<!-- Crossed person figure for console icons -->
+<symbol id="sp" viewBox="0 0 10 16" fill="none" stroke="currentColor">
+  <circle cx="5" cy="2.5" r="1.8" stroke-width="1.2"/>
+  <line x1="5" y1="4.3" x2="5" y2="10.5" stroke-width="1.2"/>
+  <line x1="2" y1="7"   x2="8" y2="7"    stroke-width="1.2"/>
+  <line x1="5" y1="10.5" x2="2.5" y2="15.5" stroke-width="1.2"/>
+  <line x1="5" y1="10.5" x2="7.5" y2="15.5" stroke-width="1.2"/>
+  <line x1=".8" y1=".5" x2="9.2" y2="15.5" stroke-width=".9"/>
+  <line x1="9.2" y1=".5" x2=".8" y2="15.5" stroke-width=".9"/>
 </symbol>
-
-<!-- g-fan : beam / signal fan -->
-<symbol id="g-fan" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <line x1="4" y1="24" x2="44" y2="4"  stroke-width=".8"/>
-  <line x1="4" y1="24" x2="44" y2="11" stroke-width=".8"/>
-  <line x1="4" y1="24" x2="44" y2="18" stroke-width=".8"/>
-  <line x1="4" y1="24" x2="44" y2="24" stroke-width="1.2"/>
-  <line x1="4" y1="24" x2="44" y2="30" stroke-width=".8"/>
-  <line x1="4" y1="24" x2="44" y2="37" stroke-width=".8"/>
-  <line x1="4" y1="24" x2="44" y2="44" stroke-width=".8"/>
-  <line x1="44" y1="2" x2="44" y2="46" stroke-width="1.1"/>
-  <rect x="2" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
-</symbol>
-
-<!-- g-dtm : datum / survey triangle -->
-<symbol id="g-dtm" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <polygon points="24,5 44,43 4,43" stroke-width=".9"/>
-  <line x1="24" y1="5"  x2="24" y2="43" stroke-width=".75" opacity=".55"/>
-  <line x1="14" y1="24" x2="34" y2="24" stroke-width=".75" opacity=".45"/>
-  <line x1="4"  y1="43" x2="0"  y2="43" stroke-width=".9" opacity=".5"/>
-  <line x1="44" y1="43" x2="48" y2="43" stroke-width=".9" opacity=".5"/>
-  <rect x="22" y="41" width="4" height="4" fill="currentColor" stroke="none"/>
-</symbol>
-
-<!-- g-rng : range / interval marker -->
-<symbol id="g-rng" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <line x1="8"  y1="8"  x2="8"  y2="40" stroke-width="1.1"/>
-  <line x1="40" y1="8"  x2="40" y2="40" stroke-width="1.1"/>
-  <line x1="8"  y1="24" x2="40" y2="24" stroke-width=".9"/>
-  <line x1="4"  y1="8"  x2="12" y2="8"  stroke-width=".8"/>
-  <line x1="4"  y1="40" x2="12" y2="40" stroke-width=".8"/>
-  <line x1="36" y1="8"  x2="44" y2="8"  stroke-width=".8"/>
-  <line x1="36" y1="40" x2="44" y2="40" stroke-width=".8"/>
-  <line x1="14" y1="19" x2="22" y2="19" stroke-width=".65" opacity=".45"/>
-  <line x1="26" y1="29" x2="34" y2="29" stroke-width=".65" opacity=".45"/>
-</symbol>
-
-<!-- g-lat : lattice / intersection grid -->
-<symbol id="g-lat" viewBox="0 0 48 48" fill="none" stroke="currentColor">
-  <line x1="4"  y1="16" x2="44" y2="16" stroke-width=".65" opacity=".45"/>
-  <line x1="4"  y1="24" x2="44" y2="24" stroke-width=".65" opacity=".45"/>
-  <line x1="4"  y1="32" x2="44" y2="32" stroke-width=".65" opacity=".45"/>
-  <line x1="16" y1="4"  x2="16" y2="44" stroke-width=".65" opacity=".45"/>
-  <line x1="24" y1="4"  x2="24" y2="44" stroke-width=".65" opacity=".45"/>
-  <line x1="32" y1="4"  x2="32" y2="44" stroke-width=".65" opacity=".45"/>
-  <rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".35"/>
-  <rect x="22" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".9"/>
-  <rect x="30" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".5"/>
-  <rect x="14" y="22" width="4" height="4" fill="currentColor" stroke="none" opacity=".7"/>
-  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
-  <rect x="30" y="22" width="4" height="4" fill="currentColor" stroke="none" opacity=".4"/>
-  <rect x="14" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".25"/>
-  <rect x="22" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".6"/>
-  <rect x="30" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".85"/>
-</symbol>
-
 </svg>
 
-<!-- ══════════════════════════════════════════
-     ROOM 0  SECTOR.00  — #cc9911
-     ══════════════════════════════════════════ -->
-<section class="rm on" id="r0" style="--ac:#cc9911">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.00</span>
-    <span class="coord">33.8688° S / 151.2093° E</span>
-    <span class="clk" id="k0"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
-      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fan"/></svg>
-      <span class="lbl">SIGNAL<br><span class="val">144.220 MHz</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e0">T+ 00:00</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>
-      <span class="lbl">NODES<br><span class="val">8 / 8</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic rot-s" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
-         style="color:var(--ac)"><use href="#g-fid"/></svg>
-    <p class="ct-lbl">AWAITING INPUT</p>
-    <div class="pbar" style="width:55%;--w:68%"></div>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">00 / ENTRY</div></div>
-    <div class="data-block"><div class="key">FREQ</div><div class="dval">144.220</div></div>
-    <div class="data-block"><div class="key">STATUS</div><div class="dval">LOCK : ∅</div></div>
-    <div class="data-block"><div class="key">DEPTH</div><div class="dval">0.0 m</div></div>
-    <div class="data-block"><div class="key">HASH</div><div class="dval">0xCC9911</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="1">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-fan"/></svg>→ 01
-    </button>
-    <span class="rm-ctr">01 / 08</span>
-    <button class="nav-btn" data-to="2">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>→ 02
-    </button>
-  </footer>
-</section>
+<!-- Full-screen noise SVG — visible when r0 is active (position:fixed inside .rm) -->
+<svg id="ns" aria-hidden="true"
+     style="display:none;position:fixed;inset:0;z-index:95;pointer-events:none;width:100%;height:100%;overflow:hidden;">
+  <defs>
+    <filter id="nf" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence id="nft" type="turbulence" baseFrequency="0.70 0.18" numOctaves="3" seed="1" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise"/>
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" filter="url(#nf)" opacity="0.30" style="mix-blend-mode:overlay"/>
+</svg>
 
-<!-- ══════════════════════════════════════════
-     ROOM 1  SECTOR.01  — #0088ee
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r1" style="--ac:#0088ee">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.01</span>
-    <span class="coord">SIGNAL ACQUIRED — 144.220 MHz</span>
-    <span class="clk" id="k1"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
-      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>
-      <span class="lbl">SCAN<br><span class="val">ACTIVE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e1">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic fan-anim" width="clamp(140px,21vw,230px)" height="clamp(140px,21vw,230px)"
-         style="color:var(--ac)"><use href="#g-fan"/></svg>
-    <p class="ct-lbl">SIGNAL ACQUIRED</p>
-    <div style="font-size:10px;color:var(--ac);opacity:.5;letter-spacing:.22em">
-      144.220 MHz — 0x7F
-    </div>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">01 / SIGNAL</div></div>
-    <div class="data-block"><div class="key">STRENGTH</div><div class="dval">7F / FF</div></div>
-    <div class="data-block"><div class="key">NOISE</div><div class="dval">0.03 dB</div></div>
-    <div class="data-block"><div class="key">SOURCE</div><div class="dval">UNKNOWN</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="3">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>→ 03
-    </button>
-    <span class="rm-ctr">02 / 08</span>
-    <button class="nav-btn" data-to="4">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>→ 04
-    </button>
-  </footer>
-</section>
+<!-- ══════════════════════════════════════
+     ROOM 0 — MONITOR / CRT THEME
+══════════════════════════════════════ -->
+<section class="rm on" id="r0">
 
-<!-- ══════════════════════════════════════════
-     ROOM 2  SECTOR.02  — #00aa44
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r2" style="--ac:#00aa44">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.02</span>
-    <span class="coord">ARCHIVE — ACCESS GRANTED</span>
-    <span class="clk" id="k2"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
-      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>
-      <span class="lbl">RECORDS<br><span class="val">128 / 128</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e2">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <div class="dgrid">
-      {['00','01','02','03','04','05','06','07','08'].map((id,i) => (
-        <div class={`cell ${[0,3,7].includes(i)?'lit':''}`}>
-          <svg width="36" height="36" style="color:var(--ac)"><use href="#g-lat"/></svg>
-          <span>REC.{id}</span>
+  <!-- Top letterbox bar -->
+  <div class="mon-bar top">
+    <span class="mon-lbl" style="bottom:8px;left:16px">
+      ⌀Ψ∅ΩΦ∇≈▒▓░⌀ // 0x4E4F58 // KERN.INIT.∅
+    </span>
+    <span class="mon-lbl" style="bottom:8px;left:50%;transform:translateX(-50%)">NOX</span>
+    <span class="mon-lbl" style="bottom:8px;right:16px">v4.3.1</span>
+  </div>
+
+  <!-- Screen area -->
+  <div class="mon-wrap">
+    <div class="mon-screen">
+
+      <!-- Test-card background canvas -->
+      <canvas id="tc" class="tc-bg" aria-hidden="true"></canvas>
+
+      <!-- Red block noise canvas -->
+      <canvas id="rn" aria-hidden="true"></canvas>
+
+      <!-- Glitch canvas -->
+      <canvas id="gc" aria-hidden="true"></canvas>
+
+      <!-- Corner markers -->
+      <div class="mon-corner tl"></div>
+      <div class="mon-corner tr"></div>
+      <div class="mon-corner bl"></div>
+      <div class="mon-corner br"></div>
+
+      <!-- Top-left decorations: 2 shapes, fixed 72px, red, no transparency -->
+      <img class="mon-deco" src={`${base}/svg/Shape%201.svg`} style="top:14px;left:14px;"  aria-hidden="true"/>
+      <img class="mon-deco" src={`${base}/svg/Shape%207.svg`} style="top:14px;left:96px;"  aria-hidden="true"/>
+
+      <!-- Centre console panel -->
+      <div class="con">
+        <div class="con-hdr">
+          SECTOR·00 // FILE LOOKUP
+          <span>VERSION: 4.3.1</span>
         </div>
-      ))}
-    </div>
-    <p class="ct-lbl">03 / 09 RECORDS ACTIVE</p>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">02 / ARCH</div></div>
-    <div class="data-block"><div class="key">INTEGRITY</div><div class="dval">94.7%</div></div>
-    <div class="data-block"><div class="key">MODIFIED</div><div class="dval">T-04:22:11</div></div>
-    <div class="data-block"><div class="key">HASH</div><div class="dval">0x4E7F</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="4">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>→ 04
-    </button>
-    <span class="rm-ctr">03 / 08</span>
-    <button class="nav-btn" data-to="5">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-sup"/></svg>→ 05
-    </button>
-  </footer>
+        <div class="con-body">
+          <p>FILE: NOX.KLR-0000.R.00001</p>
+          <p>FILE DATE: XXXX-XX-XX</p>
+          <div class="gap"></div>
+          <p>TARGET: ∅</p>
+          <p>CLEARANCE: RESTRICTED [LEVEL 7+]</p>
+          <p>ENCRYPTION: AES-256 [HASH: 0xCC9911]</p>
+          <div class="gap"></div>
+          <p>NODE STATUS: UNRESOLVED — 0 / 8 ACTIVE</p>
+          <p>SIGNAL DEPTH: ∞</p>
+          <div class="gap"></div>
+          <p>SEE FULL RECORD FOR NAVIGATION DETAILS</p>
+          <p>[RESTRICTED ACCESS] [ENCRYPTION: AES-256]</p>
+          <div class="con-icons">
+            {iconRows.map((row, ri) => (
+              <div class="ci-row">
+                {row.map((alive, ci) => (
+                  <svg class:list={['ci', alive && 'alive']}
+                       width="13" height="19"
+                       style={`color:#dd3322;opacity:${alive?.72:0};animation-delay:${icoDelay(ri,ci)}s`}
+                       aria-hidden="true">
+                    <use href="#sp"/>
+                  </svg>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .mon-screen -->
+  </div><!-- .mon-wrap -->
+
+  <!-- Bottom letterbox bar -->
+  <div class="mon-bar btm">
+    <span class="mon-lbl" style="top:8px;left:16px;line-height:1.7">
+      精度のソース<br>
+      精製のインターフェード　推進機の設定<br>
+      SDV/TV 56&nbsp;&nbsp;&nbsp;スライドを見る .00%
+    </span>
+    <span class="mon-lbl" style="top:8px;left:50%;transform:translateX(-50%)">NOX</span>
+    <span class="mon-lbl" style="top:8px;right:16px">∅ ∅ ∅</span>
+  </div>
+
 </section>
 
-<!-- ══════════════════════════════════════════
-     ROOM 3  SECTOR.03  — #ee2233
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r3" style="--ac:#ee2233">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.03</span>
-    <span class="coord">ANOMALY DETECTED — CAUTION</span>
-    <span class="clk" id="k3"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>
-      <span class="lbl">ALERT<br><span class="val">CRITICAL</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
-      <span class="lbl">SYSTEM<br><span class="val">DEGRADED</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e3">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic pls" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
-         style="color:var(--ac)"><use href="#g-dtm"/></svg>
-    <p class="ct-lbl">ANOMALY DETECTED</p>
-    <div style="font-size:10px;color:var(--ac);opacity:.6;letter-spacing:.18em">
-      ERR 0xDEAD — SECTOR.03
-    </div>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">03 / ALERT</div></div>
-    <div class="data-block"><div class="key">SEVERITY</div><div class="dval">CRITICAL</div></div>
-    <div class="data-block"><div class="key">CODE</div><div class="dval">0xDEAD</div></div>
-    <div class="data-block"><div class="key">ORIGIN</div><div class="dval">UNKNOWN</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="6">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dff"/></svg>→ 06
-    </button>
-    <span class="rm-ctr">04 / 08</span>
-    <button class="nav-btn" data-to="1">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-brk"/></svg>← 01
-    </button>
-  </footer>
-</section>
-
-<!-- ══════════════════════════════════════════
-     ROOM 4  SECTOR.04  — #00bbcc
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r4" style="--ac:#00bbcc">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.04</span>
-    <span class="coord">NETWORK MAP — 8 NODES ACTIVE</span>
-    <span class="clk" id="k4"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>
-      <span class="lbl">NODES<br><span class="val">8 ONLINE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>
-      <span class="lbl">LINKS<br><span class="val">16 ACTIVE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e4">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <!-- network graph built from g-jct and connecting lines -->
-    <svg width="clamp(190px,24vw,260px)" height="clamp(190px,24vw,260px)"
-         viewBox="0 0 100 100" style="color:var(--ac)"
-         fill="none" stroke="currentColor">
-      <g stroke-width=".7" opacity=".4">
-        <line x1="50" y1="50" x2="50" y2="14"/>
-        <line x1="50" y1="50" x2="82" y2="28"/>
-        <line x1="50" y1="50" x2="82" y2="72"/>
-        <line x1="50" y1="50" x2="50" y2="86"/>
-        <line x1="50" y1="50" x2="18" y2="72"/>
-        <line x1="50" y1="50" x2="18" y2="28"/>
-        <line x1="50" y1="14" x2="82" y2="28"/>
-        <line x1="82" y1="28" x2="82" y2="72"/>
-        <line x1="18" y1="28" x2="18" y2="72"/>
-        <line x1="18" y1="72" x2="50" y2="86"/>
-      </g>
-      <!-- center: g-jct scaled -->
-      <rect x="46" y="46" width="8" height="8" stroke-width="1.1"/>
-      <rect x="48.5" y="48.5" width="3" height="3" fill="currentColor" stroke="none"/>
-      <!-- outer nodes as small squares -->
-      <g stroke-width="1">
-        <rect x="47" y="10" width="6" height="6"/><rect x="49" y="12" width="2" height="2" fill="currentColor" stroke="none"/>
-        <rect x="79" y="25" width="6" height="6"/><rect x="81" y="27" width="2" height="2" fill="currentColor" stroke="none"/>
-        <rect x="79" y="69" width="6" height="6"/><rect x="81" y="71" width="2" height="2" fill="currentColor" stroke="none"/>
-        <rect x="47" y="83" width="6" height="6"/><rect x="49" y="85" width="2" height="2" fill="currentColor" stroke="none"/>
-        <rect x="15" y="69" width="6" height="6"/><rect x="17" y="71" width="2" height="2" fill="currentColor" stroke="none"/>
-        <rect x="15" y="25" width="6" height="6"/><rect x="17" y="27" width="2" height="2" fill="currentColor" stroke="none"/>
-      </g>
-    </svg>
-    <p class="ct-lbl">NODE MAP — SECTOR.04</p>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">04 / NET</div></div>
-    <div class="data-block"><div class="key">TOPOLOGY</div><div class="dval">MESH</div></div>
-    <div class="data-block"><div class="key">LATENCY</div><div class="dval">0.4 ms</div></div>
-    <div class="data-block"><div class="key">LOSS</div><div class="dval">0.0%</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="5">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dff"/></svg>→ 05
-    </button>
-    <span class="rm-ctr">05 / 08</span>
-    <button class="nav-btn" data-to="7">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>→ 07
-    </button>
-  </footer>
-</section>
-
-<!-- ══════════════════════════════════════════
-     ROOM 5  SECTOR.05  — #8822ff
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r5" style="--ac:#8822ff">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.05</span>
-    <span class="coord">ENCRYPTED — CLEARANCE REQUIRED</span>
-    <span class="clk" id="k5"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-brk"/></svg>
-      <span class="lbl">SECURITY<br><span class="val">LOCKED</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-sup"/></svg>
-      <span class="lbl">CIPHER<br><span class="val">AES-256</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e5">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic rot-r" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
-         style="color:var(--ac)"><use href="#g-cqs"/></svg>
-    <p class="enc" id="enc5"></p>
-    <p class="ct-lbl">DECRYPTION IN PROGRESS</p>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">05 / ENC</div></div>
-    <div class="data-block"><div class="key">KEY LENGTH</div><div class="dval">256 bit</div></div>
-    <div class="data-block"><div class="key">ATTEMPTS</div><div class="dval">∞</div></div>
-    <div class="data-block"><div class="key">ETA</div><div class="dval">UNKNOWN</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="7">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>→ 07
-    </button>
-    <span class="rm-ctr">06 / 08</span>
-    <button class="nav-btn" data-to="0">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>← 00
-    </button>
-  </footer>
-</section>
-
-<!-- ══════════════════════════════════════════
-     ROOM 6  SECTOR.06  — #00aaaa
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r6" style="--ac:#00aaaa">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.06</span>
-    <span class="coord">DIAGNOSTIC — ANALYSIS ACTIVE</span>
-    <span class="clk" id="k6"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>
-      <span class="lbl">DIAG<br><span class="val">ACTIVE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>
-      <span class="lbl">SCAN<br><span class="val">360°</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e6">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic rot-s" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
-         style="color:var(--ac)"><use href="#g-sup"/></svg>
-    <p class="ct-lbl">DIAGNOSTIC MODE</p>
-    <div style="font-size:10px;color:var(--ac);opacity:.48;letter-spacing:.2em">
-      TARGET : 0x06 / UNKNOWN
-    </div>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">06 / DIAG</div></div>
-    <div class="data-block"><div class="key">RANGE</div><div class="dval">∞ m</div></div>
-    <div class="data-block"><div class="key">TARGETS</div><div class="dval">1 / UNK</div></div>
-    <div class="data-block"><div class="key">RES</div><div class="dval">MAX</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="0">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>← 00
-    </button>
-    <span class="rm-ctr">07 / 08</span>
-    <button class="nav-btn" data-to="3">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>→ 03
-    </button>
-  </footer>
-</section>
-
-<!-- ══════════════════════════════════════════
-     ROOM 7  SECTOR.07  — #ddaa22
-     ══════════════════════════════════════════ -->
-<section class="rm" id="r7" style="--ac:#ddaa22">
-  <header class="rm-hd">
-    <span class="rid">SECTOR.07</span>
-    <span class="coord">TERMINUS — END OF SEQUENCE</span>
-    <span class="clk" id="k7"></span>
-  </header>
-  <aside class="sl panel">
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>
-      <span class="lbl">SEQUENCE<br><span class="val">COMPLETE</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>
-      <span class="lbl">RETURN<br><span class="val">∅</span></span>
-    </div>
-    <div class="stat">
-      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
-      <span class="lbl">ELAPSED<br><span class="val" id="e7">T+ 00:00</span></span>
-    </div>
-  </aside>
-  <main class="ct">
-    <svg class="ic pls2" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
-         style="color:var(--ac)"><use href="#g-stp"/></svg>
-    <p class="ct-lbl">TERMINUS</p>
-    <div style="font-size:10px;color:var(--ac);opacity:.45;letter-spacing:.25em">
-      ∅ ∅ ∅  END  ∅ ∅ ∅
-    </div>
-  </main>
-  <aside class="sr panel">
-    <div class="data-block"><div class="key">SECTOR</div><div class="dval">07 / TERM</div></div>
-    <div class="data-block"><div class="key">BEYOND</div><div class="dval">UNKNOWN</div></div>
-    <div class="data-block"><div class="key">RETURN</div><div class="dval">POSSIBLE</div></div>
-    <div class="data-block"><div class="key">DEPTH</div><div class="dval">MAX</div></div>
-  </aside>
-  <footer class="rm-ft">
-    <button class="nav-btn" data-to="2">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>→ 02
-    </button>
-    <span class="rm-ctr">08 / 08</span>
-    <button class="nav-btn" data-to="5">
-      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>→ 05
-    </button>
-  </footer>
-</section>
+<!-- ══════════════════════════════════════
+     ROOMS 1-7 (data-driven)
+══════════════════════════════════════ -->
+{rooms.map(room => (
+  <section class="rm" id={room.id} style={`--ac:${room.ac}`}>
+    {room.shapes.map(s => (
+      <img class:list={['sh',`sh-${s.layer}`,s.anim]} src={`${base}/svg/Shape%20${s.n}.svg`}
+           style={`top:${s.t}%;left:${s.l}%;width:${s.w}%${s.delay?`;animation-delay:${s.delay}s`:''}`}
+           aria-hidden="true"/>
+    ))}
+    {room.frags.map(f => (
+      <span class="frag" style={`top:${f.t}%;left:${f.l}%${f.op!==undefined?`;opacity:${f.op}`:''}`}>{f.txt}</span>
+    ))}
+    {room.syms.map(s => (
+      <svg class="sym" width={s.sz} height={s.sz}
+           style={`top:${s.t}%;left:${s.l}%;opacity:${s.op??.15};color:var(--ac)`} aria-hidden="true">
+        <use href={`#${s.sym}`}/>
+      </svg>
+    ))}
+    <span class="rid">{room.label} / 07</span>
+  </section>
+))}
 
 <script>
 'use strict';
-// maze: 0→[1,2] 1→[3,4] 2→[4,5] 3→[6,1] 4→[5,7] 5→[7,0] 6→[0,3] 7→[2,5]
 
-// canvas bg
-const canvas = document.getElementById('c');
-const ctx    = canvas.getContext('2d');
-let W, H;
-function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-resize(); window.addEventListener('resize', resize);
-function frame(t) {
+/* ── Background grid canvas ── */
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+function frame(t){
   ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='rgba(18,38,80,.13)'; ctx.lineWidth=.5;
-  const g=40;
+  ctx.strokeStyle='rgba(18,38,80,.07)';ctx.lineWidth=.5;
+  const g=32;
   for(let x=g;x<W;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
   for(let y=g;y<H;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  const sy=(t*.022)%H;
-  const sl=ctx.createLinearGradient(0,sy-55,0,sy+55);
-  sl.addColorStop(0,'rgba(255,255,255,0)');
-  sl.addColorStop(.5,'rgba(255,255,255,.018)');
-  sl.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=sl; ctx.fillRect(0,sy-55,W,110);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
-// navigation
-let cur=0, busy=false;
-const flash=document.getElementById('flash');
-function go(n) {
-  if(busy||n===cur) return; busy=true;
-  flash.style.transition='none'; flash.style.opacity='1';
-  setTimeout(()=>{
-    document.querySelectorAll('.rm').forEach(r=>r.classList.remove('on'));
-    document.getElementById(`r${n}`).classList.add('on');
-    cur=n;
-    flash.style.transition='opacity 0.42s'; flash.style.opacity='0';
-    setTimeout(()=>{busy=false;},470);
-  },130);
+/* ── Room 0: test-card background ── */
+const tc=document.getElementById('tc');
+function drawTestCard(){
+  if(!tc)return;
+  const W=tc.width=tc.offsetWidth||window.innerWidth;
+  const H=tc.height=tc.offsetHeight||window.innerHeight;
+  const dc=tc.getContext('2d');
+
+  // Graduation bands (thin horizontal lines in center)
+  dc.strokeStyle='rgba(180,180,180,.11)'; dc.lineWidth=.4;
+  [H*.28,H*.32,H*.36,H*.40].forEach(hy=>{
+    dc.beginPath(); dc.moveTo(W*.27,hy); dc.lineTo(W*.73,hy); dc.stroke();
+  });
+
+  // Ruler line at ~43.5%
+  const ry=H*.435;
+  dc.strokeStyle='rgba(230,230,230,.55)'; dc.lineWidth=.8;
+  dc.beginPath(); dc.moveTo(W*.28,ry); dc.lineTo(W*.72,ry); dc.stroke();
+  dc.strokeStyle='rgba(200,200,200,.17)'; dc.lineWidth=.5;
+  dc.beginPath(); dc.moveTo(0,ry); dc.lineTo(W*.28,ry);
+  dc.moveTo(W*.72,ry); dc.lineTo(W,ry); dc.stroke();
+  // Tick marks
+  dc.strokeStyle='rgba(215,215,215,.33)'; dc.lineWidth=.5;
+  const ts=W*.022;
+  for(let tx=0;tx<W;tx+=ts){
+    const maj=Math.round(tx/ts)%5===0;
+    const th=maj?7:3.5;
+    dc.beginPath(); dc.moveTo(tx,ry-th); dc.lineTo(tx,ry+th); dc.stroke();
+  }
+
+  // Bullseye crosshair at centre of ruler
+  const bx=W*.5,byc=ry;
+  dc.strokeStyle='rgba(230,230,230,.50)'; dc.lineWidth=.75;
+  dc.beginPath(); dc.arc(bx,byc,H*.043,0,Math.PI*2); dc.stroke();
+  dc.beginPath(); dc.arc(bx,byc,H*.018,0,Math.PI*2); dc.stroke();
+  const ao=H*.043,ae=H*.062;
+  dc.beginPath();
+  dc.moveTo(bx-ae,byc); dc.lineTo(bx-ao,byc);
+  dc.moveTo(bx+ao,byc); dc.lineTo(bx+ae,byc);
+  dc.moveTo(bx,byc-ae); dc.lineTo(bx,byc-ao);
+  dc.moveTo(bx,byc+ao); dc.lineTo(bx,byc+ae);
+  dc.stroke();
+  dc.fillStyle='rgba(230,230,230,.65)'; dc.fillRect(bx-2.5,byc-2.5,5,5);
+  dc.strokeStyle='rgba(230,230,230,.50)'; dc.lineWidth=.6;
+  dc.strokeRect(bx-5,byc-5,10,10);
+
+  // Text near ruler
+  dc.font='bold 9.5px monospace'; dc.fillStyle='rgba(220,220,220,.65)';
+  dc.fillText('-2',bx-W*.20,ry-7);
+  dc.fillText('TEST',bx-W*.11,ry-7);
+  dc.fillText('FSTEST',bx+W*.05,ry-7);
+
+  // Error text (left zone)
+  dc.font='7.5px monospace'; dc.fillStyle='rgba(165,165,165,.38)';
+  dc.fillText('err: ERROR CODE 045 · 0x7F/011',W*.07,H*.31);
+  dc.fillText('↓ HII⁰',W*.09,H*.335);
+  dc.fillText('REBOOT/PROTOCOL',W*.07,H*.37);
+  dc.fillText('##  ATTEMPT 001',W*.07,H*.40);
+
+  // Right label "01"
+  dc.font='bold 26px monospace'; dc.fillStyle='rgba(210,210,210,.50)';
+  dc.fillText('01',W*.905,H*.60);
+
+  // Bottom label row
+  const bly=H*.715;
+  dc.font='8px monospace'; dc.fillStyle='rgba(185,185,185,.45)';
+  ['·KR','R','T+','R','__L1'].forEach((t,i)=>{
+    dc.fillText(t,[W*.33,W*.41,W*.445,W*.47,W*.50][i],bly);
+  });
+
+  // Dot indicators ● ○ ● ○
+  const dotY=H*.72;
+  [[W*.625,true],[W*.66,false],[W*.698,true],[W*.735,false]].forEach(([dx,fill])=>{
+    dc.beginPath(); dc.arc(dx,dotY,4,0,Math.PI*2);
+    dc.strokeStyle='rgba(185,185,185,.55)'; dc.lineWidth=.8;
+    if(fill){dc.fillStyle='rgba(185,185,185,.55)';dc.fill();}
+    else dc.stroke();
+  });
+
+  // Small horizontal calibration lines
+  dc.strokeStyle='rgba(180,180,180,.20)'; dc.lineWidth=.55;
+  [[H*.630,W*.30,W*.44],[H*.641,W*.42,W*.50],[H*.625,W*.50,W*.60]].forEach(([y,x1,x2])=>{
+    dc.beginPath(); dc.moveTo(x1,y); dc.lineTo(x2,y); dc.stroke();
+  });
+  // Vertical calibration ticks below ruler
+  dc.strokeStyle='rgba(180,180,180,.17)'; dc.lineWidth=.55;
+  [W*.30,W*.44,W*.56,W*.70].forEach(vx=>{
+    dc.beginPath(); dc.moveTo(vx,H*.62); dc.lineTo(vx,H*.68); dc.stroke();
+  });
+
+  // Left-edge blocks
+  [[H*.54,H*.09],[H*.65,H*.06],[H*.73,H*.04]].forEach(([y,h])=>{
+    dc.fillStyle='#0f0f0f'; dc.fillRect(0,y,W*.025,h);
+    dc.strokeStyle='rgba(130,130,130,.18)'; dc.lineWidth=.4;
+    dc.strokeRect(0,y,W*.025,h);
+  });
+  // Right-edge blocks
+  [[H*.54,H*.09],[H*.65,H*.06],[H*.73,H*.04]].forEach(([y,h])=>{
+    dc.fillStyle='#0f0f0f'; dc.fillRect(W*.975,y,W*.025,h);
+    dc.strokeStyle='rgba(130,130,130,.18)'; dc.lineWidth=.4;
+    dc.strokeRect(W*.975,y,W*.025,h);
+  });
+
+  // Bottom-left halftone dot block
+  const hlW=W*.20,hlH=H*.26,hlX=0,hlY=H*.74;
+  dc.fillStyle='#090909'; dc.fillRect(hlX,hlY,hlW,hlH);
+  const dsX=hlW/15,dsY=hlH/10;
+  for(let dy=hlY+dsY*.5;dy<hlY+hlH;dy+=dsY){
+    for(let dx=hlX+dsX*.5;dx<hlX+hlW;dx+=dsX){
+      const a=(.07+(dx-hlX)/hlW*.72).toFixed(2);
+      dc.fillStyle=`rgba(118,118,118,${a})`;
+      dc.beginPath(); dc.arc(dx,dy,2.5,0,Math.PI*2); dc.fill();
+    }
+  }
+  // Bottom-right halftone dot block
+  const hrW=W*.18,hrH=H*.22,hrX=W*.82,hrY=H*.78;
+  dc.fillStyle='#0c0c0c'; dc.fillRect(hrX,hrY,hrW,hrH);
+  for(let dy=hrY+dsY*.5;dy<hrY+hrH;dy+=dsY){
+    for(let dx=hrX+dsX*.5;dx<hrX+hrW;dx+=dsX){
+      const a=(.07+(1-(dx-hrX)/hrW)*.65).toFixed(2);
+      dc.fillStyle=`rgba(125,125,125,${a})`;
+      dc.beginPath(); dc.arc(dx,dy,2.5,0,Math.PI*2); dc.fill();
+    }
+  }
+
+  // Fine grid overlay
+  dc.strokeStyle='rgba(180,180,180,.020)'; dc.lineWidth=.3;
+  const gs=H*.04;
+  for(let gy=gs;gy<H;gy+=gs){dc.beginPath();dc.moveTo(0,gy);dc.lineTo(W,gy);dc.stroke();}
+  for(let gx=gs*2;gx<W;gx+=gs*2){dc.beginPath();dc.moveTo(gx,0);dc.lineTo(gx,H);dc.stroke();}
+
+  // Asterisk/arrow markers at bottom
+  dc.font='9px monospace'; dc.fillStyle='rgba(175,175,175,.28)';
+  dc.fillText('✱ ✱ ✱',W*.37,H*.835);
+  dc.fillText('→ →',W*.56,H*.825);
 }
-document.addEventListener('click', e=>{
-  if(busy) return;
-  const b=e.target.closest('[data-to]');
-  if(b) go(parseInt(b.dataset.to));
+drawTestCard();
+window.addEventListener('resize',drawTestCard);
+
+/* ── Room 0: animated red block noise ── */
+const rn=document.getElementById('rn');
+function drawRedNoise(){
+  if(!rn||!document.getElementById('r0').classList.contains('on'))return;
+  const W=rn.width=rn.offsetWidth;
+  const H=rn.height=rn.offsetHeight;
+  const rx=rn.getContext('2d');
+  rx.clearRect(0,0,W,H);
+  const count=6+Math.random()*10|0;
+  for(let i=0;i<count;i++){
+    const x=Math.random()*W;
+    const y=Math.random()*H;
+    const w=4+Math.random()*140;
+    const h=2+Math.random()*6;
+    const r=150+Math.random()*105|0;
+    rx.fillStyle=`rgb(${r},0,0)`;
+    rx.fillRect(x,y,w,h);
+  }
+  setTimeout(()=>rn.getContext('2d').clearRect(0,0,rn.width,rn.height),
+             120+Math.random()*200);
+}
+(function scheduleRed(){
+  setTimeout(()=>{drawRedNoise();scheduleRed();},1800+Math.random()*2600);
+})();
+
+/* ── Room 0: SVG turbulence noise ── */
+const nft = document.getElementById('nft');
+const ns  = document.getElementById('ns');
+let nSeed = 1;
+function animNoise(){
+  nSeed = (nSeed % 200) + 1;
+  if(nft) nft.setAttribute('seed', nSeed);
+}
+setInterval(animNoise, 55); // ~18fps grain animation
+
+// Show/hide noise overlay with room
+function syncNoise(){
+  if(ns) ns.style.display = document.getElementById('r0').classList.contains('on') ? '' : 'none';
+}
+syncNoise();
+
+/* ── Room 0: console text irregular blink ── */
+function blinkConChars(){
+  const r0 = document.getElementById('r0');
+  if(!r0 || !r0.classList.contains('on')) return;
+  const paras = [...document.querySelectorAll('#r0 .con-body p')];
+  const ok = paras.filter(p => !p.querySelector('.bc') && p.textContent.trim().length > 3);
+  if(!ok.length) return;
+
+  const p   = ok[Math.floor(Math.random() * ok.length)];
+  const txt = p.textContent;
+  const s   = Math.floor(Math.random() * Math.max(0, txt.length - 4));
+  const len = 1 + Math.floor(Math.random() * 5);
+
+  const span = document.createElement('span');
+  span.className = 'bc';
+  span.textContent = txt.slice(s, s + len);
+  p.textContent = '';
+  p.appendChild(document.createTextNode(txt.slice(0, s)));
+  p.appendChild(span);
+  p.appendChild(document.createTextNode(txt.slice(s + len)));
+
+  // Random blink pattern: 1–3 blinks, each with random on/off durations
+  let t = 8 + Math.random() * 45;
+  const n = 1 + Math.floor(Math.random() * 3);
+  for(let i = 0; i < n; i++){
+    const offDur = 22 + Math.random() * 110; // off time varies wildly
+    const gap    = Math.random() * 90;       // pre-blink random pause
+    t += gap;
+    (function(T, D){
+      setTimeout(() => { if(span.parentNode) span.style.opacity = '0'; }, T);
+      setTimeout(() => { if(span.parentNode) span.style.opacity = '1'; }, T + D);
+    })(t, offDur);
+    t += offDur + 12 + Math.random() * 55;
+  }
+  setTimeout(() => { if(p.contains && p.contains(span)) p.textContent = txt; }, t + 40);
+}
+
+// 4 independent threads — different base speeds, random skip rate
+[
+  {base:60,  spread:280, skip:.25},
+  {base:130, spread:450, skip:.20},
+  {base:220, spread:680, skip:.30},
+  {base:380, spread:950, skip:.15},
+].forEach(({base, spread, skip}, i) => {
+  setTimeout(function run(){
+    if(Math.random() >= skip) blinkConChars();
+    setTimeout(run, base + Math.random() * spread);
+  }, i * 55 + Math.random() * 120);
 });
 
-// clock
-const start=Date.now();
-function pad(n){return String(n).padStart(2,'0');}
-function tick(){
-  const d=new Date(), now=Date.now();
-  const ts=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  const el=Math.floor((now-start)/1000);
-  const em=`T+ ${pad(Math.floor(el/60))}:${pad(el%60)}`;
-  for(let i=0;i<8;i++){
-    const c=document.getElementById(`k${i}`); if(c) c.textContent=ts;
-    const e=document.getElementById(`e${i}`); if(e) e.textContent=em;
+/* ── Room 0: occasional horizontal glitch ── */
+const gc=document.getElementById('gc');
+function doGlitch(){
+  if(!gc||!document.getElementById('r0').classList.contains('on'))return;
+  gc.width=gc.offsetWidth;gc.height=gc.offsetHeight;
+  const gx=gc.getContext('2d');
+  if(Math.random()<.45){
+    const y=Math.random()*gc.height;
+    const h=Math.random()*4+1;
+    const x=Math.random()*gc.width*.5;
+    const w=Math.random()*gc.width*.4+80;
+    const r=180+Math.random()*75|0,gg=Math.random()*40|0,b=Math.random()*40|0;
+    gx.fillStyle=`rgba(${r},${gg},${b},${.08+Math.random()*.18})`;
+    gx.fillRect(x,y,w,h);
   }
+  setTimeout(()=>{ if(gc)gc.getContext('2d').clearRect(0,0,gc.width,gc.height); },
+             60+Math.random()*140);
 }
-tick(); setInterval(tick,1000);
+setInterval(doGlitch,900+Math.random()*1400);
 
-// encrypted display for R5
-const EC='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-const el5=document.getElementById('enc5');
-if(el5) setInterval(()=>{el5.textContent=Array.from({length:60},()=>EC[Math.floor(Math.random()*EC.length)]).join('');},160);
+/* ── Navigation ── */
+let cur=0,busy=false;
+const N=8;
+const flash=document.getElementById('flash');
+function go(n){
+  n=((n%N)+N)%N;
+  if(busy||n===cur)return;
+  busy=true;
+  flash.style.transition='none';flash.style.opacity='.82';
+  setTimeout(()=>{
+    document.querySelectorAll('.rm').forEach(r=>r.classList.remove('on'));
+    document.getElementById('r'+n).classList.add('on');
+    cur=n;
+    syncNoise();
+    flash.style.transition='opacity .6s';flash.style.opacity='0';
+    setTimeout(()=>{busy=false;},680);
+  },80);
+}
+document.getElementById('tap').addEventListener('click',e=>{
+  if(busy)return;
+  if(e.shiftKey)go(cur-1);else go(cur+1);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter')go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='Backspace')go(cur-1);
+});
 </script>
 </body>
 </html>

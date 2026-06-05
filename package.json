@@ -20,5 +20,8 @@
     "hast-util-to-string": "^3.0.1",
     "satori": "^0.26.0",
     "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
   }
 }
