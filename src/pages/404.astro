@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="404">
+  <div class="not-found">
+    <p class="code">404</p>
+    <p class="msg">ページが見つかりません</p>
+  </div>
+</Base>
+
+<style>
+  .not-found {
+    margin-top: 6rem;
+    text-align: center;
+  }
+  .code {
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--faint);
+    margin: 0 0 0.5rem;
+    line-height: 1;
+  }
+  .msg {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 0 0 2rem;
+  }
+</style>
