@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340">
+  <defs>
+    <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#8899cc" stroke-width="2" opacity="0.35"/>
+    </pattern>
+    <filter id="g"><feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- shadow/glow behind main letters -->
+  <text x="150" y="270" font-family="serif" font-size="310" font-weight="900" fill="#330066" opacity="0.08" letter-spacing="-20">ノイ</text>
+
+  <!-- hatched band -->
+  <rect x="0" y="130" width="600" height="80" fill="url(#hatch)" opacity="0.55"/>
+
+  <!-- LEFT CHARACTER: ノ -->
+  <!-- main strokes in dark navy -->
+  <text x="40" y="290" font-family="sans-serif" font-size="280" font-weight="900"
+        fill="#1a0055" opacity="0.88">ノ</text>
+  <!-- outline highlight -->
+  <text x="40" y="290" font-family="sans-serif" font-size="280" font-weight="900"
+        fill="none" stroke="#4422aa" stroke-width="1.5" opacity="0.35">ノ</text>
+
+  <!-- RIGHT CHARACTER: イ -->
+  <text x="305" y="290" font-family="sans-serif" font-size="280" font-weight="900"
+        fill="#aa0022" opacity="0.85">イ</text>
+  <text x="305" y="290" font-family="sans-serif" font-size="280" font-weight="900"
+        fill="none" stroke="#ff2244" stroke-width="1.5" opacity="0.32">イ</text>
+
+  <!-- center divider line -->
+  <line x1="295" y1="20" x2="295" y2="320" stroke="#8899cc" stroke-width="1.5" opacity="0.38"/>
+
+  <!-- pink accent circle -->
+  <circle cx="300" cy="168" r="55" fill="none" stroke="#ff00aa" stroke-width="2.5" opacity="0.52"/>
+  <circle cx="300" cy="168" r="35" fill="none" stroke="#ff00aa" stroke-width="1"   opacity="0.28"/>
+  <circle cx="300" cy="168" r="7"  fill="#ff00aa" opacity="0.55" filter="url(#g)"/>
+
+  <!-- circuit trace accents -->
+  <g fill="none" stroke="#6677aa" stroke-width="1" opacity="0.28">
+    <path d="M 0,60 L 40,60 L 40,30 L 90,30"/>
+    <path d="M 520,310 L 560,310 L 560,280 L 600,280"/>
+    <path d="M 0,310 L 30,310 L 30,280"/>
+  </g>
+
+  <!-- small geometric accents -->
+  <rect x="558" y="8"   width="28" height="28" fill="none" stroke="#6677aa" stroke-width="1.5" opacity="0.35"/>
+  <rect x="14"  y="8"   width="20" height="20" fill="#4422aa" opacity="0.30"/>
+  <polygon points="282,8 295,28 308,8" fill="#ff00aa" opacity="0.40"/>
+</svg>

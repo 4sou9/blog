@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+  <defs>
+    <pattern id="dot" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1" fill="#3355bb" opacity="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- substrate grid -->
+  <rect width="640" height="640" fill="url(#dot)" opacity="0.7"/>
+
+  <!-- TRACES - primary layer -->
+  <g fill="none" stroke="#3a5acc" stroke-linecap="square">
+    <path d="M 0,90  L 200,90  L 200,140 L 420,140 L 420,90  L 640,90"  stroke-width="3"/>
+    <path d="M 0,220 L 110,220 L 110,310 L 360,310 L 360,380 L 640,380" stroke-width="3"/>
+    <path d="M 0,450 L 260,450 L 260,510 L 520,510 L 520,450 L 640,450" stroke-width="2.5"/>
+    <path d="M 0,575 L 175,575 L 175,530 L 480,530 L 480,575 L 640,575" stroke-width="2"/>
+
+    <path d="M 130,0  L 130,90  L 200,90  L 200,220 L 130,220 L 130,450" stroke-width="3"/>
+    <path d="M 340,0  L 340,140 L 420,140 L 420,310 L 340,310 L 340,510" stroke-width="3"/>
+    <path d="M 560,0  L 560,220 L 420,220 L 420,310"                      stroke-width="2.5"/>
+    <path d="M 580,450 L 580,380 L 480,380 L 480,220 L 580,220 L 580,0"   stroke-width="2.5"/>
+
+    <!-- secondary traces -->
+    <path d="M 65,0   L 65,175 L 200,175"  stroke-width="1.8" opacity="0.65"/>
+    <path d="M 455,0  L 455,90"            stroke-width="1.8" opacity="0.55"/>
+    <path d="M 220,640 L 220,575 L 340,575 L 340,640" stroke-width="1.8" opacity="0.60"/>
+    <path d="M 0,350 L 110,350 L 110,310"  stroke-width="1.5" opacity="0.52"/>
+    <path d="M 640,175 L 520,175 L 520,140" stroke-width="1.5" opacity="0.50"/>
+    <path d="M 200,90 L 200,0"             stroke-width="1.5" opacity="0.45"/>
+    <path d="M 0,490 L 70,490 L 70,450"    stroke-width="1.2" opacity="0.40"/>
+    <path d="M 260,640 L 260,510"          stroke-width="1.2" opacity="0.42"/>
+  </g>
+
+  <!-- IC BODY center -->
+  <rect x="190" y="195" width="270" height="265" fill="none" stroke="#2244aa" stroke-width="2.5" opacity="0.6"/>
+  <rect x="208" y="213" width="234" height="229" fill="#080e28" opacity="0.75"/>
+  <text x="325" y="337" fill="#3355bb" font-family="monospace" font-size="13"
+        text-anchor="middle" opacity="0.8" letter-spacing="2">IC-7F</text>
+  <text x="325" y="355" fill="#2244aa" font-family="monospace" font-size="9"
+        text-anchor="middle" opacity="0.6" letter-spacing="1">REV.03</text>
+
+  <!-- IC pins -->
+  <g fill="#3355bb" opacity="0.75">
+    <rect x="178" y="225" width="14" height="26"/><rect x="178" y="258" width="14" height="26"/>
+    <rect x="178" y="291" width="14" height="26"/><rect x="178" y="324" width="14" height="26"/>
+    <rect x="178" y="357" width="14" height="26"/>
+    <rect x="448" y="225" width="14" height="26"/><rect x="448" y="258" width="14" height="26"/>
+    <rect x="448" y="291" width="14" height="26"/><rect x="448" y="324" width="14" height="26"/>
+    <rect x="448" y="357" width="14" height="26"/>
+    <rect x="225" y="178" width="26" height="14"/><rect x="260" y="178" width="26" height="14"/>
+    <rect x="295" y="178" width="26" height="14"/><rect x="330" y="178" width="26" height="14"/>
+    <rect x="225" y="448" width="26" height="14"/><rect x="260" y="448" width="26" height="14"/>
+    <rect x="295" y="448" width="26" height="14"/><rect x="330" y="448" width="26" height="14"/>
+  </g>
+
+  <!-- VIA holes -->
+  <g fill="none" stroke="#3a5acc" stroke-width="2.2">
+    <circle cx="200" cy="90"  r="5.5"/><circle cx="200" cy="220" r="5.5"/>
+    <circle cx="420" cy="140" r="5.5"/><circle cx="420" cy="310" r="5.5"/>
+    <circle cx="340" cy="140" r="5.5"/><circle cx="340" cy="310" r="5.5"/>
+    <circle cx="130" cy="90"  r="4.5"/><circle cx="130" cy="220" r="4.5"/>
+    <circle cx="260" cy="450" r="4.5"/><circle cx="520" cy="220" r="4.5"/>
+    <circle cx="480" cy="380" r="4.5"/><circle cx="110" cy="310" r="4.5"/>
+  </g>
+
+  <!-- Resistor/capacitor symbols -->
+  <g fill="none" stroke="#2244aa" stroke-width="1.2" opacity="0.45">
+    <rect x="80"  y="58"  width="70" height="28"/>
+    <line x1="65"  y1="72" x2="80" y2="72"/>
+    <line x1="150" y1="72" x2="165" y2="72"/>
+    <rect x="490" y="490" width="60" height="40"/>
+    <circle cx="520" cy="510" r="14"/>
+    <rect x="30" y="318" width="40" height="60" rx="4"/>
+  </g>
+
+  <!-- Corner markers (silkscreen) -->
+  <g fill="none" stroke="#1a3388" stroke-width="1" opacity="0.30">
+    <path d="M 8,8 L 8,28 M 8,8 L 28,8"/>
+    <path d="M 632,8 L 612,8 M 632,8 L 632,28"/>
+    <path d="M 8,632 L 8,612 M 8,632 L 28,632"/>
+    <path d="M 632,632 L 612,632 M 632,632 L 632,612"/>
+  </g>
+</svg>

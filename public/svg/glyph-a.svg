@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-140 -200 280 400">
+  <defs>
+    <filter id="g" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- ambient glow -->
+  <g opacity="0.25" filter="url(#g)">
+    <circle cx="0" cy="-130" r="24" fill="#cc1133"/>
+    <path d="M 0,-100 L 0,90" stroke="#cc1133" stroke-width="12" fill="none"/>
+  </g>
+  <!-- head -->
+  <circle cx="0" cy="-130" r="24" fill="none" stroke="#cc1133" stroke-width="9.5"/>
+  <circle cx="0" cy="-130" r="36" fill="none" stroke="#cc1133" stroke-width="1" opacity="0.3" stroke-dasharray="5 4"/>
+  <!-- neck -->
+  <line x1="0" y1="-106" x2="0" y2="-94" stroke="#cc1133" stroke-width="9.5" stroke-linecap="round"/>
+  <!-- torso -->
+  <path d="M 0,-94 L 0,88" stroke="#cc1133" stroke-width="9.5" fill="none" stroke-linecap="round"/>
+  <!-- left upper arm long diagonal with elbow -->
+  <path d="M -5,-62 L -88,-118 L -102,-106" fill="none" stroke="#cc1133" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M -102,-106 L -115,-94 L -115,-76" fill="none" stroke="#cc1133" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+  <!-- right arm -->
+  <path d="M 5,-38 L 95,-70" fill="none" stroke="#cc1133" stroke-width="9.5" stroke-linecap="round"/>
+  <path d="M 95,-70 L 108,-55 L 108,-38" fill="none" stroke="#cc1133" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+  <!-- hip cross -->
+  <path d="M -40,22 L 40,22" stroke="#cc1133" stroke-width="6" stroke-linecap="square"/>
+  <!-- body inner detail -->
+  <path d="M 0,-22 L 26,-10 L 26,14 L 0,26" fill="none" stroke="#cc1133" stroke-width="3.5" opacity="0.52"/>
+  <!-- left leg bend -->
+  <path d="M -5,70 L -58,128 L -76,122" fill="none" stroke="#cc1133" stroke-width="9.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M -76,122 L -90,128" fill="none" stroke="#cc1133" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <!-- right leg -->
+  <path d="M 5,66 L 72,120" fill="none" stroke="#cc1133" stroke-width="9.5" stroke-linecap="round"/>
+  <!-- circuit traces (thin) -->
+  <g fill="none" stroke="#cc1133" stroke-width="1.2" opacity="0.28">
+    <path d="M -140,-82 L -115,-82 L -115,-106"/>
+    <path d="M -140,-58 L -118,-58"/>
+    <path d="M 112,-38 L 126,-38 L 126,-18"/>
+    <path d="M -90,128 L -90,162 L -55,162"/>
+    <path d="M 72,120 L 96,120 L 96,162"/>
+    <path d="M -28,-162 L -18,-148"/>
+    <path d="M 28,-162 L 18,-148"/>
+  </g>
+  <!-- endpoint fills -->
+  <g fill="#cc1133">
+    <circle cx="-102" cy="-106" r="6.5"/>
+    <circle cx="95" cy="-70" r="6.5"/>
+    <circle cx="-76" cy="122" r="6.5"/>
+    <circle cx="72" cy="120" r="6.5"/>
+    <circle cx="-115" cy="-76" r="4.5" opacity="0.8"/>
+    <circle cx="108" cy="-38" r="4.5" opacity="0.75"/>
+    <circle cx="-90" cy="128" r="4.5" opacity="0.8"/>
+  </g>
+  <!-- accent shapes -->
+  <polygon points="32,-80 52,-104 70,-80" fill="#cc1133" opacity="0.42"/>
+  <rect x="-138" y="-58" width="16" height="16" fill="none" stroke="#cc1133" stroke-width="1.5" opacity="0.32"/>
+  <circle cx="60" cy="94" r="10" fill="none" stroke="#cc1133" stroke-width="1.5" opacity="0.36"/>
+</svg>

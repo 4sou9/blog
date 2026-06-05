@@ -1,0 +1,769 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>∅</title>
+  <style>
+    :root { --bg:#03050d; --pg:rgba(4,10,26,0.94); --txt:#5a7090; --dim:#18283e; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+              font-family:monospace;color:var(--txt);font-size:12px;}
+
+    #c{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    #flash{position:fixed;inset:0;z-index:50;pointer-events:none;
+           opacity:0;background:#fff;transition:opacity 0.45s;}
+
+    /* ── rooms ─────────────────────────────── */
+    .rm{display:none;position:fixed;inset:0;z-index:2;
+        grid-template-rows:44px 1fr 58px;
+        grid-template-columns:186px 1fr 162px;
+        grid-template-areas:"hd hd hd" "sl ct sr" "ft ft ft";}
+    .rm.on{display:grid;}
+
+    /* panel with notch top-right */
+    .panel{background:var(--pg);border:1px solid var(--ac,var(--dim));
+           position:relative;}
+    .panel::after{content:'';position:absolute;top:-1px;right:-1px;
+                  border-style:solid;border-width:0 12px 12px 0;
+                  border-color:transparent var(--bg) transparent transparent;}
+
+    /* header */
+    .rm-hd{grid-area:hd;border-bottom:1px solid var(--ac,var(--dim));
+           background:var(--pg);display:flex;align-items:center;
+           padding:0 16px;gap:24px;letter-spacing:.12em;font-size:11px;}
+    .rm-hd .rid{color:var(--ac);font-weight:bold;}
+    .rm-hd .coord{opacity:.5;flex:1;}
+    .rm-hd .clk{opacity:.38;font-variant-numeric:tabular-nums;}
+
+    /* side panels */
+    .sl{grid-area:sl;border-right:1px solid var(--ac,var(--dim));
+        display:flex;flex-direction:column;}
+    .sr{grid-area:sr;border-left:1px solid var(--ac,var(--dim));
+        display:flex;flex-direction:column;overflow:hidden;}
+
+    .stat{display:flex;align-items:center;gap:9px;padding:10px 12px;
+          border-bottom:1px solid var(--ac,var(--dim));opacity:.65;}
+    .stat:last-child{border-bottom:none;margin-top:auto;}
+    .stat .lbl{opacity:.5;line-height:1.6;}
+    .stat .val{color:var(--ac);}
+
+    .data-block{padding:10px 14px;border-bottom:1px solid var(--ac,var(--dim));
+                opacity:.58;line-height:1.85;}
+    .data-block:last-child{border-bottom:none;}
+    .data-block .key{opacity:.45;}
+    .data-block .dval{color:var(--ac);}
+
+    /* center */
+    .ct{grid-area:ct;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:22px;
+        position:relative;overflow:hidden;}
+    .ct-lbl{font-size:10px;letter-spacing:.32em;opacity:.38;text-align:center;}
+
+    /* footer */
+    .rm-ft{grid-area:ft;border-top:1px solid var(--ac,var(--dim));
+           background:var(--pg);display:flex;align-items:center;
+           justify-content:space-between;padding:0 20px;}
+    .nav-btn{display:flex;align-items:center;gap:9px;
+             background:none;border:1px solid var(--ac,var(--dim));
+             color:var(--ac);padding:6px 14px;cursor:pointer;
+             font-family:monospace;font-size:11px;letter-spacing:.15em;
+             transition:background .18s,box-shadow .18s;position:relative;}
+    .nav-btn::after{content:'';position:absolute;top:-1px;right:-1px;
+                    border-style:solid;border-width:0 8px 8px 0;
+                    border-color:transparent var(--bg) transparent transparent;}
+    .nav-btn:hover{background:rgba(255,255,255,.05);
+                   box-shadow:0 0 14px var(--ac);}
+    .rm-ctr{font-size:10px;letter-spacing:.22em;opacity:.32;}
+
+    /* icon sizing helpers */
+    svg.ic{display:block;}
+
+    /* animations */
+    @keyframes rot-s {to{transform:rotate(360deg);}}
+    @keyframes rot-r {to{transform:rotate(-360deg);}}
+    @keyframes pls   {0%,100%{opacity:.9}50%{opacity:.18}}
+    @keyframes pls2  {0%,100%{opacity:.65}50%{opacity:.95}}
+    .rot-s {animation:rot-s 22s linear infinite;transform-origin:center;}
+    .rot-r {animation:rot-r 16s linear infinite;transform-origin:center;}
+    .pls   {animation:pls  1.6s ease-in-out infinite;}
+    .pls2  {animation:pls2 3s   ease-in-out infinite;}
+
+    /* R1 fan animated */
+    @keyframes fan-spread{
+      0%,100%{transform:scaleX(1) scaleY(1);}
+      50%    {transform:scaleX(1.04) scaleY(0.96);}
+    }
+    #r1 .fan-anim{animation:fan-spread 4s ease-in-out infinite;transform-origin:left center;}
+
+    /* data grid */
+    .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+    .dgrid .cell{display:flex;flex-direction:column;align-items:center;gap:5px;
+                 opacity:.28;transition:opacity .3s;}
+    .dgrid .cell.lit{opacity:.85;}
+    .dgrid .cell span{font-size:9px;letter-spacing:.08em;opacity:.7;}
+
+    /* pbar */
+    .pbar{width:100%;height:2px;background:rgba(255,255,255,.07);position:relative;}
+    .pbar::after{content:'';position:absolute;top:0;left:0;height:100%;
+                 background:var(--ac);width:var(--w,60%);}
+
+    /* enc text */
+    .enc{font-size:10px;letter-spacing:.06em;opacity:.45;line-height:2.1;
+         text-align:center;max-width:300px;word-break:break-all;}
+
+    /* back */
+    #back{position:fixed;z-index:20;bottom:.9rem;right:1.2rem;
+          color:rgba(255,255,255,.06);font-family:monospace;font-size:10px;
+          text-decoration:none;letter-spacing:.1em;transition:color .4s;}
+    #back:hover{color:rgba(255,255,255,.38);}
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="flash"></div>
+<a href={base} id="back">⌂</a>
+
+<!-- ═══════════════════════════════════════════
+     GEOMETRIC SYMBOL SPRITE
+     12 symbols — all currentColor, butt linecap,
+     thin strokes, no rounded ends
+     ═══════════════════════════════════════════ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+
+<!-- g-fid : fiducial / calibration target -->
+<symbol id="g-fid" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <line x1="0"  y1="24" x2="20" y2="24" stroke-width=".9"/>
+  <line x1="28" y1="24" x2="48" y2="24" stroke-width=".9"/>
+  <line x1="24" y1="0"  x2="24" y2="20" stroke-width=".9"/>
+  <line x1="24" y1="28" x2="24" y2="48" stroke-width=".9"/>
+  <path d="M5 13 L5 5 L13 5"   stroke-width=".9"/>
+  <path d="M35 5 L43 5 L43 13" stroke-width=".9"/>
+  <path d="M5 35 L5 43 L13 43" stroke-width=".9"/>
+  <path d="M35 43 L43 43 L43 35" stroke-width=".9"/>
+  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-sup : superimposed rotated squares -->
+<symbol id="g-sup" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <rect x="9" y="9" width="30" height="30" stroke-width=".9"/>
+  <polygon points="24,5 43,24 24,43 5,24" stroke-width=".9"/>
+  <line x1="24" y1="9"  x2="24" y2="14" stroke-width=".7" opacity=".4"/>
+  <line x1="24" y1="34" x2="24" y2="39" stroke-width=".7" opacity=".4"/>
+  <line x1="9"  y1="24" x2="14" y2="24" stroke-width=".7" opacity=".4"/>
+  <line x1="34" y1="24" x2="39" y2="24" stroke-width=".7" opacity=".4"/>
+  <rect x="22.5" y="22.5" width="3" height="3" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-cut : section cut indicator -->
+<symbol id="g-cut" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <line x1="4"  y1="24" x2="44" y2="24" stroke-width="1.2"/>
+  <line x1="4"  y1="16" x2="4"  y2="32" stroke-width="1.2"/>
+  <line x1="44" y1="16" x2="44" y2="32" stroke-width="1.2"/>
+  <line x1="13" y1="12" x2="18" y2="24" stroke-width=".75"/>
+  <line x1="22" y1="12" x2="27" y2="24" stroke-width=".75"/>
+  <line x1="31" y1="12" x2="36" y2="24" stroke-width=".75"/>
+  <line x1="18" y1="24" x2="23" y2="36" stroke-width=".75"/>
+  <line x1="27" y1="24" x2="32" y2="36" stroke-width=".75"/>
+</symbol>
+
+<!-- g-jct : junction node -->
+<symbol id="g-jct" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <rect x="20" y="20" width="8" height="8" stroke-width="1.1"/>
+  <line x1="24" y1="2"  x2="24" y2="20" stroke-width=".9"/>
+  <line x1="24" y1="28" x2="24" y2="46" stroke-width=".9"/>
+  <line x1="2"  y1="24" x2="20" y2="24" stroke-width=".9"/>
+  <line x1="28" y1="24" x2="46" y2="24" stroke-width=".9"/>
+  <rect x="21" y="1"  width="6" height="4" fill="currentColor" stroke="none"/>
+  <rect x="21" y="43" width="6" height="4" fill="currentColor" stroke="none"/>
+  <rect x="1"  y="21" width="4" height="6" fill="currentColor" stroke="none"/>
+  <rect x="43" y="21" width="4" height="6" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-dff : differential / asymmetric plates -->
+<symbol id="g-dff" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <rect x="6"  y="13" width="36" height="5"  stroke-width=".9"/>
+  <rect x="6"  y="30" width="24" height="5"  stroke-width=".9"/>
+  <line x1="24" y1="4"  x2="24" y2="13" stroke-width=".9"/>
+  <line x1="14" y1="35" x2="14" y2="44" stroke-width=".9"/>
+  <line x1="6"  y1="13" x2="6"  y2="30" stroke-width=".6" opacity=".45"/>
+  <line x1="42" y1="13" x2="42" y2="18" stroke-width=".6" opacity=".45"/>
+</symbol>
+
+<!-- g-cqs : concentric squares with axis -->
+<symbol id="g-cqs" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <rect x="4"  y="4"  width="40" height="40" stroke-width=".8"/>
+  <rect x="13" y="13" width="22" height="22" stroke-width=".8"/>
+  <rect x="20" y="20" width="8"  height="8"  stroke-width=".8"/>
+  <line x1="24" y1="0"  x2="24" y2="48" stroke-width=".7"/>
+  <line x1="0"  y1="24" x2="48" y2="24" stroke-width=".7"/>
+  <rect x="22.5" y="22.5" width="3" height="3" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-brk : opposing bracket frame -->
+<symbol id="g-brk" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <path d="M18 4 L8 4 L8 44 L18 44"  stroke-width=".9"/>
+  <path d="M30 4 L40 4 L40 44 L30 44" stroke-width=".9"/>
+  <line x1="8" y1="15" x2="40" y2="15" stroke-width=".65" opacity=".4"/>
+  <line x1="8" y1="24" x2="40" y2="24" stroke-width=".65" opacity=".4"/>
+  <line x1="8" y1="33" x2="40" y2="33" stroke-width=".65" opacity=".4"/>
+  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-stp : step / staircase sequence -->
+<symbol id="g-stp" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <polyline points="4,44 4,36 12,36 12,28 20,28 20,20 28,20 28,12 36,12 36,4 44,4"
+            stroke-width=".9"/>
+  <rect x="3"  y="35" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
+  <rect x="11" y="27" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
+  <rect x="19" y="19" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
+  <rect x="27" y="11" width="2.5" height="2.5" fill="currentColor" stroke="none"/>
+  <rect x="35" y="3"  width="2.5" height="2.5" fill="currentColor" stroke="none"/>
+  <!-- tick marks perpendicular to steps -->
+  <line x1="8"  y1="36" x2="8"  y2="34" stroke-width=".7" opacity=".5"/>
+  <line x1="16" y1="28" x2="16" y2="26" stroke-width=".7" opacity=".5"/>
+  <line x1="24" y1="20" x2="24" y2="18" stroke-width=".7" opacity=".5"/>
+  <line x1="32" y1="12" x2="32" y2="10" stroke-width=".7" opacity=".5"/>
+  <line x1="40" y1="4"  x2="40" y2="2"  stroke-width=".7" opacity=".5"/>
+</symbol>
+
+<!-- g-fan : beam / signal fan -->
+<symbol id="g-fan" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <line x1="4" y1="24" x2="44" y2="4"  stroke-width=".8"/>
+  <line x1="4" y1="24" x2="44" y2="11" stroke-width=".8"/>
+  <line x1="4" y1="24" x2="44" y2="18" stroke-width=".8"/>
+  <line x1="4" y1="24" x2="44" y2="24" stroke-width="1.2"/>
+  <line x1="4" y1="24" x2="44" y2="30" stroke-width=".8"/>
+  <line x1="4" y1="24" x2="44" y2="37" stroke-width=".8"/>
+  <line x1="4" y1="24" x2="44" y2="44" stroke-width=".8"/>
+  <line x1="44" y1="2" x2="44" y2="46" stroke-width="1.1"/>
+  <rect x="2" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-dtm : datum / survey triangle -->
+<symbol id="g-dtm" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <polygon points="24,5 44,43 4,43" stroke-width=".9"/>
+  <line x1="24" y1="5"  x2="24" y2="43" stroke-width=".75" opacity=".55"/>
+  <line x1="14" y1="24" x2="34" y2="24" stroke-width=".75" opacity=".45"/>
+  <line x1="4"  y1="43" x2="0"  y2="43" stroke-width=".9" opacity=".5"/>
+  <line x1="44" y1="43" x2="48" y2="43" stroke-width=".9" opacity=".5"/>
+  <rect x="22" y="41" width="4" height="4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<!-- g-rng : range / interval marker -->
+<symbol id="g-rng" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <line x1="8"  y1="8"  x2="8"  y2="40" stroke-width="1.1"/>
+  <line x1="40" y1="8"  x2="40" y2="40" stroke-width="1.1"/>
+  <line x1="8"  y1="24" x2="40" y2="24" stroke-width=".9"/>
+  <line x1="4"  y1="8"  x2="12" y2="8"  stroke-width=".8"/>
+  <line x1="4"  y1="40" x2="12" y2="40" stroke-width=".8"/>
+  <line x1="36" y1="8"  x2="44" y2="8"  stroke-width=".8"/>
+  <line x1="36" y1="40" x2="44" y2="40" stroke-width=".8"/>
+  <line x1="14" y1="19" x2="22" y2="19" stroke-width=".65" opacity=".45"/>
+  <line x1="26" y1="29" x2="34" y2="29" stroke-width=".65" opacity=".45"/>
+</symbol>
+
+<!-- g-lat : lattice / intersection grid -->
+<symbol id="g-lat" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+  <line x1="4"  y1="16" x2="44" y2="16" stroke-width=".65" opacity=".45"/>
+  <line x1="4"  y1="24" x2="44" y2="24" stroke-width=".65" opacity=".45"/>
+  <line x1="4"  y1="32" x2="44" y2="32" stroke-width=".65" opacity=".45"/>
+  <line x1="16" y1="4"  x2="16" y2="44" stroke-width=".65" opacity=".45"/>
+  <line x1="24" y1="4"  x2="24" y2="44" stroke-width=".65" opacity=".45"/>
+  <line x1="32" y1="4"  x2="32" y2="44" stroke-width=".65" opacity=".45"/>
+  <rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".35"/>
+  <rect x="22" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".9"/>
+  <rect x="30" y="14" width="4" height="4" fill="currentColor" stroke="none" opacity=".5"/>
+  <rect x="14" y="22" width="4" height="4" fill="currentColor" stroke="none" opacity=".7"/>
+  <rect x="22" y="22" width="4" height="4" fill="currentColor" stroke="none"/>
+  <rect x="30" y="22" width="4" height="4" fill="currentColor" stroke="none" opacity=".4"/>
+  <rect x="14" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".25"/>
+  <rect x="22" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".6"/>
+  <rect x="30" y="30" width="4" height="4" fill="currentColor" stroke="none" opacity=".85"/>
+</symbol>
+
+</svg>
+
+<!-- ══════════════════════════════════════════
+     ROOM 0  SECTOR.00  — #cc9911
+     ══════════════════════════════════════════ -->
+<section class="rm on" id="r0" style="--ac:#cc9911">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.00</span>
+    <span class="coord">33.8688° S / 151.2093° E</span>
+    <span class="clk" id="k0"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
+      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fan"/></svg>
+      <span class="lbl">SIGNAL<br><span class="val">144.220 MHz</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e0">T+ 00:00</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>
+      <span class="lbl">NODES<br><span class="val">8 / 8</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic rot-s" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
+         style="color:var(--ac)"><use href="#g-fid"/></svg>
+    <p class="ct-lbl">AWAITING INPUT</p>
+    <div class="pbar" style="width:55%;--w:68%"></div>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">00 / ENTRY</div></div>
+    <div class="data-block"><div class="key">FREQ</div><div class="dval">144.220</div></div>
+    <div class="data-block"><div class="key">STATUS</div><div class="dval">LOCK : ∅</div></div>
+    <div class="data-block"><div class="key">DEPTH</div><div class="dval">0.0 m</div></div>
+    <div class="data-block"><div class="key">HASH</div><div class="dval">0xCC9911</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="1">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-fan"/></svg>→ 01
+    </button>
+    <span class="rm-ctr">01 / 08</span>
+    <button class="nav-btn" data-to="2">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>→ 02
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 1  SECTOR.01  — #0088ee
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r1" style="--ac:#0088ee">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.01</span>
+    <span class="coord">SIGNAL ACQUIRED — 144.220 MHz</span>
+    <span class="clk" id="k1"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
+      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>
+      <span class="lbl">SCAN<br><span class="val">ACTIVE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e1">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic fan-anim" width="clamp(140px,21vw,230px)" height="clamp(140px,21vw,230px)"
+         style="color:var(--ac)"><use href="#g-fan"/></svg>
+    <p class="ct-lbl">SIGNAL ACQUIRED</p>
+    <div style="font-size:10px;color:var(--ac);opacity:.5;letter-spacing:.22em">
+      144.220 MHz — 0x7F
+    </div>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">01 / SIGNAL</div></div>
+    <div class="data-block"><div class="key">STRENGTH</div><div class="dval">7F / FF</div></div>
+    <div class="data-block"><div class="key">NOISE</div><div class="dval">0.03 dB</div></div>
+    <div class="data-block"><div class="key">SOURCE</div><div class="dval">UNKNOWN</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="3">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>→ 03
+    </button>
+    <span class="rm-ctr">02 / 08</span>
+    <button class="nav-btn" data-to="4">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>→ 04
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 2  SECTOR.02  — #00aa44
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r2" style="--ac:#00aa44">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.02</span>
+    <span class="coord">ARCHIVE — ACCESS GRANTED</span>
+    <span class="clk" id="k2"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
+      <span class="lbl">SYSTEM<br><span class="val">ONLINE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>
+      <span class="lbl">RECORDS<br><span class="val">128 / 128</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e2">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <div class="dgrid">
+      {['00','01','02','03','04','05','06','07','08'].map((id,i) => (
+        <div class={`cell ${[0,3,7].includes(i)?'lit':''}`}>
+          <svg width="36" height="36" style="color:var(--ac)"><use href="#g-lat"/></svg>
+          <span>REC.{id}</span>
+        </div>
+      ))}
+    </div>
+    <p class="ct-lbl">03 / 09 RECORDS ACTIVE</p>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">02 / ARCH</div></div>
+    <div class="data-block"><div class="key">INTEGRITY</div><div class="dval">94.7%</div></div>
+    <div class="data-block"><div class="key">MODIFIED</div><div class="dval">T-04:22:11</div></div>
+    <div class="data-block"><div class="key">HASH</div><div class="dval">0x4E7F</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="4">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>→ 04
+    </button>
+    <span class="rm-ctr">03 / 08</span>
+    <button class="nav-btn" data-to="5">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-sup"/></svg>→ 05
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 3  SECTOR.03  — #ee2233
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r3" style="--ac:#ee2233">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.03</span>
+    <span class="coord">ANOMALY DETECTED — CAUTION</span>
+    <span class="clk" id="k3"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>
+      <span class="lbl">ALERT<br><span class="val">CRITICAL</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>
+      <span class="lbl">SYSTEM<br><span class="val">DEGRADED</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e3">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic pls" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
+         style="color:var(--ac)"><use href="#g-dtm"/></svg>
+    <p class="ct-lbl">ANOMALY DETECTED</p>
+    <div style="font-size:10px;color:var(--ac);opacity:.6;letter-spacing:.18em">
+      ERR 0xDEAD — SECTOR.03
+    </div>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">03 / ALERT</div></div>
+    <div class="data-block"><div class="key">SEVERITY</div><div class="dval">CRITICAL</div></div>
+    <div class="data-block"><div class="key">CODE</div><div class="dval">0xDEAD</div></div>
+    <div class="data-block"><div class="key">ORIGIN</div><div class="dval">UNKNOWN</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="6">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dff"/></svg>→ 06
+    </button>
+    <span class="rm-ctr">04 / 08</span>
+    <button class="nav-btn" data-to="1">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-brk"/></svg>← 01
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 4  SECTOR.04  — #00bbcc
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r4" style="--ac:#00bbcc">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.04</span>
+    <span class="coord">NETWORK MAP — 8 NODES ACTIVE</span>
+    <span class="clk" id="k4"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>
+      <span class="lbl">NODES<br><span class="val">8 ONLINE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>
+      <span class="lbl">LINKS<br><span class="val">16 ACTIVE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e4">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <!-- network graph built from g-jct and connecting lines -->
+    <svg width="clamp(190px,24vw,260px)" height="clamp(190px,24vw,260px)"
+         viewBox="0 0 100 100" style="color:var(--ac)"
+         fill="none" stroke="currentColor">
+      <g stroke-width=".7" opacity=".4">
+        <line x1="50" y1="50" x2="50" y2="14"/>
+        <line x1="50" y1="50" x2="82" y2="28"/>
+        <line x1="50" y1="50" x2="82" y2="72"/>
+        <line x1="50" y1="50" x2="50" y2="86"/>
+        <line x1="50" y1="50" x2="18" y2="72"/>
+        <line x1="50" y1="50" x2="18" y2="28"/>
+        <line x1="50" y1="14" x2="82" y2="28"/>
+        <line x1="82" y1="28" x2="82" y2="72"/>
+        <line x1="18" y1="28" x2="18" y2="72"/>
+        <line x1="18" y1="72" x2="50" y2="86"/>
+      </g>
+      <!-- center: g-jct scaled -->
+      <rect x="46" y="46" width="8" height="8" stroke-width="1.1"/>
+      <rect x="48.5" y="48.5" width="3" height="3" fill="currentColor" stroke="none"/>
+      <!-- outer nodes as small squares -->
+      <g stroke-width="1">
+        <rect x="47" y="10" width="6" height="6"/><rect x="49" y="12" width="2" height="2" fill="currentColor" stroke="none"/>
+        <rect x="79" y="25" width="6" height="6"/><rect x="81" y="27" width="2" height="2" fill="currentColor" stroke="none"/>
+        <rect x="79" y="69" width="6" height="6"/><rect x="81" y="71" width="2" height="2" fill="currentColor" stroke="none"/>
+        <rect x="47" y="83" width="6" height="6"/><rect x="49" y="85" width="2" height="2" fill="currentColor" stroke="none"/>
+        <rect x="15" y="69" width="6" height="6"/><rect x="17" y="71" width="2" height="2" fill="currentColor" stroke="none"/>
+        <rect x="15" y="25" width="6" height="6"/><rect x="17" y="27" width="2" height="2" fill="currentColor" stroke="none"/>
+      </g>
+    </svg>
+    <p class="ct-lbl">NODE MAP — SECTOR.04</p>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">04 / NET</div></div>
+    <div class="data-block"><div class="key">TOPOLOGY</div><div class="dval">MESH</div></div>
+    <div class="data-block"><div class="key">LATENCY</div><div class="dval">0.4 ms</div></div>
+    <div class="data-block"><div class="key">LOSS</div><div class="dval">0.0%</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="5">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dff"/></svg>→ 05
+    </button>
+    <span class="rm-ctr">05 / 08</span>
+    <button class="nav-btn" data-to="7">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>→ 07
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 5  SECTOR.05  — #8822ff
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r5" style="--ac:#8822ff">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.05</span>
+    <span class="coord">ENCRYPTED — CLEARANCE REQUIRED</span>
+    <span class="clk" id="k5"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-brk"/></svg>
+      <span class="lbl">SECURITY<br><span class="val">LOCKED</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-sup"/></svg>
+      <span class="lbl">CIPHER<br><span class="val">AES-256</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e5">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic rot-r" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
+         style="color:var(--ac)"><use href="#g-cqs"/></svg>
+    <p class="enc" id="enc5"></p>
+    <p class="ct-lbl">DECRYPTION IN PROGRESS</p>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">05 / ENC</div></div>
+    <div class="data-block"><div class="key">KEY LENGTH</div><div class="dval">256 bit</div></div>
+    <div class="data-block"><div class="key">ATTEMPTS</div><div class="dval">∞</div></div>
+    <div class="data-block"><div class="key">ETA</div><div class="dval">UNKNOWN</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="7">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>→ 07
+    </button>
+    <span class="rm-ctr">06 / 08</span>
+    <button class="nav-btn" data-to="0">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>← 00
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 6  SECTOR.06  — #00aaaa
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r6" style="--ac:#00aaaa">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.06</span>
+    <span class="coord">DIAGNOSTIC — ANALYSIS ACTIVE</span>
+    <span class="clk" id="k6"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-cut"/></svg>
+      <span class="lbl">DIAG<br><span class="val">ACTIVE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-fid"/></svg>
+      <span class="lbl">SCAN<br><span class="val">360°</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e6">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic rot-s" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
+         style="color:var(--ac)"><use href="#g-sup"/></svg>
+    <p class="ct-lbl">DIAGNOSTIC MODE</p>
+    <div style="font-size:10px;color:var(--ac);opacity:.48;letter-spacing:.2em">
+      TARGET : 0x06 / UNKNOWN
+    </div>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">06 / DIAG</div></div>
+    <div class="data-block"><div class="key">RANGE</div><div class="dval">∞ m</div></div>
+    <div class="data-block"><div class="key">TARGETS</div><div class="dval">1 / UNK</div></div>
+    <div class="data-block"><div class="key">RES</div><div class="dval">MAX</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="0">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>← 00
+    </button>
+    <span class="rm-ctr">07 / 08</span>
+    <button class="nav-btn" data-to="3">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-jct"/></svg>→ 03
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ROOM 7  SECTOR.07  — #ddaa22
+     ══════════════════════════════════════════ -->
+<section class="rm" id="r7" style="--ac:#ddaa22">
+  <header class="rm-hd">
+    <span class="rid">SECTOR.07</span>
+    <span class="coord">TERMINUS — END OF SEQUENCE</span>
+    <span class="clk" id="k7"></span>
+  </header>
+  <aside class="sl panel">
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-stp"/></svg>
+      <span class="lbl">SEQUENCE<br><span class="val">COMPLETE</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-dtm"/></svg>
+      <span class="lbl">RETURN<br><span class="val">∅</span></span>
+    </div>
+    <div class="stat">
+      <svg class="ic" width="18" height="18" style="color:var(--ac)"><use href="#g-rng"/></svg>
+      <span class="lbl">ELAPSED<br><span class="val" id="e7">T+ 00:00</span></span>
+    </div>
+  </aside>
+  <main class="ct">
+    <svg class="ic pls2" width="clamp(130px,19vw,210px)" height="clamp(130px,19vw,210px)"
+         style="color:var(--ac)"><use href="#g-stp"/></svg>
+    <p class="ct-lbl">TERMINUS</p>
+    <div style="font-size:10px;color:var(--ac);opacity:.45;letter-spacing:.25em">
+      ∅ ∅ ∅  END  ∅ ∅ ∅
+    </div>
+  </main>
+  <aside class="sr panel">
+    <div class="data-block"><div class="key">SECTOR</div><div class="dval">07 / TERM</div></div>
+    <div class="data-block"><div class="key">BEYOND</div><div class="dval">UNKNOWN</div></div>
+    <div class="data-block"><div class="key">RETURN</div><div class="dval">POSSIBLE</div></div>
+    <div class="data-block"><div class="key">DEPTH</div><div class="dval">MAX</div></div>
+  </aside>
+  <footer class="rm-ft">
+    <button class="nav-btn" data-to="2">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-lat"/></svg>→ 02
+    </button>
+    <span class="rm-ctr">08 / 08</span>
+    <button class="nav-btn" data-to="5">
+      <svg width="18" height="18" style="color:var(--ac)"><use href="#g-cqs"/></svg>→ 05
+    </button>
+  </footer>
+</section>
+
+<script>
+'use strict';
+// maze: 0→[1,2] 1→[3,4] 2→[4,5] 3→[6,1] 4→[5,7] 5→[7,0] 6→[0,3] 7→[2,5]
+
+// canvas bg
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+function frame(t) {
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(18,38,80,.13)'; ctx.lineWidth=.5;
+  const g=40;
+  for(let x=g;x<W;x+=g){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=g;y<H;y+=g){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  const sy=(t*.022)%H;
+  const sl=ctx.createLinearGradient(0,sy-55,0,sy+55);
+  sl.addColorStop(0,'rgba(255,255,255,0)');
+  sl.addColorStop(.5,'rgba(255,255,255,.018)');
+  sl.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=sl; ctx.fillRect(0,sy-55,W,110);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// navigation
+let cur=0, busy=false;
+const flash=document.getElementById('flash');
+function go(n) {
+  if(busy||n===cur) return; busy=true;
+  flash.style.transition='none'; flash.style.opacity='1';
+  setTimeout(()=>{
+    document.querySelectorAll('.rm').forEach(r=>r.classList.remove('on'));
+    document.getElementById(`r${n}`).classList.add('on');
+    cur=n;
+    flash.style.transition='opacity 0.42s'; flash.style.opacity='0';
+    setTimeout(()=>{busy=false;},470);
+  },130);
+}
+document.addEventListener('click', e=>{
+  if(busy) return;
+  const b=e.target.closest('[data-to]');
+  if(b) go(parseInt(b.dataset.to));
+});
+
+// clock
+const start=Date.now();
+function pad(n){return String(n).padStart(2,'0');}
+function tick(){
+  const d=new Date(), now=Date.now();
+  const ts=`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const el=Math.floor((now-start)/1000);
+  const em=`T+ ${pad(Math.floor(el/60))}:${pad(el%60)}`;
+  for(let i=0;i<8;i++){
+    const c=document.getElementById(`k${i}`); if(c) c.textContent=ts;
+    const e=document.getElementById(`e${i}`); if(e) e.textContent=em;
+  }
+}
+tick(); setInterval(tick,1000);
+
+// encrypted display for R5
+const EC='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+const el5=document.getElementById('enc5');
+if(el5) setInterval(()=>{el5.textContent=Array.from({length:60},()=>EC[Math.floor(Math.random()*EC.length)]).join('');},160);
+</script>
+</body>
+</html>
