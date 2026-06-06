@@ -1,17 +1,17 @@
 ---
-title: '個人的Windows11セットアップ'
+title: '個人的 Windows11 セットアップ'
 pubDate: '2026-06-02'
 ---
 
 内容を理解した上で実行してね。操作を誤るとパソコンが爆発します。
 
-## Windows11をインストール
+## Windows11 をインストール
 
-Rufusでブートメディアを作成してインストール。
+Rufus でブートメディアを作成してインストール。
 
 https://rufus.ie/ja/
 
-![Rufusのセットアップ画面](./setup.png "ローカルアカウントの作成やBitLockerを無効にカスタムできて便利。")
+![Rufus のセットアップ画面](./setup.png "ローカルアカウントの作成や BitLocker を無効にカスタムできて便利。")
 
 ## ディスプレイ設定
 
@@ -21,11 +21,19 @@ https://rufus.ie/ja/
 
 更新がなくなるまで当てる。
 
+## PowerShell
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+実行ポリシー変更。
+
 ## ソフトのインストール
 
 以下の内容を `run.bat` として保存。
 
-PS1ファイルをこのbatにドラッグ＆ドロップすると実行できる。
+PS1 ファイルをこの bat にドラッグ＆ドロップすると実行できる。
 
 ```bat
 @echo off
@@ -33,7 +41,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
 pause
 ```
 
-コメント部分に日本語があると文字化けするため、エンコードはANSIで以下の内容を `install.ps1` として保存し、`run.bat` にドラッグして実行する。wingetでソフトウェアをまとめてインストールする。
+以下の内容を ANSI で `install.ps1` として保存し、`run.bat` にドラッグして実行。winget でソフトウェアをまとめてインストールする。
 
 ```powershell
 $packageIds = @(
@@ -75,9 +83,9 @@ foreach ($packageId in $packageIds) {
 
 ## ソフトの手動インストール
 
-wingetで取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
+winget で取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
 
-Nvidia App（GeForce Driver、Nvidia Broadcastのインストールもここから行う）
+Nvidia App（GeForce Driver、Nvidia Broadcast のインストールもここから行う）
 
 https://www.nvidia.com/ja-jp/software/nvidia-app/
 
@@ -95,7 +103,7 @@ https://motu.com/en-us/download/product/408/#3110
 
 ## ソフトのアンインストールと設定変更
 
-レジストリの編集やソフトのアンインストールを行う。Windowsの仕様変更についていくのが面倒なので、オープンソースで長期間保守されているツールを使うのがよさげ。
+レジストリの編集やソフトのアンインストールを行う。 Windows の仕様変更についていくのが面倒なので、オープンソースで長期間保守されているツールを使うのがよさげ。
 
 https://github.com/Raphire/Win11Debloat
 
@@ -105,13 +113,13 @@ https://github.com/Raphire/Win11Debloat
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
 ```
 
-GUIが立ち上がるので操作を行う。
+GUI が立ち上がるので操作を行う。
 
-1. 右上の ≡ をクリック → Import config
-2. 以下の内容をJSONファイルとして保存したものを読み込む
+1. 右上の ≡ をクリックして Import config
+2. 以下の内容を JSON ファイルとして保存したものを読み込む
 3. Apply Changes
 
-レジストリの変更を元に戻す場合は ≡ → Restore backup。
+レジストリの変更を元に戻す場合は ≡ をクリックして Restore backup
 
 ```json
 {
@@ -325,18 +333,14 @@ gh auth login
 ## Claude Code
 
 ```powershell
-irm https://claude.ai/install.ps1 | iex
+irm https://claude.ai/install.ps1 | iex; [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";" + (Join-Path $HOME ".local\bin"), "User")
 ```
 
-パスを通す
-
-```powershell
-[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";" + (Join-Path $HOME ".local\bin"), "User")
-```
+インストールついでにパスを通す。
 
 ## Caps Lockを消す
 
-Caps LockをPowerToysのKeyboard Managerで別のキーに割り当てる。
+Caps Lock を PowerToys の Keyboard Manager で別のキーに割り当てる。
 
 ## スタートアップの整理
 
