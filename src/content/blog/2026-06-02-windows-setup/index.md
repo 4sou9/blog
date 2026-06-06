@@ -5,7 +5,7 @@ pubDate: '2026-06-02'
 
 内容を理解した上で実行してね。操作を誤るとパソコンが爆発します。
 
-## windows11をインストール
+## Windows11をインストール
 
 Rufusでブートメディアを作成してインストール。
 
@@ -21,11 +21,11 @@ https://rufus.ie/ja/
 
 更新がなくなるまで当てる。
 
-## ソフトウェアのインストールと設定
+## ソフトのインストール
 
 以下の内容を `run.bat` として保存。
 
-PS1ファイルをこのbatにドラッグ＆ドロップすると、管理者権限で実行できる。
+PS1ファイルをこのbatにドラッグ＆ドロップすると実行できる。
 
 ```bat
 @echo off
@@ -71,30 +71,9 @@ foreach ($packageId in $packageIds) {
 }
 ```
 
-以下の内容を `setting.ps1` として保存し、`run.bat` にドラッグして実行する。電源・マウスの初期設定を行う。
+生でターミナルにぶち込んでもいいけどファイルとして残しておくとソフトのアップデートが楽。
 
-```powershell
-# 管理者権限の昇格
-$principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process pwsh -Verb RunAs -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath)
-    exit
-}
-
-# 電源設定
-powercfg -x monitor-timeout-ac 5   # 5分後にモニターをオフ
-powercfg -x standby-timeout-ac 0   # スリープしない
-
-# マウス加速を無効化
-$mouse = 'HKCU:\Control Panel\Mouse'
-Set-ItemProperty -Path $mouse -Name MouseSpeed      -Value '0'
-Set-ItemProperty -Path $mouse -Name MouseThreshold1 -Value '0'
-Set-ItemProperty -Path $mouse -Name MouseThreshold2 -Value '0'
-```
-
-生でコンソールにぶち込んでもいいけどファイルと残しておくとアップデートが楽。
-
-## 手動インストール
+## ソフトの手動インストール
 
 wingetで取得できなかったりパッケージマネージャ経由だと動作しないドライバ・ソフトウェアを手動でインストールする。
 
@@ -109,6 +88,10 @@ https://aquavoice.com/download
 MOTU M Series
 
 https://motu.com/en-us/download/product/408/#3110
+
+## サウンド設定
+
+出力、入力デバイスを変更。
 
 ## ソフトのアンインストールと設定変更
 
