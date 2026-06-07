@@ -333,7 +333,7 @@ gh auth login
 ## Claude Code
 
 ```powershell
-irm https://claude.ai/install.ps1 | iex; [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", "User") + ";" + (Join-Path $HOME ".local\bin"), "User")
+irm https://claude.ai/install.ps1 | iex; if($?){ $b=Join-Path $HOME ".local\bin"; $p=[Environment]::GetEnvironmentVariable("Path","User"); if($p -notlike "*$b*"){ [Environment]::SetEnvironmentVariable("Path","$p;$b","User") } }
 ```
 
 インストールついでにパスを通す。
