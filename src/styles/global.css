@@ -8,7 +8,7 @@
 
 * { box-sizing: border-box; }
 
-html { scrollbar-gutter: stable; }
+html { scrollbar-gutter: stable both-edges; }
 
 body {
   margin: 0 auto;
