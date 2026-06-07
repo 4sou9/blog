@@ -16,8 +16,11 @@ const ogImage = slug
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
-    <link rel="icon" href={`${base}/favicon.ico`} />
+    <link rel="icon" href={`${base}/favicon.ico`} sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="96x96" href={`${base}/favicon-96x96.png`} />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
+    <link rel="manifest" href={`${base}/site.webmanifest`} />
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
     <meta name="description" content={pageDescription} />
     <style>html{background:#1a1a1a}</style>
