@@ -3,9 +3,9 @@ title: 'Steamゲームのプレイ時間を稼ぐだけのツールを作りま�
 pubDate: '2026-06-09'
 ---
 
-何の意味があるんですか？
+右上の更新ボタンを押してライブラリを読み込んだらゲームを選択。あとは右下の開始を押すと放置できます。
 
-![](./screenshot.png)
+![SteamIdlePickerのGUI](./screenshot.png "何の意味があるんですか？")
 
 https://github.com/4sou9/Steam_Idle_Picker
 
