@@ -23,25 +23,13 @@ https://rufus.ie/ja/
 
 ## PowerShell
 
+実行ポリシー変更。
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-実行ポリシー変更。
 
 ## ソフトのインストール
-
-以下の内容を `run.bat` として保存。
-
-PS1 ファイルをこの bat にドラッグ＆ドロップすると実行できる。
-
-```bat
-@echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~1"
-pause
-```
-
-以下の内容を ANSI で `install.ps1` として保存し、`run.bat` にドラッグして実行。winget でソフトウェアをまとめてインストールする。
 
 ```powershell
 $packageIds = @(
@@ -55,31 +43,29 @@ $packageIds = @(
     'Valve.Steam'
     'EpicGames.EpicGamesLauncher'
 
-    # ビデオ
-    'MPC-BE.MPC-BE'
+    # メディア
+    'mpv.net'
+    'DuongDieuPhap.ImageGlass'
 
     # コミュニケーション
     'Discord.Discord'
     'RomTenma.Siki'
 
-    # 開発
-    'Microsoft.VisualStudioCode'
-    'Git.Git'
-    'Microsoft.PowerShell'
-    'OpenJS.NodeJS'
-    'GitHub.cli'
+    # ダウンロード
+    'qBittorrent.qBittorrent'
+    'yt-dlp.yt-dlp'
+    'yt-dlp.FFmpeg'
 
     # ユーティリティ
-    'Microsoft.PowerToys'
     'M2Team.NanaZip'
+    'KDE.KDEConnect'
+    'ShareX.ShareX'
 )
 
 foreach ($packageId in $packageIds) {
     winget install -e --id $packageId --accept-source-agreements --accept-package-agreements
 }
 ```
-
-生でターミナルにぶち込んでもいいけどファイルとして残しておくとソフトのアップデートが楽。
 
 ## ソフトの手動インストール
 
@@ -101,6 +87,32 @@ https://motu.com/en-us/download/product/408/#3110
 
 出力、入力デバイスを変更。
 
+## 開発環境の構築
+
+Microsoft 公式の WindowsDeveloperConfig を使い開発環境を構築。
+
+https://github.com/microsoft/WindowsDeveloperConfig
+
+```powershell
+$config = "$env:TEMP\dev-config.winget"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/WindowsDeveloperConfig/main/windows-dev-config/dev-config.winget" -OutFile $config
+winget configure -f $config --accept-configuration-agreements --disable-interactivity
+```
+
+- PowerShell 7
+- Git
+- GitHub CLI
+- VS Code
+- .NET SDK
+- Python
+- Node.js (LTS + NVM)
+- Oh My Posh
+- WSL + Ubuntu
+
+他にも色々入るけど長いので割愛。
+
+WSL 有効化のために途中で再起動が入る。再起動後に PowerShell を開き直して同じコマンドを実行すれば残りの構成が続行される。
+
 ## ソフトのアンインストールと設定変更
 
 レジストリの編集やソフトのアンインストールを行う。 Windows の仕様変更についていくのが面倒なので、オープンソースで長期間保守されているツールを使うのがよさげ。
@@ -113,13 +125,9 @@ https://github.com/Raphire/Win11Debloat
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
 ```
 
-GUI が立ち上がるので操作を行う。
+GUI が立ち上がるので、右上の ≡ ボタンから Import config を選択。以下の内容を保存した JSON ファイルを読み込み適用。
 
-1. 右上の ≡ をクリックして Import config
-2. 以下の内容を JSON ファイルとして保存したものを読み込む
-3. Apply Changes
-
-レジストリの変更を元に戻す場合は ≡ をクリックして Restore backup
+レジストリの変更を元に戻す場合は ≡ ボタンから Restore backup
 
 ```json
 {
@@ -150,7 +158,6 @@ GUI が立ち上がるので操作を行う。
                  "king.com.CandyCrushSodaSaga",
                  "Clipchamp.Clipchamp",
                  "COOKINGFEVER",
-                 "Microsoft.Copilot",
                  "Microsoft.Windows.AIHub",
                  "Microsoft.549981C3F5F10",
                  "MicrosoftWindows.CrossDevice",
@@ -295,7 +302,6 @@ GUI が立ち上がるので操作を行う。
                    { "Value": true, "Name": "DisableNotepadAI" },
                    { "Value": true, "Name": "DisableStickyKeys" },
                    { "Value": true, "Name": "DisableFindMyDevice" },
-                   { "Value": true, "Name": "DisableCopilot" },
                    { "Value": true, "Name": "DisableClickToDo" },
                    { "Value": true, "Name": "DisableBing" },
                    { "Value": true, "Name": "DisableUpdateASAP" },
@@ -335,8 +341,6 @@ gh auth login
 ```powershell
 irm https://claude.ai/install.ps1 | iex; if($?){ $b=Join-Path $HOME ".local\bin"; $p=[Environment]::GetEnvironmentVariable("Path","User"); if(($p -split ';') -notcontains $b){ [Environment]::SetEnvironmentVariable("Path","$p;$b","User") } }
 ```
-
-インストールついでにパスを通す。
 
 ## Caps Lockを消す
 
