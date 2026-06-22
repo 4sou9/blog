@@ -4,6 +4,7 @@ const SITE_TITLE = 'ねこのメモ';
 const SITE_DESCRIPTION = '備忘録です';
 const base = import.meta.env.BASE_URL;
 const { title, description, slug } = Astro.props;
+const isHome = Astro.url.pathname === `${base}/` || Astro.url.pathname === base;
 const pageTitle = title ? `${title} - ${SITE_TITLE}` : SITE_TITLE;
 const pageDescription = description ?? SITE_DESCRIPTION;
 const ogImage = slug
@@ -25,7 +26,7 @@ const ogImage = slug
     <link rel="manifest" href={`${base}/site.webmanifest`} />
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
     <meta name="description" content={pageDescription} />
-    <style>html{background:#1a1a1a}</style>
+    <style>html{background:#36373e}</style>
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
     <meta property="og:url" content={Astro.url} />
@@ -34,7 +35,7 @@ const ogImage = slug
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
-    <header class="site-title"><a href={base}>{SITE_TITLE}</a></header>
+    <header class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</header>
     <main><slot /></main>
     <script>
       document.querySelectorAll('.prose pre').forEach((pre) => {
@@ -61,6 +62,19 @@ const ogImage = slug
           setTimeout(() => { btn.textContent = 'copy'; }, 2000);
         });
         wrapper.appendChild(btn);
+      });
+
+      // タブ切り替え（:::tabs / :::tab）
+      document.querySelectorAll('.tabs').forEach((tabs) => {
+        const btns = tabs.querySelectorAll(':scope > .tab-list > .tab-btn');
+        const panels = tabs.querySelectorAll(':scope > .tab-panel');
+        btns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const i = Number(btn.dataset.index);
+            btns.forEach((b, j) => b.classList.toggle('active', j === i));
+            panels.forEach((p, j) => p.classList.toggle('active', j === i));
+          });
+        });
       });
     </script>
   </body>

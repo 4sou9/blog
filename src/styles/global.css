@@ -1,9 +1,12 @@
 :root {
-  --bg: #1a1a1a;
-  --fg: #f4f5f7;
-  --muted: #aab2bd;
-  --faint: #828b97;
-  --link: #8fb6f0;
+  --bg: #36373e;
+  --surface: #2b2d31;
+  --fg: #f2f3f5;
+  --muted: #b9bbbe;
+  --faint: #8e9297;
+  --border: #4a4d54;
+  --link: #7bb0f4;
+  --accent: #5865f2;
 }
 
 * { box-sizing: border-box; }
@@ -22,8 +25,8 @@ body {
   background: var(--bg);
 }
 
-a { color: var(--fg); text-decoration: none; }
-a:visited { color: var(--muted); }
+a { color: var(--link); text-decoration: none; }
+a:visited { color: #6f9bd0; }
 a:hover { text-decoration: underline; }
 
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0 0 2.5rem; }
@@ -48,9 +51,14 @@ a:hover { text-decoration: underline; }
 .code-wrapper:hover .copy-btn { opacity: 1; }
 .code-lang { position: absolute; top: 0.5rem; left: 0.75rem; font-size: 0.7rem; color: #8b949e; pointer-events: none; user-select: none; }
 
-.prose table { border-collapse: collapse; width: 100%; }
-.prose th, .prose td { border: 1px solid var(--faint); padding: 0.4rem 0.8rem; text-align: left; }
-.prose th { background: #21252c; }
+.prose .table-scroll { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+.prose th, .prose td { padding: 0.5rem 0.85rem; text-align: left; border-bottom: 1px solid var(--border); }
+.prose tr:last-child td { border-bottom: none; }
+.prose th { background: var(--surface); font-weight: 600; letter-spacing: 0.02em; }
+.prose tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+/* .table-scroll で包まない素の table にも角丸を効かせる */
+.prose > table { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 
 .btn-link {
   display: inline-block;
@@ -65,18 +73,91 @@ a:hover { text-decoration: underline; }
 .btn-link:hover { background: var(--link); color: var(--bg); text-decoration: none; }
 .btn-link:visited:hover { background: var(--muted); border-color: var(--muted); color: var(--bg); }
 
-.ogp-card { display: flex; border: 1px solid var(--faint); border-radius: 6px; overflow: hidden; margin: 1rem 0; color: var(--fg); text-decoration: none; }
-.ogp-card:hover { border-color: var(--link); text-decoration: none; }
+.ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; border-radius: 8px; overflow: hidden; margin: 1rem 0; color: var(--fg); text-decoration: none; }
+.ogp-card:hover { background: #38465a; text-decoration: none; }
 .ogp-image { width: 125px !important; min-width: 125px; height: 125px !important; flex-shrink: 0; align-self: flex-start; background-size: cover !important; background-position: center center; background-repeat: no-repeat; background-color: var(--faint); }
 .ogp-content { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
-.ogp-title { font-weight: 500; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ogp-title { color: var(--link); font-weight: 500; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ogp-desc { font-size: 0.78rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .ogp-url { font-size: 0.75rem; color: var(--faint); margin-top: auto; }
 
+/* スクロールバー（端の矢印三角ボタンを消す） */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 6px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+html { scrollbar-color: var(--faint) transparent; }
+
 .prose pre { scrollbar-width: thin; scrollbar-color: var(--faint) transparent; }
 .prose pre::-webkit-scrollbar { width: 6px; height: 6px; }
+.prose pre::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
 .prose pre::-webkit-scrollbar-track { background: transparent; }
-.prose pre::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
+.prose pre::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; border: none; }
 
 /* github-dark のコメント色 #6A737D はコントラスト比 3.04:1 で不足するため上書き */
 pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
+
+/* インラインコード */
+.prose :not(pre) > code { background: var(--surface); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em; }
+
+/* ===== Custom Components（:::ディレクティブ） ===== */
+
+/* Alert */
+.alert { display: flex; align-items: flex-start; gap: 0.75rem; margin: 1.25rem 0; padding: 0.85rem 1rem; border: 2px solid; border-radius: 8px; }
+.alert > .alert-icon { flex: 0 0 auto; width: 1.4rem; height: 1.4rem; margin-top: 0.1rem; -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+.alert > p:first-of-type { margin-top: 0; }
+.alert > p:last-child { margin-bottom: 0; }
+.alert-info   { background: #323c4a; border-color: #00a9fa; }
+.alert-info   > .alert-icon { background: #00a9fa; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202a10%2010%200%20100%2020%2010%2010%200%20000-20zm1%2015h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E"); }
+.alert-warn   { background: #3f3b39; border-color: #eeb132; }
+.alert-warn   > .alert-icon { background: #eeb132; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M1%2021h22L12%202%201%2021zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'/%3E%3C/svg%3E"); }
+.alert-danger { background: #41373d; border-color: #f03f42; }
+.alert-danger > .alert-icon { background: #f03f42; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202a10%2010%200%20100%2020%2010%2010%200%20000-20zm5%2013.59L15.59%2017%2012%2013.41%208.41%2017%207%2015.59%2010.59%2012%207%208.41%208.41%207%2012%2010.59%2015.59%207%2017%208.41%2013.41%2012%2017%2015.59z'/%3E%3C/svg%3E"); }
+.alert-tip    { background: #2f3d35; border-color: #3ba55d; }
+.alert-tip    > .alert-icon { background: #3ba55d; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202a10%2010%200%20100%2020%2010%2010%200%20000-20zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z'/%3E%3C/svg%3E"); }
+
+/* Collapsible（<details>） */
+.collapsible { background: #27292d; border-radius: 8px; margin: 1.5rem 0; overflow: hidden; }
+.collapsible > .collapsible-summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 0.75rem; padding: 1rem 1.25rem; }
+.collapsible > .collapsible-summary::-webkit-details-marker { display: none; }
+.collapsible-title { grid-column: 1; grid-row: 1; font-size: 1.1rem; font-weight: 600; }
+.collapsible-desc { grid-column: 1; grid-row: 2; color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+.collapsible-chevron { grid-column: 2; grid-row: 1 / span 2; width: 1.25rem; height: 1.25rem; background: var(--muted); -webkit-mask: var(--chev) center / contain no-repeat; mask: var(--chev) center / contain no-repeat; --chev: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7.41%208.59L12%2013.17l4.59-4.58L18%2010l-6%206-6-6z'/%3E%3C/svg%3E"); transition: transform 0.25s ease; }
+.collapsible[open] .collapsible-chevron { transform: rotate(180deg); }
+.collapsible[open] > .collapsible-summary { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.collapsible > *:not(.collapsible-summary) { margin-left: 1.25rem; margin-right: 1.25rem; }
+.collapsible > .collapsible-summary + * { margin-top: 1rem; }
+.collapsible > *:not(.collapsible-summary):last-child { margin-bottom: 1rem; }
+
+/* Tabs */
+.tabs { margin: 1.5rem 0; }
+.tab-list { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+.tab-list::-webkit-scrollbar { display: none; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 0.5rem 0.9rem; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+.tab-btn:hover { color: var(--fg); }
+.tab-btn.active { color: #8c93f9; border-bottom-color: #8c93f9; }
+.tab-panel { display: none; padding-top: 0.85rem; }
+.tab-panel.active { display: block; }
+.tab-panel > :first-child { margin-top: 0; }
+
+/* Changelog */
+.changelog { margin: 1.5rem 0; }
+.release { position: relative; margin-left: 0.75rem; padding-left: 2rem; padding-bottom: 1.6rem; border-left: 2px solid rgba(88, 101, 242, 0.35); }
+.release:last-child { padding-bottom: 0; border-left-color: transparent; }
+.release::before { content: ''; position: absolute; left: -9px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
+.release-head { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.3rem; }
+.release-version { font-size: 1.15rem; font-weight: 700; }
+.release-date { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.release > *:not(.release-head):first-of-type { margin-top: 0; }
+.release :is(ul, ol) { margin: 0.2rem 0; padding-left: 1.2rem; }
+.release :is(li) { margin: 0.1rem 0; }
+
+/* Badge */
+.badge { display: inline-block; padding: 0.08em 0.5em; border-radius: 999px; font-size: 0.72em; font-weight: 700; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
+.badge-default { background: var(--surface); color: var(--fg); border: 1px solid var(--border); }
+.badge-info { background: rgba(0, 169, 250, 0.18); color: #5fc6ff; }
+.badge-warn { background: rgba(238, 177, 50, 0.18); color: #f1c45a; }
+.badge-danger { background: rgba(240, 63, 66, 0.2); color: #ff6b6d; }
+.badge-success, .badge-tip { background: rgba(59, 165, 93, 0.2); color: #57d98a; }
+.badge-accent, .badge-new { background: rgba(88, 101, 242, 0.22); color: #99a0fb; }
