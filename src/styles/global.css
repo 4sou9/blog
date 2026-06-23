@@ -33,26 +33,24 @@ a:hover { text-decoration: underline; }
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0; }
 .site-title a, .site-title a:visited { color: var(--fg); }
 
-/* ヘッダーの検索トリガーボタン（クリックでモーダルを開く） */
+/* ヘッダーの検索トリガーボタン（虫眼鏡アイコンのみ。クリックでモーダルを開く） */
 .search-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  justify-content: center;
   flex-shrink: 0;
+  width: 2rem;
   height: 2rem;
-  padding: 0 0.85rem;
+  padding: 0;
   color: var(--faint);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: none;
   border-radius: 8px;
-  font: inherit;
-  font-size: 0.85rem;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: color 0.15s;
 }
-.search-trigger:hover { border-color: var(--link); color: var(--fg); }
+.search-trigger:hover { color: var(--fg); }
 .search-trigger__icon { flex-shrink: 0; }
-.search-trigger__label { line-height: 1; }
 
 /* 検索モーダル（オーバーレイ＋専用ウィンドウ） */
 .search-modal {

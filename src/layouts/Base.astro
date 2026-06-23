@@ -39,8 +39,7 @@ const ogImage = slug
     <header class="site-header">
       <div class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</div>
       <button id="search-trigger" class="search-trigger" type="button" aria-label="検索を開く">
-        <svg class="search-trigger__icon" width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.75 11.26h-.79l-.28-.27a6.47 6.47 0 1 0-.7.7l.27.28v.79l5 4.99 1.49-1.49-5-4.99Zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z"/></svg>
-        <span class="search-trigger__label">Search</span>
+        <svg class="search-trigger__icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.75 11.26h-.79l-.28-.27a6.47 6.47 0 1 0-.7.7l.27.28v.79l5 4.99 1.49-1.49-5-4.99Zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z"/></svg>
       </button>
     </header>
     <main><slot /></main>
@@ -121,10 +120,11 @@ const ogImage = slug
 
         const open = () => {
           if (!window.PagefindUI) return;
-          initOnce();
           modal.hidden = false;
           document.body.style.overflow = 'hidden';
-          requestAnimationFrame(() => modal.querySelector('.pagefind-ui__search-input')?.focus());
+          // iOS はユーザー操作と同じ呼び出しスタック内で同期的に focus しないとソフト
+          // キーボードが開かない。input を事前生成済みなので rAF を挟まず同期で focus する
+          modal.querySelector('.pagefind-ui__search-input')?.focus();
         };
         const close = () => {
           modal.hidden = true;
@@ -132,6 +132,9 @@ const ogImage = slug
           trigger.focus();
         };
 
+        // 入力欄を先に生成しておく（初回タップ時に input が存在し、同期 focus でき
+        // モバイルでもワンタップでキーボードが開くようにするため）
+        initOnce();
         trigger.addEventListener('click', open);
         modal.addEventListener('click', (e) => {
           // 背景・✕ で閉じる。結果リンクのクリックでも閉じる（同一ページ内アンカーへ
