@@ -27,6 +27,7 @@ const ogImage = slug
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
     <meta name="description" content={pageDescription} />
     <style>html{background:#36373e}</style>
+    <link rel="stylesheet" href={`${base}/pagefind/pagefind-ui.css`} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
     <meta property="og:url" content={Astro.url} />
@@ -35,7 +36,10 @@ const ogImage = slug
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
-    <header class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</header>
+    <header class="site-header">
+      <div class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</div>
+      <div id="search" class="site-search"></div>
+    </header>
     <main><slot /></main>
     <script>
       document.querySelectorAll('.prose pre').forEach((pre) => {
@@ -74,6 +78,26 @@ const ogImage = slug
             btns.forEach((b, j) => b.classList.toggle('active', j === i));
             panels.forEach((p, j) => p.classList.toggle('active', j === i));
           });
+        });
+      });
+    </script>
+    <script is:inline src={`${base}/pagefind/pagefind-ui.js`}></script>
+    <script is:inline define:vars={{ base }}>
+      window.addEventListener('DOMContentLoaded', () => {
+        if (!window.PagefindUI) return;
+        const fix = (u) => (u && !u.startsWith(base + '/')) ? base + (u.startsWith('/') ? '' : '/') + u : u;
+        new window.PagefindUI({
+          element: '#search',
+          bundlePath: base + '/pagefind/',
+          showImages: false,
+          showSubResults: true,
+          pageSize: 5,
+          processResult: (result) => {
+            result.url = fix(result.url);
+            if (Array.isArray(result.sub_results)) result.sub_results.forEach((s) => { s.url = fix(s.url); });
+            return result;
+          },
+          translations: { placeholder: 'Search', zero_results: '「[SEARCH_TERM]」に一致する記事がありません' },
         });
       });
     </script>

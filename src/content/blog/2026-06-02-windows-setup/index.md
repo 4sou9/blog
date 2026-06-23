@@ -29,8 +29,9 @@ https://rufus.ie/ja/
 
 ## PowerShell の実行ポリシーを変更
 
-このあとスクリプトを何度か流すので、ローカルのスクリプトを実行できるようにしておく。
-RemoteSigned は、自分で書いたスクリプトはそのまま実行でき、ネット経由のものは署名がある場合だけ許可する設定。
+Windows は既定でスクリプトの実行をブロックしている。拾ってきたスクリプトをうっかり動かさないための安全策。
+RemoteSigned は、自分で書いたローカルのスクリプトはそのまま実行でき、ネット経由のものは署名がある場合だけ許可する設定。改ざんされたダウンロード済みスクリプトを弾きやすくなる。
+`-Scope CurrentUser` なら変更は自分のアカウントだけで済む。とはいえ実行ポリシーは回避もできる「ガードレール」なので、過信せず中身を確認してから流すのが前提。
 
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -153,6 +154,8 @@ Windows は仕様がよく変わるので、手作業で追うより、オープ
 https://github.com/Raphire/Win11Debloat
 
 次のワンライナーで起動する。
+これは `debloat.raphi.re` からスクリプトを取得して、そのまま実行する書き方（`irm` でダウンロードした中身を即実行）。
+中身を見ずに走らせる以上、配布元とその通信を信頼することになるので、不安なら URL をブラウザで開いて中身を読むか、上の GitHub リポジトリから取得して実行する。
 
 ```powershell
 & ([scriptblock]::Create((irm "https://debloat.raphi.re/")))
@@ -483,7 +486,7 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
 
 ## Git の初期設定
 
-コミットに使う名前とメールアドレス、改行コードの自動変換を設定する。
+コミットに使う名前とメールアドレスを設定する。
 
 ```powershell
 git config --global user.name "名前"
@@ -501,6 +504,8 @@ gh auth login
 ## Claude Code をインストール
 
 インストーラを実行し、実行ファイルの場所（`~/.local\bin`）を PATH に通す。
+これも `irm | iex`（ダウンロードした中身を即実行）の形で、Anthropic 公式が案内しているインストール方法。
+ただし「公式が推奨だから中身を見なくていい」わけではなく、debloat と同じく claude.ai とその通信を信頼することになる点は変わらない。気になるなら `irm https://claude.ai/install.ps1` だけ先に実行して中身を確認してから流す。
 
 ```powershell
 irm https://claude.ai/install.ps1 | iex; if($?){ $b=Join-Path $HOME ".local\bin"; $p=[Environment]::GetEnvironmentVariable("Path","User"); if(($p -split ';') -notcontains $b){ [Environment]::SetEnvironmentVariable("Path","$p;$b","User") } }
