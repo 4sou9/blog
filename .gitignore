@@ -23,7 +23,3 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# Claude Code（個人設定は無視するが、skills はバージョン管理する）
-.claude/
-!.claude/skills/
-!.claude/skills/**

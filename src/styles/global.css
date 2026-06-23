@@ -127,6 +127,9 @@ a:hover { text-decoration: underline; }
   background: transparent;
 }
 .site-search .pagefind-ui__search-input:focus { outline: none; }
+/* type="search" 化で出る WebKit のネイティブなクリアボタンを隠す（Pagefind の「クリア」と重複するため） */
+.site-search .pagefind-ui__search-input::-webkit-search-cancel-button,
+.site-search .pagefind-ui__search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 /* drawer が form 内にあり form が伸びるため、アイコン／クリアは入力欄上端基準で固定 */
 .site-search .pagefind-ui__form::before { top: 2.05rem; left: 1.6rem; transform: translateY(-50%); }
 .site-search .pagefind-ui__search-clear {
