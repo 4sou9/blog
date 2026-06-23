@@ -138,6 +138,15 @@ const ogImage = slug
           // 飛ぶ場合はページ遷移が起きずモーダルが残るため）
           if (e.target === modal || e.target.closest('[data-close]') || e.target.closest('.pagefind-ui__result-link')) close();
         });
+        // 検索実行（モバイルキーボードの確定/検索キー）で入力欄のフォーカスを外し、
+        // ソフトキーボードを閉じて結果を見やすくする。Pagefind が Enter の既定動作を
+        // 抑制し submit が発火しない場合があるため keydown でも拾う
+        modal.addEventListener('submit', (e) => { e.preventDefault(); });
+        modal.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('pagefind-ui__search-input')) {
+            e.target.blur();
+          }
+        });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && !modal.hidden) close();
           if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && modal.hidden && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName))) {
