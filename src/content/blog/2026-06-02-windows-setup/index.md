@@ -6,11 +6,6 @@ pubDate: '2026-06-02'
 新しい PC を用意したときや Windows をクリーンインストールしたときに、毎回やっている初期設定を上から順にまとめた。
 あくまで自分用の構成なので、入れるソフトや設定は好みで決めている。
 
-:::danger
-レジストリの編集や OS 機能の無効化を含む。
-操作を誤るとパソコンが爆発する。
-:::
-
 ## Windows11 をインストール
 
 公式のメディア作成ツールではなく Rufus を使う。
@@ -86,17 +81,17 @@ foreach ($packageId in $packageIds) {
 
 winget に無かったり、winget 経由だとうまく動かなかったりするドライバやソフトは個別に入れる。
 
-**Nvidia App**：GeForce のドライバや Nvidia Broadcast も、ここからまとめて入れられる。
+[**Nvidia App**](https://www.nvidia.com/ja-jp/software/nvidia-app/) - GeForce ドライバと Nvidia Broadcast を入れる。
 
-https://www.nvidia.com/ja-jp/software/nvidia-app/
+[**Adobe Creative Cloud**](https://www.adobe.com/jp/creativecloud/desktop-app.html) - Premiere Pro、After Effects、Photoshop、Illustrator を入れる。
 
-**Aqua Voice**：音声入力ツール。
+[**Aqua Voice**](https://aquavoice.com/download) - 音声入力ツール。
 
-https://aquavoice.com/download
+[**VOICEVOX**](https://voicevox.hiroshiba.jp/) - 無料のテキスト読み上げソフト。
 
-**MOTU M Series**：オーディオインターフェースのドライバ。
+[**A.I.VOICE2 Editor**](https://aivoice.jp/) - 音声合成ソフト。
 
-https://motu.com/en-us/download/product/408/#3110
+[**MOTU M Series**](https://motu.com/en-us/download/product/408/#3110) - オーディオインターフェースのドライバ。
 
 ## サウンド設定
 
@@ -110,32 +105,46 @@ Microsoft 公式の WindowsDeveloperConfig で、開発まわりのツールを�
 
 https://github.com/microsoft/WindowsDeveloperConfig
 
+管理者の PowerShell で実行する（非昇格だと別途 Visual C++ 再頒布可能パッケージが要る）。
+`winget configure` を有効化してから、設定ファイルを落として適用する。
+
 ```powershell
+winget configure --enable
 $config = "$env:TEMP\dev-config.winget"
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/microsoft/WindowsDeveloperConfig/main/windows-dev-config/dev-config.winget" -OutFile $config
 winget configure -f $config --accept-configuration-agreements --disable-interactivity
 ```
 
-これで入る主なもの。
+これで入るもの。
 
 - PowerShell 7
 - Git
 - GitHub CLI
+- GitHub Copilot CLI
 - VS Code
 - .NET SDK
 - Python
-- Node.js (LTS + NVM)
+- uv（Python の高速なパッケージ/環境管理）
+- Node.js（LTS）
+- nvm for Windows（Node のバージョン管理）
 - Oh My Posh
+- winappcli（Windows App CLI）
+- PowerToys
 - WSL + Ubuntu
-
-ほかにもいろいろ入るが、長いので割愛。
 
 :::warn
 WSL を有効化する途中で、一度再起動が入る。
 再起動したら PowerShell を開き直し、同じコマンドをもう一度実行する。残りの構成が続きから進む。
+WSL の初期化に失敗する場合は、BIOS/UEFI でハードウェア仮想化を有効にする。
 :::
 
 ## 不要なアプリの削除と設定変更
+
+:::danger
+この手順は大量のレジストリの編集とアプリの削除を伴うので、後戻りしにくい。
+下の JSON は自分の環境に合わせた削除リストなので、適用前に中身を確認して、残したいアプリ（電卓やカメラなども消える）は外しておくとよい。
+ `CreateRestorePoint` で復元ポイントは作られ、レジストリ変更は Restore backup で戻せるが、削除したアプリは全て入れ直しになる。
+:::
 
 プリインストールされた使わないアプリを消し、プライバシーや見た目まわりの設定をまとめて変える。
 Windows は仕様がよく変わるので、手作業で追うより、オープンソースで継続的に保守されているツールに任せるのがよさげ。
@@ -151,8 +160,6 @@ https://github.com/Raphire/Win11Debloat
 
 GUI が立ち上がったら、右上の ≡ ボタンから Import config を選び、下の JSON を保存したファイルを読み込んで適用する。
 変更を元に戻したくなったら、同じ ≡ ボタンの Restore backup から戻せる。
-
-:::collapse[Win11Debloat に読み込む設定 JSON]{desc="削除するアプリの一覧と各種トグル。長いので折りたたみ"}
 
 ```json
 {
@@ -183,7 +190,6 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
                  "king.com.CandyCrushSodaSaga",
                  "Clipchamp.Clipchamp",
                  "COOKINGFEVER",
-                 "Microsoft.Windows.AIHub",
                  "Microsoft.549981C3F5F10",
                  "MicrosoftWindows.CrossDevice",
                  "CyberLinkMediaSuiteEssentials",
@@ -259,6 +265,7 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
                  "PandoraMediaInc",
                  "Microsoft.People",
                  "Microsoft.YourPhone",
+                 "Microsoft.Windows.Photos",
                  "PhototasticCollage",
                  "PicsArt-PhotoStudio",
                  "Plex",
@@ -272,6 +279,7 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
                  "Shazam",
                  "Microsoft.SkypeApp",
                  "SlingTV",
+                 "Microsoft.ScreenSketch",
                  "Microsoft.MicrosoftSolitaireCollection",
                  "Microsoft.WindowsSoundRecorder",
                  "Spotify",
@@ -298,56 +306,180 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
                  "XING"
              ],
     "Tweaks":  [
-                   { "Value": true, "Name": "DisableSettings365Ads" },
-                   { "Value": true, "Name": "EnableDarkMode" },
-                   { "Value": true, "Name": "DisableBitlockerAutoEncryption" },
-                   { "Value": true, "Name": "HideSearchTb" },
-                   { "Value": true, "Name": "DisableTelemetry" },
-                   { "Value": true, "Name": "DisableWidgets" },
-                   { "Value": true, "Name": "DisableLockscreenTips" },
-                   { "Value": true, "Name": "DisableAISvcAutoStart" },
-                   { "Value": true, "Name": "DisableStartPhoneLink" },
-                   { "Value": true, "Name": "DisableStartRecommended" },
-                   { "Value": true, "Name": "DisableMouseAcceleration" },
-                   { "Value": true, "Name": "DisableStoreSearchSuggestions" },
-                   { "Value": true, "Name": "DisableDeliveryOptimization" },
-                   { "Value": true, "Name": "HideTaskview" },
-                   { "Value": true, "Name": "DisableGameBarIntegration" },
-                   { "Value": true, "Name": "DisableDVR" },
-                   { "Value": true, "Name": "DisableSuggestions" },
-                   { "Value": true, "Name": "ShowKnownFileExt" },
-                   { "Value": true, "Name": "ClearStart" },
-                   { "Value": true, "Name": "DisableDesktopSpotlight" },
-                   { "Value": true, "Name": "HideOnedrive" },
-                   { "Value": true, "Name": "HideGallery" },
-                   { "Value": true, "Name": "EnableEndTask" },
-                   { "Value": true, "Name": "ShowHiddenFolders" },
-                   { "Value": true, "Name": "DisableEdgeAI" },
-                   { "Value": true, "Name": "DisableSettingsHome" },
-                   { "Value": true, "Name": "DisableNotepadAI" },
-                   { "Value": true, "Name": "DisableStickyKeys" },
-                   { "Value": true, "Name": "DisableFindMyDevice" },
-                   { "Value": true, "Name": "DisableClickToDo" },
-                   { "Value": true, "Name": "DisableBing" },
-                   { "Value": true, "Name": "DisableUpdateASAP" },
-                   { "Value": true, "Name": "DisableRecall" },
-                   { "Value": true, "Name": "DisableDragTray" },
-                   { "Value": true, "Name": "ExplorerToThisPC" },
-                   { "Value": true, "Name": "DisableEdgeAds" },
-                   { "Value": true, "Name": "DisableLocationServices" },
-                   { "Value": true, "Name": "DisablePaintAI" }
+                   {
+                       "Value":  true,
+                       "Name":  "DisableSettings365Ads"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "EnableDarkMode"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableBitlockerAutoEncryption"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "HideSearchTb"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableTelemetry"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableWidgets"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableLockscreenTips"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableAISvcAutoStart"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableStartPhoneLink"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableMouseAcceleration"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableStartRecommended"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableStoreSearchSuggestions"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableDeliveryOptimization"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "HideTaskview"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableGameBarIntegration"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableDVR"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableSuggestions"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "ShowKnownFileExt"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "ClearStartAllUsers"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableDesktopSpotlight"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "HideOnedrive"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "HideGallery"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "EnableEndTask"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "ShowHiddenFolders"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableEdgeAI"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableSettingsHome"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableNotepadAI"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableStickyKeys"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableFindMyDevice"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableUpdateASAP"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableClickToDo"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableBing"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableRecall"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableDragTray"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "ExplorerToThisPC"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableEdgeAds"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisableLocationServices"
+                   },
+                   {
+                       "Value":  true,
+                       "Name":  "DisablePaintAI"
+                   }
                ],
     "Deployment":  [
-                       { "Value": 0,    "Name": "UserSelectionIndex" },
-                       { "Value": 0,    "Name": "AppRemovalScopeIndex" },
-                       { "Value": true, "Name": "CreateRestorePoint" },
-                       { "Value": true, "Name": "RestartExplorer" }
+                       {
+                           "Value":  0,
+                           "Name":  "UserSelectionIndex"
+                       },
+                       {
+                           "Value":  0,
+                           "Name":  "AppRemovalScopeIndex"
+                       },
+                       {
+                           "Value":  true,
+                           "Name":  "CreateRestorePoint"
+                       },
+                       {
+                           "Value":  true,
+                           "Name":  "RestartExplorer"
+                       }
                    ],
     "Version":  "1.0"
 }
 ```
-
-:::
 
 ## Git の初期設定
 
@@ -374,8 +506,10 @@ gh auth login
 irm https://claude.ai/install.ps1 | iex; if($?){ $b=Join-Path $HOME ".local\bin"; $p=[Environment]::GetEnvironmentVariable("Path","User"); if(($p -split ';') -notcontains $b){ [Environment]::SetEnvironmentVariable("Path","$p;$b","User") } }
 ```
 
-## 仕上げ
+## その他
 
 **Caps Lock の無効化**：PowerToys の Keyboard Manager で、Caps Lock を別のキーに割り当てて潰す。
+
+**スリープ抑止**：PowerToys の Awake を無期限にして、長時間の書き出しやエンコード中にスリープ・画面オフさせないようにする。
 
 **スタートアップの整理**：タスクマネージャーのスタートアップ タブで、不要なソフトの自動起動を無効にする。

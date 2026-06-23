@@ -3,7 +3,7 @@
   --surface: #2b2d31;
   --fg: #f2f3f5;
   --muted: #b9bbbe;
-  --faint: #8e9297;
+  --faint: #a8acb3;
   --border: #4a4d54;
   --link: #7bb0f4;
   --accent: #5865f2;
@@ -26,7 +26,7 @@ body {
 }
 
 a { color: var(--link); text-decoration: none; }
-a:visited { color: #6f9bd0; }
+a:visited { color: #88add8; }
 a:hover { text-decoration: underline; }
 
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0 0 2.5rem; }
@@ -81,19 +81,28 @@ a:hover { text-decoration: underline; }
 .ogp-desc { font-size: 0.78rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .ogp-url { font-size: 0.75rem; color: var(--faint); margin-top: auto; }
 
-/* スクロールバー（端の矢印三角ボタンを消す） */
-::-webkit-scrollbar { width: 12px; height: 12px; }
-::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 6px; border: 3px solid var(--bg); }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
-html { scrollbar-color: var(--faint) transparent; }
+/* スクロールバー（参照: site/stylesheets/scrollbar.css）
+   矢印ボタンを出さないため、Chromium は ::-webkit-scrollbar 擬似要素だけで描画する。
+   標準の scrollbar-color を Chromium に当てると webkit 擬似要素が無効化されてネイティブ矢印が出るので、
+   scrollbar-color は @supports で Firefox 専用に隔離する。 */
+:root { --scrollbar-thumb: #202225; --scrollbar-track: #2f3136; }
 
-.prose pre { scrollbar-width: thin; scrollbar-color: var(--faint) transparent; }
-.prose pre::-webkit-scrollbar { width: 6px; height: 6px; }
-.prose pre::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-.prose pre::-webkit-scrollbar-track { background: transparent; }
-.prose pre::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; border: none; }
+@supports (-moz-appearance: none) {
+  html { scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+}
+
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-button { display: none; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border: 4px solid transparent; border-radius: 8px; min-height: 40px; background-clip: padding-box; }
+::-webkit-scrollbar-track { background-color: var(--scrollbar-track); border: 4px solid transparent; border-radius: 8px; background-clip: padding-box; }
+
+.prose pre::-webkit-scrollbar { width: 8px; height: 8px; }
+.prose pre::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border: 2px solid transparent; border-radius: 6px; background-clip: padding-box; }
+.prose pre::-webkit-scrollbar-track { background-color: transparent; }
+@supports (-moz-appearance: none) {
+  .prose pre { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+}
 
 /* github-dark のコメント色 #6A737D はコントラスト比 3.04:1 で不足するため上書き */
 pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }

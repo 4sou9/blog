@@ -24,6 +24,7 @@ Astro static blog ("ねこのメモ") deployed to GitHub Pages.
 - `rehype-steam.js` — Steam store URL → Steam widget `<iframe>`（高さ190px）
 - `rehype-ogp-card.js` — bare URL → OGP card (build time)。`steampowered.com` はスキップ済み
 - `rehype-figure.js` — 画像 → `<figure>` + キャプション（alt/title）
+- `rehype-external-links.js` — 本文の外部リンク（http/https）に `target="_blank"` + `rel="noopener noreferrer"` を付与
 - `remark-btn.js` — リンクタイトル `"btn"` → ボタン風スタイル
 - `remark-excerpt.js` — 本文先頭から抜粋（description 未指定時の概要）
 
