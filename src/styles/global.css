@@ -33,38 +33,129 @@ a:hover { text-decoration: underline; }
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0; }
 .site-title a, .site-title a:visited { color: var(--fg); }
 
-/* Pagefind 検索ボックス（ヘッダー右端） */
-.site-search {
-  position: relative;
-  width: min(46vw, 14rem);
+/* ヘッダーの検索トリガーボタン（クリックでモーダルを開く） */
+.search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   flex-shrink: 0;
-  --pagefind-ui-scale: 0.62;
+  height: 2rem;
+  padding: 0 0.85rem;
+  color: var(--faint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.search-trigger:hover { border-color: var(--link); color: var(--fg); }
+.search-trigger__icon { flex-shrink: 0; }
+.search-trigger__label { line-height: 1; }
+
+/* 検索モーダル（オーバーレイ＋専用ウィンドウ） */
+.search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 5rem 1rem 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  overflow-y: auto;
+}
+.search-modal[hidden] { display: none; }
+.search-modal__panel {
+  position: relative;
+  width: min(46rem, 92vw);
+  background: #1f2025; /* 上部（入力欄エリア）のダーク背景。結果エリアは drawer で一段明るく */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+/* 閉じるボタンはパネル右上に絶対配置（flow から外し、結果を全幅に） */
+.search-modal__head { position: static; padding: 0; }
+.search-modal__close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 3;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: var(--faint);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.search-modal__close:hover { background: rgba(255, 255, 255, 0.08); color: var(--fg); }
+
+/* モーダル内の Pagefind UI（全幅。スクロールバーをパネル右端へ） */
+.site-search {
+  display: block;
+  width: 100%;
+  --pagefind-ui-scale: 1;
   --pagefind-ui-primary: var(--link);
   --pagefind-ui-text: var(--fg);
-  --pagefind-ui-background: var(--surface);
+  --pagefind-ui-background: var(--bg);
   --pagefind-ui-border: var(--border);
-  --pagefind-ui-tag: var(--surface);
+  --pagefind-ui-tag: var(--bg);
   --pagefind-ui-border-width: 1px;
   --pagefind-ui-border-radius: 8px;
   --pagefind-ui-font: inherit;
-  min-height: 2rem;
 }
 .site-search .pagefind-ui, .site-search .pagefind-ui__form { margin: 0; }
-.site-search .pagefind-ui__search-input { height: 2rem; padding-top: 0; padding-bottom: 0; font-size: 0.85rem; font-weight: 400; background-position-x: 0.6rem; background-position-y: center; }
+/* 入力欄の上の余白は form の padding-top で取る（margin-top だと相殺してアイコン／クリアとズレる） */
+.site-search .pagefind-ui__form { padding-top: 0.85rem; }
+/* 入力欄：iOS のフォーカス時ズームを防ぐため 16px 以上。右マージンで ✕ ボタンを避ける */
+.site-search .pagefind-ui__search-input {
+  width: calc(100% - 4.25rem); /* 左右マージン(0.85+3.4)を差し引いて全幅。右側は ✕ を避ける */
+  height: 2.4rem;
+  margin: 0 3.4rem 0.75rem 0.85rem;
+  padding: 0 2.6rem 0 2.5rem;
+  font-size: 16px;
+  font-weight: 400;
+  border: none;
+  background: transparent;
+}
+.site-search .pagefind-ui__search-input:focus { outline: none; }
+/* drawer が form 内にあり form が伸びるため、アイコン／クリアは入力欄上端基準で固定 */
+.site-search .pagefind-ui__form::before { top: 2.05rem; left: 1.6rem; transform: translateY(-50%); }
+.site-search .pagefind-ui__search-clear {
+  top: 0.85rem;
+  right: 3.7rem;
+  height: 2.4rem;
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+  background: transparent;
+  transform: none;
+  display: inline-flex;
+  align-items: center;
+}
+/* 結果は通常フローでパネル全幅に展開し、drawer 自身をスクローラに。
+   右パディングを 0 にしてスクロールバーをパネル右端へ寄せる */
 .site-search .pagefind-ui__drawer {
-  position: absolute;
-  top: calc(100% + 0.4rem);
-  right: 0;
-  width: 28rem;
-  max-width: 88vw;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.5rem 0.9rem 0.9rem;
-  max-height: 70vh;
+  position: static;
+  margin: 0;
+  max-height: min(60vh, 30rem);
   overflow-y: auto;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  z-index: 50;
+  padding: 0 0 0.6rem;
+  background: var(--surface); /* 結果エリアは上部より一段明るく */
+}
+.site-search .pagefind-ui__message { padding: 0.5rem 0.95rem; height: auto; }
+.site-search .pagefind-ui__results-area { margin-top: 0; padding: 0 0.95rem; }
+/* ハイライトを黄色背景からシンプルな青文字に */
+.site-search .pagefind-ui mark {
+  background: transparent;
+  color: var(--link);
+  font-weight: 600;
 }
 
 .post-list { list-style: none; padding: 0; margin: 0; }
