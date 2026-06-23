@@ -1,13 +1,12 @@
 ---
 title: Epic Games のゲームを再ダウンロードせず引き継ぐ
 pubDate: 2026-06-23
-description: クリーンインストールや別ドライブ移設で Epic がゲームを見失ったとき、再ダウンロードせず認識させる二つの方法。
 ---
 
-Steam はライブラリフォルダを別ドライブに置いておけば、クリーンインストール後にフォルダを指定するだけで全ゲームが即座に戻る。
-Epic Games Launcher にはこの引き継ぎが無い。
-ゲーム本体が別ドライブに残っていても、ランチャーを入れ直すと存在を認識せず、再ダウンロードを促してくる。
-この差を埋める方法を二つ紹介する。
+Steam はライブラリフォルダを別ドライブに置いておけば、クリーンインストール後にフォルダを指定するだけで全ゲームが戻る。
+Epic Games Launcher にはこれが無い。
+ゲーム本体が別ドライブに残っていても、入れ直すと認識されず再ダウンロードになる。
+これを解決する手段を2つ紹介する。
 
 ## なぜ Steam は楽で Epic は引き継げないのか
 
@@ -16,20 +15,16 @@ Steam は各ライブラリフォルダの中の `appmanifest_*.acf` に状態�
 だからフォルダを指定し直せば、その場で読み直して全ゲームを復元できる。
 
 Epic は `C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests` の中の `.item`（JSON）に持つ。
-この置き場所はランチャーのインストールに紐付いていて、ゲーム本体とは別管理になっている。
-クリーンインストールで `.item` が消えると、本体が残っていてもランチャーは何も知らない状態になる。
+これはゲーム本体とは別管理なので、クリーンインストールで `.item` が消えると、本体が残っていてもランチャーは存在を知らない。
 
-ただし、各ゲームフォルダの中には `.egstore` という隠しフォルダがあり、ここにバージョン情報を持つ `.manifest` がある。
-`.egstore` はゲーム本体と一緒なので、データドライブが残っていれば生き残る。
+ただし、各ゲームフォルダ内の隠しフォルダ `.egstore` にはバージョン情報を持つ `.manifest` があり、ゲーム本体と一緒なのでドライブが残れば生き残る。
 つまり消えるのは `ProgramData` 側の `.item` だけで、ゲームの実体と `.egstore` は手元にある。
 復元とは、この失われた `.item` をどう取り戻すかという話になる。
 
 ## 方法1 ランチャーに .item を作らせる
 
-`.item` を事前に保存していなくても復元できる。
-`.item` はアカウントとストアのカタログからランチャーが再生成できるからだ。
-インストールを開始した瞬間、ランチャーはサーバーに問い合わせて `.item` を作る。
-これを利用して、ダウンロードの中身だけ手元のファイルに差し替える。
+`.item` を保存していなくても復元できる。
+インストールを開始するとランチャーがサーバーから `.item` を作り直すので、それを利用してダウンロードの中身だけ手元のファイルに差し替える。
 
 1. ランチャーで対象ゲームを、既存ファイルと同じ場所にインストール開始する。ランチャーが新しい `.item` と `.egstore` を作る。
 2. ダウンロードが始まったらすぐ一時停止する。
@@ -41,58 +36,17 @@ Epic は `C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests` の中の `.item
 
 ## 方法2 PowerShell で .item を書き換えて一括復元
 
-`.item` を事前に退避していれば、もっと楽にできる。
-`.item` の中で場所に依存するのは次の三つだけだ。
+`.item` を事前に退避しておけば、入れ直したあとに全ゲームをまとめて復元できる。
+ここでは Python のいらない PowerShell スクリプトを使う。
+普段 PowerShell を触らない人でも、次の手順をなぞれば実行できる。多分。
 
-- `InstallLocation`：ゲーム本体フォルダ
-- `ManifestLocation`：`<ゲームフォルダ>\.egstore`
-- `StagingLocation`：`<ゲームフォルダ>\.egstore\bps`
+まず、下のスクリプトを用意する。
 
-この三つを今のパスに書き換えてランチャーの `Manifests` フォルダへ戻せば、ランチャーは既存インストールを認識する。
-
-同じことをする Python 製ツール（[Epic-Games-Library-Relinker](https://github.com/Supernova1114/Epic-Games-Library-Relinker)）があるが、Python のインストールが要る。
-Windows 標準の PowerShell だけで動くように書き直したのが、この記事末尾のスクリプトだ。
-二つのコマンドで完結する。
-
-```powershell
-# クリーンインストールの前に、今の .item を退避する
-.\Epic-Relink.ps1 backup -GamesFolder D:\EpicLibrary
-
-# 入れ直した後、ゲームフォルダに合わせて復元する
-.\Epic-Relink.ps1 restore -GamesFolder D:\EpicLibrary
-```
-
-`D:\EpicLibrary` はゲームが並ぶ親フォルダの例なので、自分の保存先に読み替える。
-
-`restore` の中身は単純だ。
-各ゲームフォルダの `.egstore\*.manifest` と、退避した `.item` を、拡張子を除いたファイル名で突き合わせる。
-一致したら先述の三つのパスを今の場所に書き換え、`Manifests` フォルダへ配置する。
-ゲームが何本あっても一度で終わる。
-
-`.item` を退避できるのは、退避した時点でランチャーがオンラインで作った正規のファイルだからだ。
-方法1がインストール開始のたびにサーバーから取り直しているものを、方法2は事前に手元へ保存しておく、という違いになる。
-
-## どちらを使うか
-
-| 状況 | 方法 |
-| --- | --- |
-| クリーンインストール前に `.item` を退避できた | 方法2（一括、ツールで自動） |
-| 退避し忘れた、または既に消えた | 方法1（一本ずつだが救済できる） |
-
-## 注意点
-
-- 手元のゲームが最新版でないと、結局ダウンロードが走る。退避や移行は更新を当てた直後に行う。
-- `.egstore` フォルダを消さない。これが無いと突き合わせができない。
-- クラウドセーブは別管理なので、この方法では引き継げない。
-- 対応する `.item` の形式は `FormatVersion 0`。将来フォーマットが変わったら確認が要る。
-- 初めて使うときは、一本だけで試してからまとめて流すと安心できる。
-
-:::collapse[Epic-Relink.ps1 全文]{desc="方法2 で使う PowerShell スクリプト"}
 ```powershell
 <#
 .SYNOPSIS
-    Epic Games Launcher に、別ドライブに残った既存ゲームを再ダウンロードせず認識させる。
-    Python 不要。Windows 標準の PowerShell だけで動く。
+    Re-link already-installed Epic Games on another drive to the launcher
+    without re-downloading. No Python required; uses the built-in Windows PowerShell.
 
 .EXAMPLE
     .\Epic-Relink.ps1 backup  -GamesFolder D:\EpicLibrary
@@ -135,7 +89,7 @@ function Resolve-BackupFolder {
     throw 'Specify -BackupFolder or -GamesFolder.'
 }
 
-# .egstore\*.manifest のベース名 -> ゲームフォルダのフルパス の対応表を作る
+# Build a map: manifest base name -> game folder full path
 function Get-GameManifestMap ([string]$gamesRoot) {
     $map = @{}
     foreach ($dir in (Get-ChildItem -LiteralPath $gamesRoot -Directory)) {
@@ -230,4 +184,49 @@ switch ($Mode) {
     'restore' { Invoke-Restore }
 }
 ```
-:::
+
+手順は次のとおり。
+
+1. メモ帳を開き、上のスクリプトを全部コピーして貼り付ける。
+2. 「ファイル」から「名前を付けて保存」を選ぶ。ファイルの種類を「すべてのファイル」、`Epic-Relink.ps1` という名前で保存する。場所はゲームのあるドライブなど、分かりやすいところでよい。
+3. 保存したフォルダを開き、中の何もない場所で右クリックして「ターミナルで開く」を選ぶ。そのフォルダで PowerShell が開く。
+4. 開いた PowerShell に次を貼り付けて Enter。`D:\EpicLibrary` は自分のゲーム保存先に置き換える。
+
+```powershell
+.\Epic-Relink.ps1 backup -GamesFolder D:\EpicLibrary
+```
+
+ゲームドライブの中に `_MANIFEST_BACKUPS` フォルダができる。
+ゲーム本体と一緒に、このドライブを保管しておく。
+
+クリーンインストールしたあと、または別の PC では、手順3と同じように PowerShell を開いて次を実行する。
+保存先は退避したときと同じものを指定する。
+
+```powershell
+.\Epic-Relink.ps1 restore -GamesFolder D:\EpicLibrary
+```
+
+あとは Epic Games Launcher を起動すれば、各ゲームが検証されてそのまま遊べる。
+
+もし「スクリプトの実行が無効になっています」と表示されたら、先に次を実行してから、もう一度コマンドを打つ。
+この設定はウィンドウを閉じるまでの一時的なものだ。
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass -Force
+```
+
+`restore` がやっているのは、`.item` の中の三つの場所（`InstallLocation` と `ManifestLocation` と `StagingLocation`）を今のフォルダに書き換えて `Manifests` へ戻すことだけだ。
+方法1がインストールのたびにサーバーから取り直す `.item` を、方法2は事前に退避しておくだけの違いになる。
+
+## どちらを使うか
+
+| 状況 | 方法 |
+| --- | --- |
+| クリーンインストール後 | 方法1（一本ずつだが救済できる） |
+| クリーンインストール前 | 方法2（一括、ツールで自動） |
+
+## 注意点
+
+- 手元のゲームが最新版でないと、結局ダウンロードが走る。退避や移行は更新を当てた直後に行う。
+- `.egstore` フォルダを消さない。これが無いと突き合わせができない。
+- 対応する `.item` の形式は `FormatVersion 0`。将来フォーマットが変わったら確認が要る。
