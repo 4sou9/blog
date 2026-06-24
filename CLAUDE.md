@@ -21,8 +21,7 @@ Astro static blog ("ねこのメモ") deployed to GitHub Pages.
 **Plugins** (`src/plugins/`)
 - `rehype-youtube.js` — YouTube URL → `<iframe>` embed
 - `rehype-twitter.js` — Twitter/X URL → embed widget
-- `rehype-steam.js` — Steam store URL → Steam widget `<iframe>`（高さ190px）
-- `rehype-ogp-card.js` — bare URL → OGP card (build time)。`steampowered.com` はスキップ済み
+- `rehype-ogp-card.js` — bare URL → OGP card (build time)。YouTube/Twitter 等の埋め込み対象URLはスキップ（Steam URL も OGP カードになる）
 - `rehype-figure.js` — 画像 → `<figure>` + キャプション（alt/title）
 - `rehype-external-links.js` — 本文の外部リンク（http/https）に `target="_blank"` + `rel="noopener noreferrer"` を付与
 - `remark-btn.js` — リンクタイトル `"btn"` → ボタン風スタイル
@@ -36,9 +35,6 @@ https://www.youtube.com/watch?v=VIDEO_ID
 
 # Twitter/X
 https://twitter.com/user/status/STATUS_ID
-
-# Steam ストアページ
-https://store.steampowered.com/app/APP_ID/
 
 # その他URL → OGPカード
 https://example.com/
