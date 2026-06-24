@@ -266,7 +266,7 @@ a:hover { text-decoration: underline; }
 pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 
 /* インラインコード */
-.prose :not(pre) > code { background: var(--surface); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em; }
+.prose :not(pre) > code { background: var(--surface); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em; overflow-wrap: anywhere; }
 
 /* ===== Custom Components（:::ディレクティブ） ===== */
 
