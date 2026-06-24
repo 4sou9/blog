@@ -10,6 +10,10 @@ export default function rehypeSteam() {
       const child = node.children[0];
       if (child.type !== 'element' || child.tagName !== 'a') return;
       const href = child.properties?.href ?? '';
+      // 裸URL（リンクテキスト＝href）のときだけ widget 化する。
+      // [テキスト](URL) のように明示テキストを付けたリンクは普通のリンクのまま残す。
+      const text = child.children.length === 1 && child.children[0].type === 'text' ? child.children[0].value : null;
+      if (text !== href) return;
       const match = href.match(STEAM_RE);
       if (!match) return;
 
