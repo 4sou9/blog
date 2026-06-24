@@ -29,7 +29,7 @@ a { color: var(--link); text-decoration: none; }
 a:visited { color: var(--link); }
 a:hover { text-decoration: underline; }
 
-.site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 2.5rem; }
+.site-header { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 2.5rem; }
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0; }
 .site-title a, .site-title a:visited { color: var(--fg); }
 
@@ -42,6 +42,7 @@ a:hover { text-decoration: underline; }
   width: 2rem;
   height: 2rem;
   padding: 0;
+  margin-left: -0.4rem; /* アイコンを左端にそろえる（ボタンの中央寄せ分を相殺） */
   color: var(--faint);
   background: transparent;
   border: none;

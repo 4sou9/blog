@@ -37,10 +37,10 @@ const ogImage = slug
   </head>
   <body>
     <header class="site-header">
-      <div class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</div>
       <button id="search-trigger" class="search-trigger" type="button" aria-label="検索を開く">
         <svg class="search-trigger__icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.75 11.26h-.79l-.28-.27a6.47 6.47 0 1 0-.7.7l.27.28v.79l5 4.99 1.49-1.49-5-4.99Zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Z"/></svg>
       </button>
+      <div class="site-title">{isHome ? SITE_TITLE : <a href={base}>{SITE_TITLE}</a>}</div>
     </header>
     <main><slot /></main>
     <div id="search-modal" class="search-modal" hidden>
