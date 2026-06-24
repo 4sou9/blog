@@ -28,6 +28,7 @@ export default function rehypeYoutube() {
           style: 'aspect-ratio:16/9;border:none;margin:1rem 0;display:block;',
           allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
           allowfullscreen: true,
+          loading: 'lazy',
         },
         children: [],
       };

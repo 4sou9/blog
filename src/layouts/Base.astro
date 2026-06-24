@@ -133,10 +133,11 @@ const ogImage = slug
 
         const open = () => {
           if (!window.PagefindUI) return;
+          initOnce();
           modal.hidden = false;
           document.body.style.overflow = 'hidden';
           // iOS はユーザー操作と同じ呼び出しスタック内で同期的に focus しないとソフト
-          // キーボードが開かない。input を事前生成済みなので rAF を挟まず同期で focus する
+          // キーボードが開かない。pointerdown で input を生成済みなので同期で focus する
           modal.querySelector('.pagefind-ui__search-input')?.focus();
         };
         const close = () => {
@@ -145,9 +146,10 @@ const ogImage = slug
           trigger.focus();
         };
 
-        // 入力欄を先に生成しておく（初回タップ時に input が存在し、同期 focus でき
-        // モバイルでもワンタップでキーボードが開くようにするため）
-        initOnce();
+        // 検索を使わないページで無駄なインデックス取得を走らせないため、ページ読込時には
+        // 初期化しない。トリガーに触れた最初の pointerdown で初期化しておけば、続く click 時には
+        // 入力欄が存在し、モバイルでもワンタップで同期 focus できる
+        trigger.addEventListener('pointerdown', initOnce);
         trigger.addEventListener('click', open);
         modal.addEventListener('click', (e) => {
           // 背景・✕ で閉じる。結果リンクのクリックでも閉じる（同一ページ内アンカーへ
