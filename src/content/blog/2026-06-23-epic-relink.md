@@ -6,7 +6,7 @@ pubDate: 2026-06-23
 Steam はライブラリフォルダを別ドライブに置いておけば、クリーンインストール後にフォルダを指定するだけで全ゲームが戻る。
 Epic Games Launcher にはこれが無い。
 ゲーム本体が別ドライブに残っていても、入れ直すと認識されず再ダウンロードになる。
-これを解決する手段を2つ紹介する。
+これを解決する手段を二つ紹介する。
 
 ## なぜ Steam は楽で Epic は引き継げないのか
 
@@ -14,7 +14,7 @@ Epic Games Launcher にはこれが無い。
 Steam は各ライブラリフォルダの中の `appmanifest_*.acf` に状態を持つ。
 だからフォルダを指定し直せば、その場で読み直して全ゲームを復元できる。
 
-Epic は `C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests` の中の `.item`（JSON）に持つ。
+Epic は `C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests` の中の `.item`（JSON）に状態を持つ。
 これはゲーム本体とは別管理なので、クリーンインストールで `.item` が消えると、本体が残っていてもランチャーは存在を知らない。
 
 ただし、各ゲームフォルダ内の隠しフォルダ `.egstore` にはバージョン情報を持つ `.manifest` があり、ゲーム本体と一緒なのでドライブが残れば生き残る。
@@ -192,7 +192,7 @@ switch ($Mode) {
 1. メモ帳を開き、上のスクリプトを全部コピーして貼り付ける。
 2. 「ファイル」から「名前を付けて保存」を選ぶ。ファイルの種類を「すべてのファイル」、`Epic-Relink.ps1` という名前で保存する。場所はゲームのあるドライブなど、分かりやすいところでよい。
 3. 保存したフォルダを開き、中の何もない場所で右クリックして「ターミナルで開く」を選ぶ。そのフォルダで PowerShell が開く。
-4. 開いた PowerShell に次を貼り付ける。`D:\EpicLibrary` は自分のゲーム保存先に置き換え、Enter。
+4. 開いた PowerShell に次を貼り付ける。`D:\EpicLibrary` は自分のゲーム保存先に置き換えてから Enter を押す。
 
 ```powershell
 .\Epic-Relink.ps1 backup -GamesFolder D:\EpicLibrary
@@ -218,4 +218,4 @@ Set-ExecutionPolicy -Scope Process Bypass -Force
 ```
 
 `restore` がやっているのは、`.item` の中の三つの場所（`InstallLocation` と `ManifestLocation` と `StagingLocation`）を今のフォルダに書き換えて `Manifests` へ戻すことだけだ。
-方法1がインストールのたびにサーバーから取り直す `.item` を、方法2は事前に退避しておくだけの違いになる。
+方法1がインストールのたびにサーバーから取り直す `.item` を、方法2は事前に退避しておくだけの違いだ。
