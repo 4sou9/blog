@@ -27,7 +27,6 @@ const ogImage = slug
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
     <meta name="description" content={pageDescription} />
     <style>html{background:#36373e}</style>
-    <link rel="stylesheet" href={`${base}/pagefind/pagefind-ui.css`} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
     <meta property="og:url" content={new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), Astro.site)} />
@@ -91,12 +90,26 @@ const ogImage = slug
         });
       });
     </script>
-    <script is:inline src={`${base}/pagefind/pagefind-ui.js`}></script>
     <script is:inline define:vars={{ base }}>
-      window.addEventListener('DOMContentLoaded', () => {
+      {
         const trigger = document.getElementById('search-trigger');
         const modal = document.getElementById('search-modal');
-        if (!trigger || !modal) return;
+
+        // Pagefind UI（js 134KB + css 15KB）は検索を使うページでしか要らないので、
+        // ページ読込時にはロードせず、トリガーに触れた最初の pointerdown で動的にロードする
+        let loadPromise;
+        const load = () => (loadPromise ??= new Promise((resolve) => {
+          const css = document.createElement('link');
+          css.rel = 'stylesheet';
+          css.href = base + '/pagefind/pagefind-ui.css';
+          // サイト CSS（global.css）の pagefind 上書きは同詳細度の後勝ちに依存しているため、
+          // 既存の stylesheet より前に挿入してカスケード順を静的読み込み時代と同じに保つ
+          document.head.insertBefore(css, document.querySelector('link[rel="stylesheet"]'));
+          const s = document.createElement('script');
+          s.src = base + '/pagefind/pagefind-ui.js';
+          s.onload = resolve;
+          document.head.appendChild(s);
+        }));
 
         let initialized = false;
         const initOnce = () => {
@@ -131,14 +144,17 @@ const ogImage = slug
           }
         };
 
-        const open = () => {
-          if (!window.PagefindUI) return;
-          initOnce();
+        const show = () => {
           modal.hidden = false;
           document.body.style.overflow = 'hidden';
           // iOS はユーザー操作と同じ呼び出しスタック内で同期的に focus しないとソフト
-          // キーボードが開かない。pointerdown で input を生成済みなので同期で focus する
+          // キーボードが開かない。pointerdown で input を生成済みなら同期で focus できる
           modal.querySelector('.pagefind-ui__search-input')?.focus();
+        };
+        const open = () => {
+          // ロード済みなら同期パス（iOS のキーボードを開くため await を挟まない）
+          if (initialized) { show(); return; }
+          load().then(() => { initOnce(); show(); });
         };
         const close = () => {
           modal.hidden = true;
@@ -146,10 +162,9 @@ const ogImage = slug
           trigger.focus();
         };
 
-        // 検索を使わないページで無駄なインデックス取得を走らせないため、ページ読込時には
-        // 初期化しない。トリガーに触れた最初の pointerdown で初期化しておけば、続く click 時には
-        // 入力欄が存在し、モバイルでもワンタップで同期 focus できる
-        trigger.addEventListener('pointerdown', initOnce);
+        // トリガーに触れた最初の pointerdown でロード＋初期化を始める。回線が速ければ
+        // 続く click 時には入力欄が存在し、モバイルでもワンタップで同期 focus できる
+        trigger.addEventListener('pointerdown', () => load().then(initOnce));
         trigger.addEventListener('click', open);
         modal.addEventListener('click', (e) => {
           // 背景・✕ で閉じる。結果リンクのクリックでも閉じる（同一ページ内アンカーへ
@@ -172,7 +187,7 @@ const ogImage = slug
             open();
           }
         });
-      });
+      }
     </script>
   </body>
 </html>
