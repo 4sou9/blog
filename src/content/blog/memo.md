@@ -1,8 +1,11 @@
 ---
-title: 'ブログ運用メモ'
+title: 'ブログ記法ガイド'
 pubDate: '2026-06-02'
 unlisted: true
 ---
+
+このブログで使える記法と運用手順の一覧。
+各記法は書き方のコードと、実際にレンダリングされた表示例をセットで載せている。
 
 ## このブログについて
 
@@ -13,8 +16,6 @@ unlisted: true
 | ベースパス | `/blog`（`import.meta.env.BASE_URL`） |
 | コンテンツ | `src/content/blog/` 以下の `.md` ファイル |
 | スタイル | `src/styles/global.css` |
-
----
 
 ## 記事の作成
 
@@ -39,18 +40,15 @@ src/content/blog/YYYY-MM-DD-slug/image.png
 ---
 title: '記事タイトル'          # 必須
 pubDate: '2026-06-02'          # 必須。Date 型に強制変換される
-description: 'OGP用の説明文'  # 省略可。省略時は本文冒頭から自動生成
+description: 'OGP用の説明文'  # 基本記入しない。省略時は本文冒頭から自動生成
 unlisted: true                 # 省略可。一覧非表示にする
 ---
 ```
 
-### unlisted 記事
+`unlisted: true` を書くと記事一覧・RSS・検索・サイトマップ・OG 画像生成から除外されるが、URL を直接開けばアクセスできる。
+この文字列一致で判定される箇所があるため、表記を揺らさずこのとおりに書く。
 
-`unlisted: true` を書くと記事一覧・サイトマップに載らないが、URL を直接開けばアクセスできる。
-
----
-
-## Markdown 記法
+## 基本の Markdown
 
 ### テキスト装飾
 
@@ -68,7 +66,7 @@ unlisted: true                 # 省略可。一覧非表示にする
 #### h4
 ```
 
-`h1` は記事タイトルとして自動挿入されるため記事本文内では使わない。
+`h1` は記事タイトルとして自動挿入されるため、本文内では使わない。
 
 ### リスト
 
@@ -102,7 +100,9 @@ unlisted: true                 # 省略可。一覧非表示にする
 | A   | B   |
 ```
 
----
+| 列1 | 列2 |
+|-----|-----|
+| A   | B   |
 
 ## リンク
 
@@ -124,8 +124,6 @@ title に `"btn"` を指定するとボタン風スタイルになる（`remark-
 
 [リンクテキスト](https://example.com "btn")
 
----
-
 ## 画像
 
 ### 通常画像
@@ -134,15 +132,13 @@ title に `"btn"` を指定するとボタン風スタイルになる（`remark-
 ![alt テキスト](./image.png)
 ```
 
-### キャプション付き画像（figure）
+### キャプション付き画像
 
 title を指定すると `<figure>` + `<figcaption>` に変換される（`rehype-figure.js`）。
 
 ```md
 ![alt テキスト](./image.png "キャプションテキスト")
 ```
-
----
 
 ## コードブロック
 
@@ -158,43 +154,40 @@ const x = 1;
 const x = 1;
 ```
 
----
-
 ## 埋め込み
 
-段落に **単独で書いた裸の URL**（リンクテキスト ≠ href だと変換されない）が各サービスに自動変換される。
+段落に**単独で書いた裸の URL**（リンクテキスト ≠ href だと変換されない）が、URL の種類に応じて自動変換される。
 
 ### YouTube
+
+`<iframe>` 埋め込みになる（`rehype-youtube.js`）。
 
 ```md
 https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
-`<iframe>` 埋め込みになる（`rehype-youtube.js`）。
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 ### Twitter / X
+
+ウィジェット埋め込みになる（`rehype-twitter.js`）。
 
 ```md
 https://twitter.com/user/status/STATUS_ID
 ```
 
-Twitter ウィジェット埋め込みになる（`rehype-twitter.js`）。
-
-### Steam
-
-```md
-https://store.steampowered.com/app/APP_ID/
-```
-
-Steam ウィジェット（高さ 190px）になる（`rehype-steam.js`）。
+https://x.com/elonmusk/status/1519480761749016577
 
 ### OGP カード
 
-上記以外の URL は OGP カードになる（`rehype-ogp-card.js`、ビルド時取得）。
+上記以外の URL は OGP カードになる（`rehype-ogp-card.js`。Steam ストアの URL もこれ）。
+カードの情報はビルド時に取得され、失敗した場合は裸リンクのままになる（Cloudflare 保護されたサイトなど）。
 
 ```md
-https://astro.build
+https://astro.build/
 ```
+
+https://astro.build/
 
 OGP カードにしたくない場合はテキストと URL を別にする：
 
@@ -202,11 +195,117 @@ OGP カードにしたくない場合はテキストと URL を別にする：
 [Astro 公式サイト](https://astro.build)
 ```
 
-Cloudflare 保護されたサイトはカード取得に失敗し通常リンクにフォールバックする。
+## Custom Components
 
----
+入れ子にするときは外側のコロンを内側より多くする（Tabs / Changelog は外側が `::::`）。
+同数だと最初の子で閉じてしまう。
+
+### Alert
+
+`info` / `warn` / `danger` / `tip` の 4 種類。
+
+```md
+:::info
+本文。リンクも `code` も入る。
+:::
+```
+
+:::info
+これは **info** アラートです。リンクも `code` も入ります。
+:::
+
+:::warn
+これは warn アラート。注意喚起に使います。
+:::
+
+:::danger
+これは danger アラート。破壊的操作の警告に。
+:::
+
+:::tip
+これは tip アラート（おまけ）。
+:::
+
+### Collapsible
+
+`<details>` に変換される。`desc` は省略可。
+
+```md
+:::collapse[タイトル]{desc="説明"}
+中身
+:::
+```
+
+:::collapse[詳細を表示]{desc="クリックで開閉します"}
+中身はここに書きます。
+
+- リスト
+- も
+- 書ける
+:::
+
+### Tabs
+
+```md
+::::tabs
+:::tab[ラベル1]
+中身
+:::
+
+:::tab[ラベル2]
+中身
+:::
+::::
+```
+
+::::tabs
+:::tab[Windows]
+Windows の手順。
+:::
+
+:::tab[macOS]
+macOS の手順。
+:::
+
+:::tab[Linux]
+Linux の手順。
+:::
+::::
+
+### Changelog
+
+```md
+::::changelog
+:::release{version="v1.0.0" date="2026-06-09"}
+- 変更点
+:::
+::::
+```
+
+::::changelog
+:::release{version="v2.0.0" date="2026-06-09"}
+- 新機能を追加
+- バグ修正
+:::
+
+:::release{version="v1.0.0" date="2026-05-01"}
+- 初回リリース
+:::
+::::
+
+### Badge
+
+インライン要素。`type` は `default` / `info` / `warn` / `danger` / `success` / `new`。
+
+```md
+:badge[NEW]{type="new"}
+```
+
+新着 :badge[NEW]{type="new"} / 情報 :badge[INFO]{type="info"} / 警告 :badge[WARN]{type="warn"} / 危険 :badge[DANGER]{type="danger"} / 成功 :badge[OK]{type="success"}
 
 ## デプロイ
+
+main に push すると GitHub Actions が自動でビルド＆デプロイする。
 
 ```bash
 npm run build    # ビルド確認
@@ -214,10 +313,6 @@ git add .
 git commit -m "メッセージ"
 git push origin main
 ```
-
-GitHub Actions が自動でビルド＆デプロイする。
-
----
 
 ## カスタマイズ箇所
 
@@ -238,13 +333,11 @@ GitHub Actions が自動でビルド＆デプロイする。
 | `--faint` | `#828b97` | 日付・コードブロック枠など |
 | `--link` | `#8fb6f0` | ボタンリンク色 |
 
----
-
 ## ローカル開発
 
 ```bash
-npm run dev      # 開発サーバー起動
-npm run build    # 本番ビルド
+npm run dev      # 開発サーバー起動（検索は動かない）
+npm run build    # 本番ビルド（astro build + pagefind）
 npm run preview  # ビルド結果プレビュー
 ```
 

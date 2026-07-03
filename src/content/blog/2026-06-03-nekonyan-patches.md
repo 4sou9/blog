@@ -3,9 +3,9 @@ title: 'NekoNyanSoft R18パッチ'
 pubDate: '2026-06-03'
 ---
 
-[patches.nekonyansoft.com](https://patches.nekonyansoft.com/) のまとめ。
+[patches.nekonyansoft.com](https://patches.nekonyansoft.com/) のまとめです。
 
-VPN嚙ませるとDLリンクが見えるようになるのでそのまま貼っただけ。
+VPN を嚙ませると DL リンクが見えるようになるので、そのまま貼っただけです。
 
 ## YUZUSOFT
 

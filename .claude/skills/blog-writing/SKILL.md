@@ -7,13 +7,13 @@ description: 記事の書き方（ファイル配置、frontmatter、埋め込�
 
 **配置**（`src/content/blog/`）: 画像なし `YYYY-MM-DD-slug.md`、画像あり `YYYY-MM-DD-slug/index.md` + 画像。
 
-**Frontmatter**: `title`（必須）、`pubDate`（必須）、`description`（任意。未指定なら自動抜粋）、`unlisted: true`（任意。一覧・RSS・検索・sitemap・OG画像から除外。URL 直打ちでは見える。この文字列一致で判定される箇所があるため表記ゆれ不可）
+**Frontmatter**: `title`（必須）、`pubDate`（必須）、`description`（基本記入しない方針。未指定なら自動抜粋）、`unlisted: true`（任意。一覧・RSS・検索・sitemap・OG画像から除外。URL 直打ちでは見える。この文字列一致で判定される箇所があるため表記ゆれ不可）
 
 **埋め込み**: 単独行の裸URL（リンクテキスト≠href だと変換されない）。YouTube → iframe、Twitter/X → widget、その他 → OGPカード（Steam 含む。build 時 fetch、失敗時は裸リンクのまま）。
 
 **ボタンリンク**: `[テキスト](https://example.com "btn")`
 
-**Custom Components**（サンプル: `sandbox.md`）:
+**Custom Components**（サンプル: `memo.md` = 記法ガイド）:
 
 ```
 :::info          ← Alert（info / warn / danger / tip）
