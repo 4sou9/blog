@@ -1,5 +1,10 @@
 import { visit } from 'unist-util-visit';
 
+// 単独行の裸URL（<p><a>href と同一テキスト</a></p>）を OGP カードに変換する。
+// build 時に対象URLへ実際に fetch するためネットワークが必要。
+// fetch 失敗・タイムアウト（8秒）・Cloudflare のチャレンジページ検出時は
+// エラーにせず、黙って通常のリンクのまま残す（ビルドは落とさない方針）。
+// YouTube/Twitter は専用の rehype プラグインが埋め込むためここではスキップ。
 const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com/;
 
 async function fetchOgp(url) {

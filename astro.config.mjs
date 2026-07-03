@@ -5,6 +5,10 @@ import { defineConfig } from 'astro/config';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
+// sitemap から unlisted 記事を除外するためのスラッグ一覧。
+// この config はコンテンツコレクション（astro:content）より先に評価されるため、
+// getCollection が使えず、frontmatter を文字列スキャンしている。
+// 「unlisted: true」の表記ゆれ（クォート等）には反応しない点に注意。
 function getUnlistedSlugs() {
   const dir = join(process.cwd(), 'src/content/blog');
   const slugs = [];
