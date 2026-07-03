@@ -30,7 +30,7 @@ const ogImage = slug
     <link rel="stylesheet" href={`${base}/pagefind/pagefind-ui.css`} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
-    <meta property="og:url" content={Astro.url} />
+    <meta property="og:url" content={new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, ''), Astro.site)} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />

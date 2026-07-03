@@ -17,7 +17,7 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.pubDate,
       description: post.data.description ?? textExcerpt(post.body),
-      link: new URL(`${base}${post.id}/`, context.site).href,
+      link: new URL(`${base}${post.id}`, context.site).href,
     })),
   });
 }

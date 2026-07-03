@@ -56,11 +56,13 @@ import { remarkExcerpt } from './src/plugins/remark-excerpt.js';
 export default defineConfig({
 	site: 'https://4sou9.github.io',
 	base: '/blog',
+	trailingSlash: 'never',
+	build: { format: 'file' },
 	integrations: [
 		sitemap({
 			filter: (page) =>
-				!unlistedSlugs.some((slug) => page.includes(`/blog/${slug}/`)) &&
-				!page.includes('/blog/ogp/'),
+				!unlistedSlugs.some((slug) => page.endsWith(`/blog/${slug}`)) &&
+				!page.endsWith('/blog/ogp'),
 		}),
 		watchPlugins(),
 	],
