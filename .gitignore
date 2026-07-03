@@ -20,6 +20,13 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# Windows-specific files
+Thumbs.db
+Desktop.ini
+
 # jetbrains setting folder
 .idea/
+
+# Claude Code local settings (per-user permissions)
+.claude/settings.local.json
 
