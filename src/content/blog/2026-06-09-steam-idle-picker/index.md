@@ -24,7 +24,7 @@ pubDate: '2026-06-09'
 - Steam がインストール済みで、起動していること
 - Microsoft Edge WebView2 ランタイム（Windows 11 には標準で入っています）
 
-[ダウンロード (v2.1.0)](https://github.com/4sou9/Steam_Idle_Picker/releases/download/v2.1.0/Steam%20Idle%20Picker_2.1.0_x64-setup.exe "btn")
+[ダウンロード (v2.1.0)](https://github.com/4sou9/Steam_Idle_Picker/releases/download/v2.1.0/Steam.Idle.Picker_2.1.0_x64-setup.exe "btn")
 
 ソースコードはこちら。
 
