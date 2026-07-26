@@ -74,7 +74,6 @@ $packageIds = @(
 
     # ユーティリティ
     'M2Team.NanaZip'
-    'KDE.KDEConnect'
 )
 
 foreach ($packageId in $packageIds) {
