@@ -22,7 +22,7 @@ export default function rehypeYoutube() {
         type: 'element',
         tagName: 'iframe',
         properties: {
-          src: `https://www.youtube.com/embed/${id}`,
+          src: `https://www.youtube-nocookie.com/embed/${id}`,
           title: href,
           width: '100%',
           style: 'aspect-ratio:16/9;border:none;margin:1rem 0;display:block;',
