@@ -33,6 +33,9 @@ function textSpan(className, value) {
 
 export default function remarkDirectives() {
   return (tree) => {
+    // タブの id は aria-controls / aria-labelledby で相互参照するため、
+    // 1ページに複数の :::tabs があっても衝突しないよう連番を振る
+    let tabsSeq = 0;
     visit(tree, (node) => {
       // インライン: :badge[テキスト]{type="info"}
       if (node.type === 'textDirective' && node.name === 'badge') {
@@ -85,6 +88,9 @@ export default function remarkDirectives() {
         const tabs = node.children.filter(
           (c) => c.type === 'containerDirective' && c.name === 'tab'
         );
+        const gid = `tabs-${++tabsSeq}`;
+        const tabId = (i) => `${gid}-tab-${i}`;
+        const panelId = (i) => `${gid}-panel-${i}`;
         const buttons = tabs.map((tab, i) => {
           const label = takeLabel(tab) || [{ type: 'text', value: `Tab ${i + 1}` }];
           return {
@@ -94,6 +100,11 @@ export default function remarkDirectives() {
               hProperties: {
                 type: 'button',
                 role: 'tab',
+                id: tabId(i),
+                ariaSelected: i === 0 ? 'true' : 'false',
+                ariaControls: panelId(i),
+                // 選択中のタブだけを Tab キーの移動先にし、左右キーで切り替える
+                tabIndex: i === 0 ? 0 : -1,
                 className: ['tab-btn', ...(i === 0 ? ['active'] : [])],
                 dataIndex: String(i),
               },
@@ -104,7 +115,13 @@ export default function remarkDirectives() {
         tabs.forEach((tab, i) => {
           tab.data = {
             hName: 'div',
-            hProperties: { className: ['tab-panel', ...(i === 0 ? ['active'] : [])] },
+            hProperties: {
+              role: 'tabpanel',
+              id: panelId(i),
+              ariaLabelledBy: tabId(i),
+              tabIndex: 0,
+              className: ['tab-panel', ...(i === 0 ? ['active'] : [])],
+            },
           };
         });
         const tablist = {

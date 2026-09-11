@@ -19,9 +19,6 @@ const ogImage = slug
     <title>{pageTitle}</title>
     <link rel="icon" href={`${base}/favicon.ico`} sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
-    <link rel="icon" type="image/png" sizes="16x16" href={`${base}/favicon-16x16.png`} />
-    <link rel="icon" type="image/png" sizes="32x32" href={`${base}/favicon-32x32.png`} />
-    <link rel="icon" type="image/png" sizes="96x96" href={`${base}/favicon-96x96.png`} />
     <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}/site.webmanifest`} />
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
@@ -43,7 +40,7 @@ const ogImage = slug
     </header>
     <main><slot /></main>
     <div id="search-modal" class="search-modal" hidden>
-      <div class="search-modal__panel" role="dialog" aria-modal="true" aria-label="サイト内検索">
+      <div class="search-modal__panel" role="dialog" aria-modal="true" aria-label="サイト内検索" tabindex="-1">
         <div class="search-modal__head">
           <div id="search" class="site-search"></div>
           <button class="search-modal__close" type="button" data-close aria-label="閉じる">✕</button>
@@ -77,44 +74,127 @@ const ogImage = slug
         wrapper.appendChild(btn);
       });
 
-      // タブ切り替え（:::tabs / :::tab）
+      // タブ切り替え（:::tabs / :::tab）。role="tablist" を名乗る以上、選択状態を
+      // aria-selected で伝え、左右／Home／End でも移動できるようにする
       document.querySelectorAll('.tabs').forEach((tabs) => {
-        const btns = tabs.querySelectorAll(':scope > .tab-list > .tab-btn');
-        const panels = tabs.querySelectorAll(':scope > .tab-panel');
-        btns.forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const i = Number(btn.dataset.index);
-            btns.forEach((b, j) => b.classList.toggle('active', j === i));
-            panels.forEach((p, j) => p.classList.toggle('active', j === i));
+        const btns = [...tabs.querySelectorAll(':scope > .tab-list > .tab-btn')];
+        const panels = [...tabs.querySelectorAll(':scope > .tab-panel')];
+        if (!btns.length) return;
+        const select = (i, moveFocus) => {
+          btns.forEach((b, j) => {
+            const on = j === i;
+            b.classList.toggle('active', on);
+            b.setAttribute('aria-selected', String(on));
+            b.tabIndex = on ? 0 : -1;
+          });
+          panels.forEach((p, j) => p.classList.toggle('active', j === i));
+          if (moveFocus) btns[i].focus();
+        };
+        btns.forEach((btn, i) => {
+          btn.addEventListener('click', () => select(i));
+          btn.addEventListener('keydown', (e) => {
+            let next = null;
+            if (e.key === 'ArrowRight') next = (i + 1) % btns.length;
+            else if (e.key === 'ArrowLeft') next = (i - 1 + btns.length) % btns.length;
+            else if (e.key === 'Home') next = 0;
+            else if (e.key === 'End') next = btns.length - 1;
+            if (next === null) return;
+            e.preventDefault();
+            select(next, true);
           });
         });
+        const active = btns.findIndex((b) => b.classList.contains('active'));
+        select(active < 0 ? 0 : active);
       });
     </script>
-    <script is:inline define:vars={{ base }}>
+    <script>
       {
+        const base = import.meta.env.BASE_URL;
         const trigger = document.getElementById('search-trigger');
         const modal = document.getElementById('search-modal');
 
         // Pagefind UI（js 134KB + css 15KB）は検索を使うページでしか要らないので、
         // ページ読込時にはロードせず、トリガーに触れた最初の pointerdown で動的にロードする
         let loadPromise;
-        const load = () => (loadPromise ??= new Promise((resolve) => {
-          const css = document.createElement('link');
-          css.rel = 'stylesheet';
-          css.href = base + '/pagefind/pagefind-ui.css';
-          // サイト CSS（global.css）の pagefind 上書きは同詳細度の後勝ちに依存しているため、
-          // 既存の stylesheet より前に挿入してカスケード順を静的読み込み時代と同じに保つ
-          document.head.insertBefore(css, document.querySelector('link[rel="stylesheet"]'));
+        let loadFailed = false;
+        const load = () => (loadPromise ??= new Promise((resolve, reject) => {
+          // CSS は再試行しても貼り直さない（重複挿入と再取得を避ける）
+          if (!document.getElementById('pagefind-css')) {
+            const css = document.createElement('link');
+            css.id = 'pagefind-css';
+            css.rel = 'stylesheet';
+            css.href = base + '/pagefind/pagefind-ui.css';
+            // サイト CSS（global.css）の pagefind 上書きは同詳細度の後勝ちに依存しているため、
+            // 既存の stylesheet より前に挿入してカスケード順を静的読み込み時代と同じに保つ
+            document.head.insertBefore(css, document.querySelector('link[rel="stylesheet"]'));
+          }
           const s = document.createElement('script');
           s.src = base + '/pagefind/pagefind-ui.js';
           s.onload = resolve;
+          // 失敗しても Promise はここで捨てない。捨てると同じ操作の pointerdown と
+          // click が二重に取りにいくため、破棄は close() まで遅らせる
+          s.onerror = () => { s.remove(); loadFailed = true; reject(new Error('pagefind load failed')); };
           document.head.appendChild(s);
         }));
+
+        // Pagefind の抜粋は語数で切るため、日本語だと文の途中でぶつ切りになる。
+        // 抜粋の前後を本文から補い、文の区切り（句点・改行）まで伸ばして表示する
+        const MAX_GROW = 160; // 区切りが遠すぎる場合は諦めて省略記号を付ける
+        const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const strip = (html) => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent || ''; };
+        // 位置 i の直前で文が終わっているか。Pagefind の本文はブロックの区切りを
+        // ". " で連結するので、空白が続く半角ピリオドも区切りとして扱う
+        const endsAt = (src, i) => {
+          const ch = src[i - 1];
+          if (!ch) return true;
+          if (/[。．！？!?…\n]/.test(ch)) return true;
+          return ch === '.' && (i >= src.length || /\s/.test(src[i]));
+        };
+        // 抜粋は語の区切りに空白が入り本文とそのままでは一致しないため、空白と
+        // ゼロ幅スペースを除いた文字列同士で突き合わせ、元の添字に戻す表を作る
+        const squeeze = (s) => {
+          let text = '';
+          const map = [];
+          const SKIP = new Set([0x200b, 0x200c, 0xfeff]);
+          for (let i = 0; i < s.length; i++) if (!/\s/.test(s[i]) && !SKIP.has(s.charCodeAt(i))) { text += s[i]; map.push(i); }
+          return { text, map };
+        };
+        // cursor を渡すと、その位置以降から抜粋を探す。同じ文言がページ内で繰り返される
+        // と先頭の別の箇所に当たって無関係な文脈を継ぎ足してしまうため、文書順に並ぶ
+        // サブ結果では直前の一致より後ろを優先する
+        const expand = (excerpt, source, cursor = { at: 0 }) => {
+          if (!excerpt || !source) return excerpt;
+          const needle = squeeze(strip(excerpt));
+          if (!needle.text) return excerpt;
+          const hay = squeeze(source);
+          let at = hay.text.indexOf(needle.text, cursor.at);
+          if (at < 0) at = hay.text.indexOf(needle.text); // 順序が崩れていれば全体から
+          if (at < 0) return excerpt;
+          cursor.at = at + needle.text.length;
+          const from = hay.map[at];
+          const to = hay.map[at + needle.text.length - 1] + 1;
+          let s = from;
+          while (s > 0 && from - s < MAX_GROW && !endsAt(source, s)) s--;
+          let e = to;
+          while (e < source.length && e - to < MAX_GROW && !endsAt(source, e)) e++;
+          // 打ち切り位置が英単語の途中なら、語の切れ目まで寄せる（日本語には空白が
+          // ないので、両隣が英数字のときだけ動かす）
+          const word = (c) => c && /[A-Za-z0-9]/.test(c);
+          while (s < from && word(source[s - 1]) && word(source[s])) s++;
+          while (e > to && word(source[e - 1]) && word(source[e])) e--;
+          const head = endsAt(source, s) ? '' : '…';
+          const tail = endsAt(source, e) ? '' : '…';
+          const out = head + esc(source.slice(s, from).replace(/^\s+/, '')) + excerpt + esc(source.slice(to, e).replace(/\s+$/, '')) + tail;
+          return out.replace(/[ \t]{2,}/g, ' '); // 抜粋の端の空白と本文の空白が重なる
+
+        };
 
         let initialized = false;
         const initOnce = () => {
           if (initialized || !window.PagefindUI) return;
           initialized = true;
+          // 前回の失敗で出した案内が残っていると、動く UI の横に居座るので消す
+          document.querySelector('#search .search-error')?.remove();
           const fix = (u) => (u && !u.startsWith(base + '/')) ? base + (u.startsWith('/') ? '' : '/') + u : u;
           new window.PagefindUI({
             element: '#search',
@@ -124,7 +204,13 @@ const ogImage = slug
             pageSize: 5,
             processResult: (result) => {
               result.url = fix(result.url);
-              if (Array.isArray(result.sub_results)) result.sub_results.forEach((s) => { s.url = fix(s.url); });
+              const body = strip(result.content || result.raw_content || '');
+              result.excerpt = expand(result.excerpt, body);
+              const cursor = { at: 0 };
+              if (Array.isArray(result.sub_results)) result.sub_results.forEach((s) => {
+                s.url = fix(s.url);
+                s.excerpt = expand(s.excerpt, body, cursor);
+              });
               return result;
             },
             translations: { placeholder: '記事を検索', zero_results: '「[SEARCH_TERM]」に一致する記事がありません' },
@@ -144,27 +230,51 @@ const ogImage = slug
           }
         };
 
+        // 読み込み失敗を黙って握りつぶさず、モーダル内に理由を出す
+        const showLoadError = () => {
+          const box = document.getElementById('search');
+          if (box && !box.querySelector('.search-error')) {
+            const p = document.createElement('p');
+            p.className = 'search-error';
+            p.setAttribute('role', 'alert');
+            p.textContent = '検索を読み込めませんでした。通信状況を確認して、開き直してください。';
+            box.appendChild(p);
+          }
+          show();
+        };
+
+        const panel = modal.querySelector('.search-modal__panel');
+        // モーダル表示中に背後へタブ移動できると aria-modal の宣言と食い違うので、
+        // ヘッダーと本文を inert にして焦点も読み上げも外す
+        const behind = [document.querySelector('.site-header'), document.querySelector('main')];
+        const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
         const show = () => {
           modal.hidden = false;
           document.body.style.overflow = 'hidden';
+          behind.forEach((el) => { if (el) el.inert = true; });
           // iOS はユーザー操作と同じ呼び出しスタック内で同期的に focus しないとソフト
           // キーボードが開かない。pointerdown で input を生成済みなら同期で focus できる
-          modal.querySelector('.pagefind-ui__search-input')?.focus();
+          (modal.querySelector('.pagefind-ui__search-input') || panel).focus();
         };
         const open = () => {
           // ロード済みなら同期パス（iOS のキーボードを開くため await を挟まない）
           if (initialized) { show(); return; }
-          load().then(() => { initOnce(); show(); });
+          load().then(() => { initOnce(); show(); }, showLoadError);
         };
         const close = () => {
           modal.hidden = true;
           document.body.style.overflow = '';
+          behind.forEach((el) => { if (el) el.inert = false; });
+          // 失敗した読み込みはここで初めて捨てる。次に開いたときだけ取り直す
+          if (loadFailed) { loadFailed = false; loadPromise = undefined; }
           trigger.focus();
         };
 
         // トリガーに触れた最初の pointerdown でロード＋初期化を始める。回線が速ければ
         // 続く click 時には入力欄が存在し、モバイルでもワンタップで同期 focus できる
-        trigger.addEventListener('pointerdown', () => load().then(initOnce));
+        // 先読みなので失敗はここでは黙って捨てる（実際に開く click 側で通知する）
+        trigger.addEventListener('pointerdown', () => { load().then(initOnce, () => {}); });
         trigger.addEventListener('click', open);
         modal.addEventListener('click', (e) => {
           // 背景・✕ で閉じる。結果リンクのクリックでも閉じる（同一ページ内アンカーへ
@@ -175,6 +285,21 @@ const ogImage = slug
         // ソフトキーボードを閉じて結果を見やすくする。Pagefind が Enter の既定動作を
         // 抑制し submit が発火しない場合があるため keydown でも拾う
         modal.addEventListener('submit', (e) => { e.preventDefault(); });
+        // inert だけでは端で行き止まりになるだけなので、Tab をパネル内で循環させる
+        modal.addEventListener('keydown', (e) => {
+          if (e.key !== 'Tab') return;
+          const items = [...panel.querySelectorAll(FOCUSABLE)].filter((el) => el.offsetParent !== null);
+          if (!items.length) { e.preventDefault(); panel.focus(); return; }
+          const first = items[0];
+          const last = items[items.length - 1];
+          if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        });
         modal.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' && e.target.classList && e.target.classList.contains('pagefind-ui__search-input')) {
             e.target.blur();
@@ -182,7 +307,14 @@ const ogImage = slug
         });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && !modal.hidden) close();
-          if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && modal.hidden && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName))) {
+          // Ctrl/⌘+K は開閉のトグル（同じ操作でしまえるようにする）。Shift 付きは
+          // Firefox の Web コンソール（Ctrl+Shift+K）なので拾わない
+          if ((e.key === 'k' || e.key === 'K') && !e.shiftKey && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            modal.hidden ? open() : close();
+            return;
+          }
+          if (e.key === '/' && modal.hidden && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName)) {
             e.preventDefault();
             open();
           }

@@ -26,12 +26,11 @@ body {
 }
 
 a { color: var(--link); text-decoration: none; }
-a:visited { color: var(--link); }
 a:hover { text-decoration: underline; }
 
 .site-header { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 2.5rem; }
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0; }
-.site-title a, .site-title a:visited { color: var(--fg); }
+.site-title a { color: var(--fg); }
 
 /* ヘッダーの検索トリガーボタン（虫眼鏡アイコンのみ。クリックでモーダルを開く） */
 .search-trigger {
@@ -80,7 +79,6 @@ a:hover { text-decoration: underline; }
   overflow: hidden;
 }
 /* 閉じるボタンはパネル右上に絶対配置（flow から外し、結果を全幅に） */
-.search-modal__head { position: static; padding: 0; }
 .search-modal__close {
   position: absolute;
   top: 0.85rem;
@@ -113,6 +111,8 @@ a:hover { text-decoration: underline; }
   --pagefind-ui-font: inherit;
 }
 .site-search .pagefind-ui, .site-search .pagefind-ui__form { margin: 0; }
+/* Pagefind の読み込みに失敗したときの案内 */
+.search-error { margin: 0; padding: 1.4rem 3.4rem 1.2rem 1rem; color: var(--muted); font-size: 0.9rem; text-align: center; }
 /* 入力欄の上の余白は form の padding-top で取る（margin-top だと相殺してアイコン／クリアとズレる）。
    ダークなヘッダー背景は panel 側のグラデーションで描く */
 .site-search .pagefind-ui__form { padding-top: 0.85rem; }
@@ -203,21 +203,21 @@ a:hover { text-decoration: underline; }
 .prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 .prose figure { margin: 1.5rem 0; }
 .prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
+/* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
+.prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
 .prose pre { padding: 1rem; border-radius: 6px; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
 .copy-btn { position: absolute; top: 0.5rem; right: 1rem; padding: 0.15rem 0.5rem; font-size: 0.72rem; background: var(--faint); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; opacity: 0; transition: opacity 0.15s; z-index: 1; }
 .code-wrapper:hover .copy-btn { opacity: 1; }
 .code-lang { position: absolute; top: 0.5rem; left: 0.75rem; font-size: 0.7rem; color: #8b949e; pointer-events: none; user-select: none; }
 
-.prose .table-scroll { overflow-x: auto; margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; }
 .prose table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
 .prose th, .prose td { padding: 0.5rem 0.85rem; text-align: left; border-bottom: 1px solid var(--border); }
 .prose tr:last-child td { border-bottom: none; }
 .prose th { background: var(--surface); font-weight: 600; letter-spacing: 0.02em; }
 .prose tbody tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.035); }
 .prose tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.08); }
-/* .table-scroll で包まない素の table にも角丸を効かせる */
-.prose > table { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.prose > table { margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 
 .btn-link {
   display: inline-block;
@@ -228,7 +228,6 @@ a:hover { text-decoration: underline; }
   font-size: 0.85rem;
   transition: background 0.15s, color 0.15s;
 }
-.btn-link:visited { color: var(--link); border-color: var(--link); }
 .btn-link:hover { background: var(--link); color: var(--bg); text-decoration: none; }
 
 .ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; border-radius: 8px; overflow: hidden; margin: 1rem 0; color: var(--fg); text-decoration: none; }
@@ -236,7 +235,7 @@ a:hover { text-decoration: underline; }
 .ogp-image { width: 125px !important; min-width: 125px; height: 125px !important; flex-shrink: 0; align-self: flex-start; background-size: cover !important; background-position: center center; background-repeat: no-repeat; background-color: var(--faint); }
 .ogp-content { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
 .ogp-title { color: var(--link); font-weight: 500; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ogp-desc { font-size: 0.78rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ogp-desc { font-size: 0.78rem; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
 .ogp-url { font-size: 0.75rem; color: var(--faint); margin-top: auto; }
 
 /* スクロールバー（参照: site/stylesheets/scrollbar.css）
@@ -293,7 +292,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .collapsible-chevron { grid-column: 2; grid-row: 1 / span 2; width: 1.25rem; height: 1.25rem; background: var(--muted); -webkit-mask: var(--chev) center / contain no-repeat; mask: var(--chev) center / contain no-repeat; --chev: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7.41%208.59L12%2013.17l4.59-4.58L18%2010l-6%206-6-6z'/%3E%3C/svg%3E"); transition: transform 0.25s ease; }
 .collapsible[open] .collapsible-chevron { transform: rotate(180deg); }
 .collapsible[open] > .collapsible-summary { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.collapsible > *:not(.collapsible-summary) { margin-left: 1.25rem; margin-right: 1.25rem; }
+.collapsible > *:not(.collapsible-summary) { margin-inline: 1.25rem; }
 .collapsible > .collapsible-summary + * { margin-top: 1rem; }
 .collapsible > *:not(.collapsible-summary):last-child { margin-bottom: 1rem; }
 
