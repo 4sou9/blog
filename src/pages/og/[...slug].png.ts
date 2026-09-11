@@ -1,16 +1,16 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
-import { getCollection } from 'astro:content';
 import { Resvg } from '@resvg/resvg-js';
 import satori from 'satori';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { listedPosts } from '../../lib/posts';
 
 const fontData = readFileSync(
   join(process.cwd(), 'node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-700-normal.woff')
 );
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = (await getCollection('blog')).filter(p => !p.data.unlisted);
+  const posts = await listedPosts();
   return posts.map(post => ({
     params: { slug: post.id },
     props: { title: post.data.title },

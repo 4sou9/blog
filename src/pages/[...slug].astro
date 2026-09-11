@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { formatDate } from '../lib/posts';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -11,12 +12,10 @@ const post = Astro.props;
 const { Content, remarkPluginFrontmatter } = await render(post);
 
 const autoDescription = post.data.description ?? remarkPluginFrontmatter.excerpt;
-const fmt = (d) =>
-  `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 ---
 <Base title={post.data.title} description={autoDescription} slug={post.id}>
   <article class="prose" data-pagefind-body={post.data.unlisted ? undefined : true}>
-    <div class="post-date">{fmt(post.data.pubDate)}</div>
+    <div class="post-date">{formatDate(post.data.pubDate)}</div>
     <h1>{post.data.title}</h1>
     <Content />
   </article>

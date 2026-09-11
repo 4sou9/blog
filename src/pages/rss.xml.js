@@ -1,11 +1,9 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { listedPosts } from '../lib/posts';
 import { textExcerpt } from '../plugins/remark-excerpt.js';
 
 export async function GET(context) {
-  const posts = (await getCollection('blog'))
-    .filter((p) => !p.data.unlisted)
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const posts = await listedPosts();
 
   const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 

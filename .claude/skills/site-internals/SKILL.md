@@ -14,7 +14,9 @@ description: サイト実装の詳細（プラグイン、unlisted の除外箇�
 - `remark-directives.js` — `:::` → Custom Components
 - `remark-excerpt.js` — 抜粋2系統: remark 版（meta description）と `textExcerpt`（RSS・/ogp）
 
-**unlisted の除外は5箇所**（露出先を増やしたら追加）: `index.astro`、`rss.xml.js`、`og/[...slug].png.ts`、`astro.config.mjs` の `getUnlistedSlugs()`（config はコレクションより先に評価されるため `unlisted: true` を文字列一致でスキャン）、`[...slug].astro` の `data-pagefind-body`。
+**unlisted の除外**: 記事一覧は `src/lib/posts.ts` の `listedPosts()` に集約（`index.astro`、`rss.xml.js`、`ogp.astro`、`og/[...slug].png.ts` が使用）。露出先を増やすときは自前でフィルタせずこれを使う。集約できない例外が2箇所ある: `astro.config.mjs` の `getUnlistedSlugs()`（config はコレクションより先に評価されるため `unlisted: true` を文字列一致でスキャン）と、`[...slug].astro` の `data-pagefind-body`。
+
+**日付表記**: `src/lib/posts.ts` の `formatDate()`。
 
 **OG画像**: build 時生成（`og/[...slug].png.ts`、satori + resvg）。一覧確認は `/blog/ogp`。トップは静的 `public/og-image.svg`。
 
