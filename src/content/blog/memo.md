@@ -223,7 +223,7 @@ OGP カードにしたくない場合はテキストと URL を別にする：
 :::
 
 :::tip
-これは tip アラート（おまけ）。
+これは tip アラート（おまけ）。`:::success` と書いても同じものが出ます。
 :::
 
 ### Collapsible
@@ -303,6 +303,18 @@ Linux の手順。
 
 新着 :badge[NEW]{type="new"} / 情報 :badge[INFO]{type="info"} / 警告 :badge[WARN]{type="warn"} / 危険 :badge[DANGER]{type="danger"} / 成功 :badge[OK]{type="success"}
 
+### Banners
+
+中に並べた画像を原寸のまま横に敷き詰める。88x31 バナーのような小さい画像の一覧向け。
+画像の行のあいだに空行を入れると、そこで行が分かれる。
+
+```md
+:::banners
+![alt1](./b/a.gif)
+![alt2](./b/b.gif)
+:::
+```
+
 ## デプロイ
 
 main に push すると GitHub Actions が自動でビルド＆デプロイする。
@@ -320,7 +332,7 @@ git push origin main
 |------|---------|
 | サイトタイトル | `src/layouts/Base.astro` の `SITE_TITLE` |
 | 色・幅・フォント | `src/styles/global.css` の CSS 変数・body |
-| OGP 画像（デフォルト） | `public/og-image.svg` |
+| OGP 画像（デフォルト） | `public/og-image.png` |
 | ベースパス | `astro.config.mjs` の `base` |
 
 ### CSS 変数

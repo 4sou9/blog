@@ -1,5 +1,9 @@
 import { visit } from 'unist-util-visit';
 
+// 単独行のツイートURLを公式の埋め込みに変換する。
+// widgets.js は読み込まないと描画できないが、YouTube を nocookie にしたのと同じ趣旨で
+// data-dnt="true"（Do Not Track。閲覧者の情報を広告のパーソナライズに使わせない）を
+// 付ける。テーマはサイトに合わせてダーク固定。
 const TWITTER_RE = /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/\w+\/status\/\d+/;
 
 export default function rehypeTwitter() {
@@ -17,7 +21,7 @@ export default function rehypeTwitter() {
       parent.children[index] = {
         type: 'element',
         tagName: 'blockquote',
-        properties: { className: ['twitter-tweet'] },
+        properties: { className: ['twitter-tweet'], dataDnt: 'true', dataTheme: 'dark' },
         children: [
           { type: 'element', tagName: 'a', properties: { href }, children: [{ type: 'text', value: href }] },
         ],

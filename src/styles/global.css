@@ -1,3 +1,5 @@
+/* 配色はここが唯一の定義。OG画像（src/pages/og/[...slug].png.ts）は CSS を
+   適用できないため、このファイルから値を読み出して使っている */
 :root {
   --bg: #36373e;
   --surface: #2b2d31;
@@ -11,6 +13,8 @@
 
 * { box-sizing: border-box; }
 
+/* html に背景を置かない。body の background がキャンバスに伝播するので、
+   オーバースクロール領域も --bg になる（色の定義を1か所に保つため） */
 html { scrollbar-gutter: stable both-edges; }
 
 body {
@@ -201,6 +205,10 @@ a:hover { text-decoration: underline; }
 .prose h2 { font-size: 1.4rem; font-weight: normal; margin: 5rem 0 0.4rem; }
 .prose h3 { font-size: 1.2rem; font-weight: normal; margin: 1.5rem 0 0.4rem; }
 .prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+/* バナーの壁。原寸のまま隙間なく並べたいので、prose の img 既定（block + auto margin）を打ち消す */
+.banner-wall p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0.8rem 0; }
+/* flex の既定（伸縮 + stretch）で原寸が崩れるため、縮めも伸ばしもさせない */
+.prose .banner-wall img { display: block; flex: none; margin: 0; image-rendering: pixelated; }
 .prose figure { margin: 1.5rem 0; }
 .prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */

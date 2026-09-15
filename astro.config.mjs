@@ -2,31 +2,36 @@
 
 import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { assertUnlistedExcluded, unlistedSlugs } from './src/lib/unlisted.mjs';
+import remarkDirective from 'remark-directive';
+import remarkBtn from './src/plugins/remark-btn.js';
+import remarkDirectives from './src/plugins/remark-directives.js';
+import rehypeExternalLinks from './src/plugins/rehype-external-links.js';
+import rehypeFigure from './src/plugins/rehype-figure.js';
+import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
+import rehypeTwitter from './src/plugins/rehype-twitter.js';
+import rehypeYoutube from './src/plugins/rehype-youtube.js';
+import { remarkExcerpt } from './src/plugins/remark-excerpt.js';
 
 // sitemap から unlisted 記事を除外するためのスラッグ一覧。
-// この config はコンテンツコレクション（astro:content）より先に評価されるため、
+// この config はコンテンツコレクション（astro:content）より先に評価されるため
 // getCollection が使えず、frontmatter を文字列スキャンしている。
-// 「unlisted: true」の表記ゆれ（クォート等）には反応しない点に注意。
-function getUnlistedSlugs() {
-  const dir = join(process.cwd(), 'src/content/blog');
-  const slugs = [];
-  for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) {
-    if (!entry.name.endsWith('.md')) continue;
-    const filePath = join(entry.parentPath ?? entry.path, entry.name);
-    const content = readFileSync(filePath, 'utf-8');
-    const fmEnd = content.indexOf('---', 3);
-    const fm = fmEnd === -1 ? content : content.slice(0, fmEnd);
-    if (!fm.includes('unlisted: true')) continue;
-    const rel = filePath.replace(dir + '\\', '').replace(dir + '/', '');
-    const slug = rel.replace(/[\\/]index\.md$/, '').replace(/\.md$/, '');
-    slugs.push(slug);
-  }
-  return slugs;
-}
+// スキャンの取りこぼしは下の checkUnlisted() がビルド後に検出する。
+const unlisted = unlistedSlugs();
 
-const unlistedSlugs = getUnlistedSlugs();
+// スキャンとコレクションのズレを検算する。sitemap の生成後に走らせたいので、
+// integrations 配列では sitemap より後ろに置くこと。
+function checkUnlisted() {
+	return {
+		name: 'check-unlisted',
+		hooks: {
+			'astro:build:done': ({ dir, pages }) => {
+				assertUnlistedExcluded(fileURLToPath(dir), pages);
+			},
+		},
+	};
+}
 
 function watchPlugins() {
 	return {
@@ -43,16 +48,6 @@ function watchPlugins() {
 		},
 	};
 }
-import remarkDirective from 'remark-directive';
-import remarkBtn from './src/plugins/remark-btn.js';
-import remarkDirectives from './src/plugins/remark-directives.js';
-import rehypeExternalLinks from './src/plugins/rehype-external-links.js';
-import rehypeFigure from './src/plugins/rehype-figure.js';
-import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
-import rehypeTwitter from './src/plugins/rehype-twitter.js';
-import rehypeYoutube from './src/plugins/rehype-youtube.js';
-import { remarkExcerpt } from './src/plugins/remark-excerpt.js';
-
 export default defineConfig({
 	site: 'https://4sou9.github.io',
 	base: '/blog',
@@ -61,10 +56,11 @@ export default defineConfig({
 	integrations: [
 		sitemap({
 			filter: (page) =>
-				!unlistedSlugs.some((slug) => page.endsWith(`/blog/${slug}`)) &&
+				!unlisted.some((slug) => page.endsWith(`/blog/${slug}`)) &&
 				!page.endsWith('/blog/ogp'),
 		}),
 		watchPlugins(),
+		checkUnlisted(),
 	],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },

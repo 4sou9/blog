@@ -16,7 +16,7 @@ description: 記事の書き方（ファイル配置、frontmatter、埋め込�
 **Custom Components**（サンプル: `memo.md` = 記法ガイド）:
 
 ```
-:::info          ← Alert（info / warn / danger / tip）
+:::info          ← Alert（info / warn / danger / tip = success）
 本文
 :::
 
@@ -36,7 +36,11 @@ description: 記事の書き方（ファイル配置、frontmatter、埋め込�
 :::
 ::::
 
-:badge[NEW]{type="new"}   ← インライン。type=default/info/warn/danger/success/new
+:::banners       ← 画像を原寸のまま横に敷き詰める（88x31 バナー等）
+![alt](./b/a.gif)
+:::
+
+:badge[NEW]{type="new"}   ← インライン。type=default/info/warn/danger/tip=success/accent/new
 ```
 
 入れ子は外側のコロンを内側より多くする（Tabs/Changelog は外 `::::`）。同数だと最初の子で閉じる。

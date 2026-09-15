@@ -3,29 +3,24 @@ title: 'Steam のプレイ時間を稼ぐだけのツールを作りました'
 pubDate: '2026-06-09'
 ---
 
-ゲームを実際に遊ばずに、放置で Steam のプレイ時間だけを積み上げるツール「Steam Idle Picker」を作りました。
-最大 32 本のゲームを同時に「プレイ中」の状態にできます。
+選んだ Steam のゲームを、起動したことにしておくツール「Steam Idle Picker」を作りました。
 
 ![SteamIdlePickerのGUI](./screenshot.png "何の意味があるんですか？")
 
+## 機能
+
+- 最大 32 本を同時に放置
+- 検索、お気に入り、フィルター、並べ替え
+- アプリを閉じると放置も止まる（クラッシュしても止まる）
+
 ## 使い方
 
-1. 更新ボタンを押して、ライブラリのゲーム一覧を読み込む
-2. ゲームを選ぶ
-3. 再生ボタンを押すと、選んだゲームが起動されてることになる
+Windows 10/11 で、Steam を起動しておく必要があります。
 
-やめるときは停止ボタンを押すだけです。
-一覧は名前、App ID、放置中かどうかでソートでき、検索で絞り込めます。
-言語（日本語/英語）とダーク/ライトテーマは、Windows の設定に合わせて自動で切り替わります。
+1. 更新ボタンでゲーム一覧を読み込む
+2. 放置したいゲームにチェックを入れる
+3. 再生ボタンを押す
 
-## 動作環境とダウンロード
-
-- Windows 10/11（x64）
-- Steam がインストール済みで、起動していること
-- Microsoft Edge WebView2 ランタイム（Windows 11 には標準で入っています）
-
-[ダウンロード (v2.1.1)](https://github.com/4sou9/Steam_Idle_Picker/releases/download/v2.1.1/Steam.Idle.Picker_2.1.1_x64-setup.exe "btn")
-
-ソースコードはこちら。
+[ダウンロード (v2.3.0)](https://github.com/4sou9/Steam_Idle_Picker/releases/download/v2.3.0/Steam.Idle.Picker_2.3.0_x64-setup.exe "btn")
 
 https://github.com/4sou9/Steam_Idle_Picker
