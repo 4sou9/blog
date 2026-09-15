@@ -58,7 +58,6 @@ $packageIds = @(
 
     # メディア
     'mpv.net'
-    'DuongDieuPhap.ImageGlass'
 
     # AI
     'Anthropic.Claude'
@@ -187,7 +186,6 @@ GUI が立ち上がったら、右上の ≡ ボタンから Import config を�
                  "Microsoft.Todos",
                  "Microsoft.Paint",
                  "Microsoft.YourPhone",
-                 "Microsoft.Windows.Photos",
                  "Microsoft.PowerAutomateDesktop",
                  "MicrosoftCorporationII.QuickAssist",
                  "Microsoft.ScreenSketch",
@@ -392,8 +390,6 @@ irm https://claude.ai/install.ps1 | iex; if($?){ $b=Join-Path $HOME ".local\bin"
 ```
 
 ## 残りの細かい調整
-
-**Caps Lock の無効化**：PowerToys の Keyboard Manager で、Caps Lock を別のキーに割り当てて潰します。
 
 **スリープ抑止**：PowerToys の Awake を無期限にして、長時間の書き出しやエンコード中にスリープ・画面オフさせないようにします。
 

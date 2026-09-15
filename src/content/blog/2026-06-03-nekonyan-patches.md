@@ -5,7 +5,8 @@ pubDate: '2026-06-03'
 
 [patches.nekonyansoft.com](https://patches.nekonyansoft.com/) のまとめです。
 
-VPN を嚙ませると DL リンクが見えるようになるので、そのまま貼っただけです。
+VPN を嚙ませると DL リンクが見えるようになります。
+一覧は [JSON](https://patches.nekonyansoft.com/?_data=routes/_index) でも取得できます。
 
 ## YUZUSOFT
 
