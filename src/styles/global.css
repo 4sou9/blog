@@ -207,7 +207,10 @@ a:hover { text-decoration: underline; }
 .prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 /* バナーの壁。原寸のまま隙間なく並べたいので、prose の img 既定（block + auto margin）を打ち消す */
 .banner-wall p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0.8rem 0; }
-/* flex の既定（伸縮 + stretch）で原寸が崩れるため、縮めも伸ばしもさせない */
+/* flex の既定（伸縮 + stretch）で原寸が崩れるため、縮めも伸ばしもさせない。
+   バナーをリンクにすると flex の対象が a に変わるので、a にも同じ指定が要る */
+.banner-wall p > a { display: block; flex: none; line-height: 0; text-decoration: none; }
+.banner-wall p > a:hover { outline: 1px solid var(--faint); }
 .prose .banner-wall img { display: block; flex: none; margin: 0; image-rendering: pixelated; }
 .prose figure { margin: 1.5rem 0; }
 .prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }

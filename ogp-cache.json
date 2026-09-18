@@ -47,6 +47,12 @@
     "image": "",
     "siteName": ""
   },
+  "https://tters.jp/banner": {
+    "title": "日本の88x31バナー保管庫",
+    "description": "「日本の88x31バナー保管庫」は、個人サイト全盛期に多く見られた88x31ピクセルのバナーを収集・保存・公開するアーカイブサイトです。",
+    "image": "https://tters.jp/v1/static/image/banner/og-image.png?2025040200",
+    "siteName": "Tters"
+  },
   "https://web.archive.org/": {
     "title": "Wayback Machine",
     "description": "",
