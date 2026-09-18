@@ -160,6 +160,15 @@ a:hover { text-decoration: underline; }
 }
 .site-search .pagefind-ui__message { padding: 0.5rem 0.95rem; height: auto; }
 .site-search .pagefind-ui__results-area { margin-top: 0; padding: 0 0.95rem; }
+/* 抜粋に URL やコマンド行が入ると途中で折り返せず横スクロールが出るため、
+   flex 子の min-width をほどいた上でどこでも折り返せるようにする。
+   Pagefind 側は .pagefind-ui__x.svelte-xxx.svelte-xxx（詳細度 0,3,0）で書かれているので、
+   打ち消す側も .pagefind-ui を挟んで詳細度を揃える */
+.site-search .pagefind-ui .pagefind-ui__result-inner,
+.site-search .pagefind-ui .pagefind-ui__result-nested,
+.site-search .pagefind-ui .pagefind-ui__result-excerpt { min-width: 0; }
+.site-search .pagefind-ui .pagefind-ui__result-title,
+.site-search .pagefind-ui .pagefind-ui__result-excerpt { overflow-wrap: anywhere; }
 /* ハイライトを黄色背景からシンプルな青文字に */
 .site-search .pagefind-ui mark {
   background: transparent;
@@ -192,6 +201,13 @@ a:hover { text-decoration: underline; }
   .site-search .pagefind-ui__form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   /* 結果エリアを残り高さいっぱいに広げ、スクローラにする */
   .site-search .pagefind-ui__drawer { flex: 1; min-height: 0; max-height: none; }
+  /* 画面が狭いぶん、結果の文字と余白を詰めて一覧性を上げる */
+  .site-search .pagefind-ui .pagefind-ui__message { font-size: 0.85rem; }
+  .site-search .pagefind-ui .pagefind-ui__result { padding: 0.9rem 0 1rem; }
+  .site-search .pagefind-ui .pagefind-ui__result-title { font-size: 0.95rem; line-height: 1.5; }
+  .site-search .pagefind-ui .pagefind-ui__result-excerpt { font-size: 0.8rem; line-height: 1.65; }
+  .site-search .pagefind-ui .pagefind-ui__result-inner { margin-top: 0.2rem; }
+  .site-search .pagefind-ui .pagefind-ui__result-nested { padding: 0.45rem 0 0 0.9rem; }
 }
 
 .post-list { list-style: none; padding: 0; margin: 0; }
