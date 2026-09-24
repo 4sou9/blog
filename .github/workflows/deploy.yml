@@ -1,5 +1,8 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
+# main に push すると、Cloudflare（https://neko4.dev/blog）に公開し、
+# 旧 URL の GitHub Pages（https://4sou9.github.io/blog）には新しい URL への転送ページを置く。
+# Cloudflare への公開には、リポジトリの Secrets に CLOUDFLARE_API_TOKEN（「Edit Cloudflare Workers」テンプレートで作ったトークン）が必要
 on:
   push:
     branches: [main]
@@ -12,13 +15,20 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v5
+      - run: node scripts/stage-cloudflare.mjs
+      - uses: cloudflare/wrangler-action@v3
         with:
-          path: ./dist
-      - uses: actions/deploy-pages@v5
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: efd49b736a3d9b13891a8a2a7b98c72f
+          command: deploy
+      - run: node scripts/github-redirects.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./.github-redirects
+      - uses: actions/deploy-pages@v4

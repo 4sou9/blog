@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // ブログを Cloudflare（Workers の静的ファイル配信）で公開する設定。Worker のコードはなく、ファイルを配るだけ
+  "name": "neko-blog",
+  "compatibility_date": "2026-09-01",
+  // 独自ドメインでは、トップ・掲示板と同じドメインの /blog の下を受け持つ。
+  "routes": [{ "pattern": "neko4.dev/blog*", "zone_name": "neko4.dev" }],
+  "assets": {
+    // scripts/stage-cloudflare.mjs が dist/ を .cloudflare/blog/ に写す（URL の /blog/〜 がそのままファイルの場所になる）
+    "directory": "./.cloudflare",
+    // Astro の build.format: 'file' と trailingSlash: 'never' に合わせ、/blog/foo で foo.html、/blog で blog/index.html を返す
+    "html_handling": "drop-trailing-slash",
+    // 見つからない URL には、いちばん近い 404.html（blog/404.html）を返す
+    "not_found_handling": "404-page"
+  }
+}

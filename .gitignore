@@ -30,3 +30,8 @@ Desktop.ini
 # Claude Code local settings (per-user permissions)
 .claude/settings.local.json
 
+
+# Cloudflare 用の配置（scripts/stage-cloudflare.mjs）と wrangler の作業フォルダ
+.cloudflare/
+.wrangler/
+.github-redirects/

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://4sou9.github.io/blog/sitemap-index.xml
+Sitemap: https://neko4.dev/blog/sitemap-index.xml

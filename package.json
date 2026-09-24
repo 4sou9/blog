@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "preview:cf": "npm run build && node scripts/stage-cloudflare.mjs && wrangler dev --port 8789",
+    "deploy:cf": "npm run build && node scripts/stage-cloudflare.mjs && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.18",
@@ -23,6 +25,7 @@
     "sharp": "^0.34.3"
   },
   "devDependencies": {
-    "pagefind": "^1.5.2"
+    "pagefind": "^1.5.2",
+    "wrangler": "^4.136.3"
   }
 }

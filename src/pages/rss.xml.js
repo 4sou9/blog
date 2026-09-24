@@ -9,7 +9,7 @@ export async function GET(context) {
   return rss({
     title: 'ねこのメモ',
     description: '備忘録です',
-    site: context.site,
+    site: new URL(import.meta.env.BASE_URL, context.site).href, // ブログのトップ（ドメインの直下はサイトのトップ）
     items: await Promise.all(posts.map(async (post) => ({
       title: post.data.title,
       pubDate: post.data.pubDate,

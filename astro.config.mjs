@@ -49,7 +49,7 @@ function watchPlugins() {
 	};
 }
 export default defineConfig({
-	site: 'https://4sou9.github.io',
+	site: 'https://neko4.dev',
 	base: '/blog',
 	trailingSlash: 'never',
 	build: { format: 'file' },
