@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "preview:cf": "npm run build && node scripts/stage-cloudflare.mjs && wrangler dev --port 8789",
-    "deploy:cf": "npm run build && node scripts/stage-cloudflare.mjs && wrangler deploy"
+    "deploy:cf": "npm run build && node scripts/stage-cloudflare.mjs && wrangler deploy",
+    "build:favicons": "node scripts/build-favicons.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.18",
