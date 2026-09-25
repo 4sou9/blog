@@ -26,4 +26,4 @@ description: サイト実装の詳細（プラグイン、unlisted の除外箇�
 
 **キャッシュ**: dev と本番で挙動が違うときは `.astro`・`node_modules/.vite`・`node_modules/.astro` を削除して再起動。プラグイン変更後の build は `node_modules/.astro/data-store.json` が古い出力を返すことがある（コンテンツ変更まで無効化されない）ので、これも消す。
 
-**デプロイ**: main push → `.github/workflows/deploy.yml` → GitHub Pages。手動不要。
+**デプロイ**: main push → `.github/workflows/deploy.yml` → Cloudflare（neko4.dev/blog）に公開し、旧 URL の GitHub Pages には `scripts/github-redirects.mjs` の転送ページと画像を置く。手動不要。キャッシュの指定（`_headers`）は `scripts/stage-cloudflare.mjs` が書き出す。

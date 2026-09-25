@@ -1,6 +1,8 @@
 // 旧 URL（https://4sou9.github.io/blog/〜）用の転送ページを .github-redirects/ に作る。
 // GitHub Pages ではサーバー側の転送ができないので、ページごとに同じパスの新しい URL へ移る HTML を置く。
-// rss.xml・サイトマップ・Search Console の確認ファイルは、中身をそのまま残す（RSS リーダーと「アドレス変更」用）
+// rss.xml・サイトマップ・Search Console の確認ファイルは、中身をそのまま残す（RSS リーダーと「アドレス変更」用）。
+// 画像もそのまま残す（X や Discord に共有済みのカードのプレビュー画像が旧 URL を指しているため）。
+// 転送ページに noindex は付けない。付けると Google が canonical をたどらず、新しい URL へ評価が引き継がれにくい
 import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 
@@ -12,7 +14,6 @@ const page = (to) => `<!doctype html>
 <head>
 <meta charset="utf-8">
 <title>ねこのメモは移転しました</title>
-<meta name="robots" content="noindex">
 <link rel="canonical" href="${to}">
 <meta http-equiv="refresh" content="0; url=${to}">
 <script>location.replace(${JSON.stringify(to)} + location.search + location.hash)</script>
@@ -45,7 +46,7 @@ for (const entry of readdirSync('dist', { recursive: true, withFileTypes: true }
     const path = rel.replace(/(^|\/)index\.html$/, '').replace(/\.html$/, '');
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, page(path ? `${NEW}/${path}` : NEW));
-  } else if (/^(rss\.xml|sitemap.*\.xml|google.*\.html)$/.test(rel)) {
+  } else if (/^(rss\.xml|sitemap.*\.xml|google.*\.html)$/.test(rel) || /\.(png|jpe?g|webp|gif|svg|ico|avif)$/.test(rel)) {
     mkdirSync(dirname(out), { recursive: true });
     cpSync(join('dist', rel), out);
   }

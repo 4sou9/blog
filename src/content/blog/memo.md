@@ -12,7 +12,7 @@ unlisted: true
 | 項目 | 内容 |
 |------|------|
 | フレームワーク | [Astro](https://astro.build) v6 |
-| デプロイ先 | GitHub Pages（`https://4sou9.github.io/blog/`） |
+| デプロイ先 | Cloudflare（`https://neko4.dev/blog`） |
 | ベースパス | `/blog`（`import.meta.env.BASE_URL`） |
 | コンテンツ | `src/content/blog/` 以下の `.md` ファイル |
 | スタイル | `src/styles/global.css` |
@@ -317,7 +317,7 @@ Linux の手順。
 
 ## デプロイ
 
-main に push すると GitHub Actions が自動でビルド＆デプロイする。
+main に push すると GitHub Actions が自動でビルドし、Cloudflare に公開する。旧 URL（`https://4sou9.github.io/blog/`）には新しい URL への転送ページが置かれる。
 
 ```bash
 npm run build    # ビルド確認
