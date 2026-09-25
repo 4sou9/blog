@@ -1,12 +1,15 @@
 // 旧 URL（https://4sou9.github.io/blog/〜）用の転送ページを .github-redirects/ に作る。
 // GitHub Pages ではサーバー側の転送ができないので、ページごとに同じパスの新しい URL へ移る HTML を置く。
 // rss.xml・サイトマップ・Search Console の確認ファイルは、中身をそのまま残す（RSS リーダーと「アドレス変更」用）。
+// サイトマップの URL は旧ドメインに書き換える（Google は別ドメインの URL を載せたサイトマップを無視する。
+// 旧 URL を並べておくと、Google が旧ページを巡回し直して転送に気づきやすい）。
 // 画像もそのまま残す（X や Discord に共有済みのカードのプレビュー画像が旧 URL を指しているため）。
 // 転送ページに noindex は付けない。付けると Google が canonical をたどらず、新しい URL へ評価が引き継がれにくい
-import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 
 const NEW = 'https://neko4.dev/blog';
+const OLD = 'https://4sou9.github.io/blog';
 const OUT = '.github-redirects';
 
 const page = (to) => `<!doctype html>
@@ -46,7 +49,10 @@ for (const entry of readdirSync('dist', { recursive: true, withFileTypes: true }
     const path = rel.replace(/(^|\/)index\.html$/, '').replace(/\.html$/, '');
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, page(path ? `${NEW}/${path}` : NEW));
-  } else if (/^(rss\.xml|sitemap.*\.xml|google.*\.html)$/.test(rel) || /\.(png|jpe?g|webp|gif|svg|ico|avif)$/.test(rel)) {
+  } else if (/^sitemap.*\.xml$/.test(rel)) {
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, readFileSync(join('dist', rel), 'utf8').replaceAll(`<loc>${NEW}`, `<loc>${OLD}`));
+  } else if (/^(rss\.xml|google.*\.html)$/.test(rel) || /\.(png|jpe?g|webp|gif|svg|ico|avif)$/.test(rel)) {
     mkdirSync(dirname(out), { recursive: true });
     cpSync(join('dist', rel), out);
   }

@@ -8,6 +8,7 @@ const { title, description, slug, noindex } = Astro.props;
 // isHome と og:url の両方が素のパスでは判定を誤るため、ここで一度だけ正規化する
 const pathname = Astro.url.pathname.replace(/(\/index)?\.html$/, '').replace(/\/$/, '');
 const isHome = pathname === base;
+const pageUrl = new URL(pathname, Astro.site);
 const pageTitle = title ? `${title} - ${SITE_TITLE}` : SITE_TITLE;
 const pageDescription = description ?? SITE_DESCRIPTION;
 // SVG は OGP のクローラ（X・Slack・Discord 等）が描画しないため PNG を使う
@@ -26,11 +27,12 @@ const ogImage = slug
     <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}/site.webmanifest`} />
     <link rel="alternate" type="application/rss+xml" title="ねこのメモ" href={`${base}/rss.xml`} />
+    <link rel="canonical" href={pageUrl} />
     <meta name="description" content={pageDescription} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:type" content={title ? 'article' : 'website'} />
-    <meta property="og:url" content={new URL(pathname, Astro.site)} />
+    <meta property="og:url" content={pageUrl} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
