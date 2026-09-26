@@ -26,7 +26,7 @@ export async function postExcerpt(post: CollectionEntry<'blog'>): Promise<string
   return remarkPluginFrontmatter.excerpt as string | undefined;
 }
 
-/** 記事の日付表記（2026年09月11日）。 */
+/** 記事の日付表記（2026/09/11）。トップ（neko4.dev）の表記とそろえる。 */
 export function formatDate(d: Date): string {
-  return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 }

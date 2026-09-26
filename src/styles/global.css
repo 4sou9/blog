@@ -1,4 +1,6 @@
-/* 配色はここが唯一の定義。OG画像（src/pages/og/[...slug].png.ts）は CSS を
+/* 角は丸めない（トップ neko4.dev に合わせたカクカクした見た目）。
+   例外はスクロールバー、右上のカラーパレット、Changelog の丸い点だけ。
+   配色はここが唯一の定義。OG画像（src/pages/og/[...slug].png.ts）は CSS を
    適用できないため、このファイルから値を読み出して使っている */
 :root {
   --bg: #36373e;
@@ -18,6 +20,7 @@
 html { scrollbar-gutter: stable both-edges; }
 
 body {
+  position: relative; /* 右上のカラーパレットの基準 */
   margin: 0 auto;
   max-width: 46rem;
   padding: 3rem 1.25rem 4rem;
@@ -32,9 +35,15 @@ body {
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* 列の右上に、サイトで使う3色を丸で並べる。マウスを乗せると色コードが出る（トップと同じ） */
+.palette { position: absolute; top: 1.5rem; right: 1.25rem; display: flex; gap: 0.5rem; }
+.palette span { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+
 .site-header { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 2.5rem; }
 .site-title { font-size: 1.2rem; font-weight: 600; margin: 0; }
 .site-title a { color: var(--fg); }
+/* トップのロゴと同じく、ホバーでは下線を出さずに色だけ変える */
+.site-title a:hover { color: var(--link); text-decoration: none; }
 
 /* ヘッダーの検索トリガーボタン（虫眼鏡アイコンのみ。クリックでモーダルを開く） */
 .search-trigger {
@@ -49,7 +58,6 @@ a:hover { text-decoration: underline; }
   color: var(--faint);
   background: transparent;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
   transition: color 0.15s;
 }
@@ -78,7 +86,6 @@ a:hover { text-decoration: underline; }
      依らず常に「上だけダーク」が保証され、空状態でも下端に明るい帯が出ない */
   background: linear-gradient(to bottom, #1f2025 4rem, var(--surface) 4rem);
   border: 1px solid var(--border);
-  border-radius: 12px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
@@ -93,7 +100,6 @@ a:hover { text-decoration: underline; }
   color: var(--faint);
   background: transparent;
   border: none;
-  border-radius: 8px;
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -111,7 +117,7 @@ a:hover { text-decoration: underline; }
   --pagefind-ui-border: var(--border);
   --pagefind-ui-tag: var(--bg);
   --pagefind-ui-border-width: 1px;
-  --pagefind-ui-border-radius: 8px;
+  --pagefind-ui-border-radius: 0;
   --pagefind-ui-font: inherit;
 }
 .site-search .pagefind-ui, .site-search .pagefind-ui__form { margin: 0; }
@@ -189,7 +195,6 @@ a:hover { text-decoration: underline; }
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 0;
     box-shadow: none;
     display: flex;
     flex-direction: column;
@@ -214,6 +219,9 @@ a:hover { text-decoration: underline; }
 .post-list li { margin-bottom: 1.6rem; }
 .post-date { font-size: 0.8rem; color: var(--faint); font-variant-numeric: tabular-nums; }
 .post-title { font-size: 1rem; font-weight: 500; }
+/* 記事名は白。水色はホバーしたときだけにして、アクセント色を特別なものに保つ（トップと同じ） */
+.post-list .post-title { color: var(--fg); }
+.post-list .post-title:hover { color: var(--link); }
 
 .prose { margin-top: 2rem; }
 .prose p { margin: 0.4em 0; }
@@ -233,8 +241,8 @@ a:hover { text-decoration: underline; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
 .prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
-.prose pre { padding: 1rem; border-radius: 6px; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
-.copy-btn { position: absolute; top: 0.5rem; right: 1rem; padding: 0.15rem 0.5rem; font-size: 0.72rem; background: var(--faint); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; opacity: 0; transition: opacity 0.15s; z-index: 1; }
+.prose pre { padding: 1rem; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
+.copy-btn { position: absolute; top: 0.5rem; right: 1rem; padding: 0.15rem 0.5rem; font-size: 0.72rem; background: var(--faint); color: var(--bg); border: none; cursor: pointer; opacity: 0; transition: opacity 0.15s; z-index: 1; }
 .code-wrapper:hover .copy-btn { opacity: 1; }
 .code-lang { position: absolute; top: 0.5rem; left: 0.75rem; font-size: 0.7rem; color: #8b949e; pointer-events: none; user-select: none; }
 
@@ -244,20 +252,19 @@ a:hover { text-decoration: underline; }
 .prose th { background: var(--surface); font-weight: 600; letter-spacing: 0.02em; }
 .prose tbody tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.035); }
 .prose tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.08); }
-.prose > table { margin: 1.25rem 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.prose > table { margin: 1.25rem 0; border: 1px solid var(--border); }
 
 .btn-link {
   display: inline-block;
   padding: 0.25em 0.75em;
   border: 1px solid var(--link);
-  border-radius: 4px;
   color: var(--link);
   font-size: 0.85rem;
   transition: background 0.15s, color 0.15s;
 }
 .btn-link:hover { background: var(--link); color: var(--bg); text-decoration: none; }
 
-.ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; border-radius: 8px; overflow: hidden; margin: 1rem 0; color: var(--fg); text-decoration: none; }
+.ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; overflow: hidden; margin: 1rem 0; color: var(--fg); text-decoration: none; }
 .ogp-card:hover { background: #38465a; text-decoration: none; }
 .ogp-image { width: 125px !important; min-width: 125px; height: 125px !important; flex-shrink: 0; align-self: flex-start; background-size: cover !important; background-position: center center; background-repeat: no-repeat; background-color: var(--faint); }
 .ogp-content { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
@@ -292,12 +299,12 @@ a:hover { text-decoration: underline; }
 pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 
 /* インラインコード */
-.prose :not(pre) > code { background: var(--surface); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em; overflow-wrap: anywhere; }
+.prose :not(pre) > code { background: var(--surface); padding: 0.1em 0.35em; font-size: 0.88em; overflow-wrap: anywhere; }
 
 /* ===== Custom Components（:::ディレクティブ） ===== */
 
 /* Alert */
-.alert { display: flex; align-items: flex-start; gap: 0.75rem; margin: 1.25rem 0; padding: 0.85rem 1rem; border: 2px solid; border-radius: 8px; }
+.alert { display: flex; align-items: flex-start; gap: 0.75rem; margin: 1.25rem 0; padding: 0.85rem 1rem; border: 2px solid; }
 .alert > .alert-icon { flex: 0 0 auto; width: 1.4rem; height: 1.4rem; margin-top: 0.1rem; -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
 .alert > p:first-of-type { margin-top: 0; }
 .alert > p:last-child { margin-bottom: 0; }
@@ -311,7 +318,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .alert-tip    > .alert-icon { background: #3ba55d; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202a10%2010%200%20100%2020%2010%2010%200%20000-20zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z'/%3E%3C/svg%3E"); }
 
 /* Collapsible（<details>） */
-.collapsible { background: #27292d; border-radius: 8px; margin: 1.5rem 0; overflow: hidden; }
+.collapsible { background: #27292d; margin: 1.5rem 0; overflow: hidden; }
 .collapsible > .collapsible-summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 0.75rem; padding: 1rem 1.25rem; }
 .collapsible > .collapsible-summary::-webkit-details-marker { display: none; }
 .collapsible-title { grid-column: 1; grid-row: 1; font-size: 1.1rem; font-weight: 600; }
@@ -347,7 +354,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .release :is(li) { margin: 0.1rem 0; }
 
 /* Badge */
-.badge { display: inline-block; padding: 0.08em 0.5em; border-radius: 999px; font-size: 0.72em; font-weight: 700; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
+.badge { display: inline-block; padding: 0.08em 0.5em; font-size: 0.72em; font-weight: 700; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
 .badge-default { background: var(--surface); color: var(--fg); border: 1px solid var(--border); }
 .badge-info { background: rgba(0, 169, 250, 0.18); color: #5fc6ff; }
 .badge-warn { background: rgba(238, 177, 50, 0.18); color: #f1c45a; }

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://neko4.dev/blog/sitemap-index.xml
