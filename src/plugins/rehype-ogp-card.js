@@ -113,6 +113,7 @@ async function resolveOgp(url) {
   return ogp;
 }
 
+// X・Facebook・Discord と同じく、画像を上に置き、その下にドメイン・タイトル・説明を並べる
 function makeCard(href, ogp) {
   let hostname = href;
   try { hostname = new URL(href).hostname; } catch {}
@@ -139,6 +140,12 @@ function makeCard(href, ogp) {
           {
             type: 'element',
             tagName: 'div',
+            properties: { className: ['ogp-url'] },
+            children: [{ type: 'text', value: hostname }],
+          },
+          {
+            type: 'element',
+            tagName: 'div',
             properties: { className: ['ogp-title'] },
             children: [{ type: 'text', value: ogp.title || href }],
           },
@@ -148,12 +155,6 @@ function makeCard(href, ogp) {
             properties: { className: ['ogp-desc'] },
             children: [{ type: 'text', value: ogp.description }],
           }] : []),
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['ogp-url'] },
-            children: [{ type: 'text', value: ogp.siteName || hostname }],
-          },
         ],
       },
     ],
