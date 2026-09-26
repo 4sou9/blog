@@ -1,4 +1,4 @@
-// ファビコン一式を public/favicon.svg から書き出す（node scripts/build-favicons.mjs）。
+// ファビコン一式と一覧用の OGP 画像を public/ の SVG から書き出す（node scripts/build-favicons.mjs）。
 // アイコンはトップ（10_SITE の public/favicon.svg）と同じもの。変えるときはトップの SVG をここにも写してから実行する
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
@@ -23,3 +23,9 @@ write('public/favicon.png', png(icon, 48)); // トップ・掲示板と同じ形
 write('public/apple-touch-icon.png', png(filled(8), 180)); // トップ・掲示板と同じ作り方
 // manifest の maskable は、中央の円（直径 80%）の外が切られることがあるので、ねこをさらに小さくする
 for (const s of [192, 512]) write(`public/web-app-manifest-${s}x${s}.png`, png(filled(14), s));
+
+// 一覧などの OGP 画像（記事ごとの画像は src/pages/og/ でビルド時に作る）
+const og = new Resvg(readFileSync('public/og-image.svg', 'utf8'), {
+  font: { loadSystemFonts: true, defaultFontFamily: 'Yu Gothic' },
+}).render().asPng();
+write('public/og-image.png', og);
