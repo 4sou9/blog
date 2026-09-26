@@ -20,6 +20,7 @@
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^6.4.2",
+    "budoux": "^0.9.2",
     "remark-directive": "^4.0.0",
     "satori": "^0.26.0",
     "sharp": "^0.34.3"

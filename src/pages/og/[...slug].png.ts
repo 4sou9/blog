@@ -4,6 +4,9 @@ import satori from 'satori';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getCollection } from 'astro:content';
+import { loadDefaultJapaneseParser } from 'budoux';
+
+const ja = loadDefaultJapaneseParser();
 
 const fontData = readFileSync(
   join(process.cwd(), 'node_modules/@fontsource/noto-sans-jp/files/noto-sans-jp-japanese-700-normal.woff')
@@ -17,7 +20,6 @@ const color = (name: string, fallback: string) =>
 
 const BG = color('bg', '#36373e');
 const FG = color('fg', '#f2f3f5');
-const SUB = color('faint', '#a8acb3');
 
 // unlisted も含めた全記事分を生成する。unlisted は URL を直接共有する使い方なので、
 // OG画像が無いと共有時のカードだけが壊れる（一覧に出ないこととは無関係）
@@ -31,6 +33,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const GET: APIRoute = async ({ props }) => {
   const { title } = props as { title: string };
+  // 短いタイトルほど大きく。横幅いっぱい使い、長くても3行ほどに収める
+  const len = [...title].length;
+  const fontSize = len <= 10 ? 96 : len <= 20 ? 80 : 64;
   const svg = await satori(
     {
       type: 'div',
@@ -40,46 +45,35 @@ export const GET: APIRoute = async ({ props }) => {
           height: '100%',
           background: BG,
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '64px',
+          justifyContent: 'center',
+          padding: '80px 100px',
           fontFamily: 'Noto Sans JP',
         },
-        children: [
-          {
-            type: 'div',
-            props: {
-              style: {
-                color: FG,
-                fontSize: 72,
-                lineHeight: 1.4,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                textAlign: 'center',
-                wordBreak: 'break-word',
-                overflowWrap: 'break-word',
-                maxWidth: 500,
-              },
-              children: title,
+        children: {
+          type: 'div',
+          props: {
+            style: {
+              color: FG,
+              fontSize,
+              lineHeight: 1.4,
+              fontWeight: 700,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              textAlign: 'center',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
             },
+            // 文節ごとの塊にして、行の折り返しを文節の切れ目だけにする（1文節が1行より長いときだけ中で折れる）
+            // BudouX は「時間まとめ（2026年9月）」「個人的 Windows11 セットアップ」を1文節にするので、
+            // 開きかっこの前と半角スペースの後でも切れるようにする
+            children: ja.parse(title).flatMap(p => p.split(/(?=[（(「『【])|(?<= )/)).map(phrase => ({
+              type: 'div',
+              props: { style: { whiteSpace: 'pre-wrap' }, children: phrase },
+            })),
           },
-          {
-            type: 'div',
-            props: {
-              style: {
-                color: SUB,
-                fontSize: 28,
-                fontWeight: 700,
-                textAlign: 'center',
-              },
-              children: 'ねこのメモ',
-            },
-          },
-        ],
+        },
       },
     },
     {
