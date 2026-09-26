@@ -19,28 +19,7 @@ const filled = (pad) =>
     .replace(/<path/, `<rect x="${-pad}" y="${-pad}" width="${64 + pad * 2}" height="${64 + pad * 2}" fill="${BG}"/><path`)
     .replace('viewBox="0 0 64 64"', `viewBox="${-pad} ${-pad} ${64 + pad * 2} ${64 + pad * 2}"`);
 
-// ICO は PNG をそのまま入れる形式（16・32・48px）
-function ico(sizes) {
-  const images = sizes.map((s) => png(icon, s));
-  const header = Buffer.alloc(6 + 16 * sizes.length);
-  header.writeUInt16LE(0, 0);
-  header.writeUInt16LE(1, 2); // アイコン
-  header.writeUInt16LE(sizes.length, 4);
-  let offset = header.length;
-  sizes.forEach((s, i) => {
-    const e = 6 + 16 * i;
-    header.writeUInt8(s, e);
-    header.writeUInt8(s, e + 1);
-    header.writeUInt16LE(1, e + 4); // 色平面
-    header.writeUInt16LE(32, e + 6); // ビット深度
-    header.writeUInt32LE(images[i].length, e + 8);
-    header.writeUInt32LE(offset, e + 12);
-    offset += images[i].length;
-  });
-  return Buffer.concat([header, ...images]);
-}
-
-write('public/favicon.ico', ico([16, 32, 48]));
+write('public/favicon.png', png(icon, 48)); // トップ・掲示板と同じ形式（png, 48x48）
 write('public/apple-touch-icon.png', png(filled(8), 180)); // トップ・掲示板と同じ作り方
 // manifest の maskable は、中央の円（直径 80%）の外が切られることがあるので、ねこをさらに小さくする
 for (const s of [192, 512]) write(`public/web-app-manifest-${s}x${s}.png`, png(filled(14), s));
