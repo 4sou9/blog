@@ -41,7 +41,6 @@ function ico(sizes) {
 }
 
 write('public/favicon.ico', ico([16, 32, 48]));
-for (const s of [16, 32, 96]) write(`public/favicon-${s}x${s}.png`, png(icon, s));
 write('public/apple-touch-icon.png', png(filled(8), 180)); // トップ・掲示板と同じ作り方
 // manifest の maskable は、中央の円（直径 80%）の外が切られることがあるので、ねこをさらに小さくする
 for (const s of [192, 512]) write(`public/web-app-manifest-${s}x${s}.png`, png(filled(14), s));
