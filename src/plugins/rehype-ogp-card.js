@@ -1,6 +1,8 @@
 import { visit } from 'unist-util-visit';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import sharp from 'sharp';
 
 // 単独行の裸URL（<p><a>href と同一テキスト</a></p>）を OGP カードに変換する。
 // YouTube/Twitter は専用の rehype プラグインが埋め込むためここではスキップ。
@@ -9,8 +11,16 @@ import { join } from 'node:path';
 // 誰がいつビルドしても同じ HTML が出るようにするため。キャッシュに無い URL だけ
 // 取りにいくので、CI はネットワークが無くても既存記事を落とさずビルドできる。
 // カードを取り直したいときは該当エントリ（またはファイルごと）を消して再ビルドする。
+//
+// カードの画像も同じ考え方で public/ogp-card/ に置いてコミットする。相手の原寸（GitHub だと
+// 1920px・200KB 超）をそのまま読ませるとページの大半がこの 1 枚になるため、カードの表示幅に
+// 合わせて縮めた WebP を自分のドメインから配る。取れなかったときは相手の URL を直接使う。
 const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com/;
 const CACHE_PATH = join(process.cwd(), 'ogp-cache.json');
+const IMAGE_DIR = 'ogp-card';
+// カードは最大 520px（global.css の .ogp-card）。少し余裕を持たせ、OGP 標準の 1200:630 で切る
+const IMAGE_WIDTH = 600;
+const IMAGE_HEIGHT = 315;
 
 function loadCache() {
   try {
@@ -40,8 +50,9 @@ function decode(value) {
   });
 }
 
-// style="background-image:url(...)" に埋めるので、属性や url() を抜け出せる文字を
-// 通さない。http/https 以外（javascript: 等）もここで弾く
+// 取り込みに失敗したときは img の src にそのまま入れるので、http/https 以外（javascript: 等）を弾く。
+// 以前は style="background-image:url(...)" に埋めていたため url() を抜け出せる文字も置き換えており、
+// ogp-cache.json にはその形で入っている
 function safeImageUrl(value) {
   if (!value) return '';
   try {
@@ -104,6 +115,27 @@ async function fetchOgp(url) {
   }
 }
 
+// 画像 URL ごとにファイル名を決め、無ければ取ってきて縮める。返すのは public/ からの相対パス
+async function localizeImage(imageUrl) {
+  const name = `${createHash('sha1').update(imageUrl).digest('hex').slice(0, 12)}.webp`;
+  const file = join(process.cwd(), 'public', IMAGE_DIR, name);
+  if (existsSync(file)) return `${IMAGE_DIR}/${name}`;
+  try {
+    const res = await fetch(imageUrl, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const webp = await sharp(Buffer.from(await res.arrayBuffer()))
+      .resize(IMAGE_WIDTH, IMAGE_HEIGHT, { fit: 'cover' })
+      .webp({ quality: 80 })
+      .toBuffer();
+    mkdirSync(join(process.cwd(), 'public', IMAGE_DIR), { recursive: true });
+    writeFileSync(file, webp);
+    return `${IMAGE_DIR}/${name}`;
+  } catch (err) {
+    console.warn(`[ogp-card] 画像を取り込めなかったため元の URL を使います: ${imageUrl} (${err})`);
+    return null;
+  }
+}
+
 // キャッシュ優先。取得できた分だけ貯め、失敗はキャッシュしない（次回また試す）
 async function resolveOgp(url) {
   if (url in cache) return cache[url];
@@ -114,7 +146,8 @@ async function resolveOgp(url) {
 }
 
 // X・Facebook・Discord と同じく、画像を上に置き、その下にドメイン・タイトル・説明を並べる
-function makeCard(href, ogp) {
+// 画面外のカードが多いので画像は lazy。width/height で読み込み前から場所を確保する
+function makeCard(href, ogp, imageSrc) {
   let hostname = href;
   try { hostname = new URL(href).hostname; } catch {}
 
@@ -123,12 +156,17 @@ function makeCard(href, ogp) {
     tagName: 'a',
     properties: { href, className: ['ogp-card'], target: '_blank', rel: 'noopener noreferrer' },
     children: [
-      ...(ogp.image ? [{
+      ...(imageSrc ? [{
         type: 'element',
-        tagName: 'div',
+        tagName: 'img',
         properties: {
           className: ['ogp-image'],
-          style: `background-image:url(${ogp.image})`, // safeImageUrl 済み
+          src: imageSrc,
+          alt: '',
+          width: IMAGE_WIDTH,
+          height: IMAGE_HEIGHT,
+          loading: 'lazy',
+          decoding: 'async',
         },
         children: [],
       }] : []),
@@ -161,7 +199,7 @@ function makeCard(href, ogp) {
   };
 }
 
-export default function rehypeOgpCard() {
+export default function rehypeOgpCard({ base = '' } = {}) {
   return async (tree) => {
     const tasks = [];
 
@@ -183,7 +221,9 @@ export default function rehypeOgpCard() {
     const before = Object.keys(cache).length;
     await Promise.all(tasks.map(async ({ index, parent, href }) => {
       const ogp = await resolveOgp(href);
-      if (ogp) parent.children[index] = makeCard(href, ogp);
+      if (!ogp) return;
+      const local = ogp.image ? await localizeImage(ogp.image) : null;
+      parent.children[index] = makeCard(href, ogp, local ? `${base}/${local}` : ogp.image);
     }));
     if (Object.keys(cache).length !== before) saveCache();
   };

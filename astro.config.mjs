@@ -66,6 +66,6 @@ export default defineConfig({
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
 		remarkPlugins: [remarkExcerpt, remarkBtn, remarkDirective, remarkDirectives],
-		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeOgpCard, rehypeFigure, rehypeImageLoading, rehypeExternalLinks],
+		rehypePlugins: [rehypeYoutube, rehypeTwitter, [rehypeOgpCard, { base: '/blog' }], rehypeFigure, rehypeImageLoading, rehypeExternalLinks],
 	},
 });

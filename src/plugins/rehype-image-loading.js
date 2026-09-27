@@ -11,6 +11,8 @@ export default function rehypeImageLoading() {
       if (node.tagName !== 'img') return;
       const src = node.properties?.src;
       if (typeof src !== 'string' || /^(https?:)?\/\//.test(src)) return;
+      // OGP カードの画像は rehype-ogp-card が縮めて lazy にしてある
+      if ([].concat(node.properties.className ?? []).includes('ogp-image')) return;
       if (first) {
         node.properties.loading = 'eager';
         node.properties.fetchpriority = 'high';
