@@ -9,6 +9,7 @@ import remarkBtn from './src/plugins/remark-btn.js';
 import remarkDirectives from './src/plugins/remark-directives.js';
 import rehypeExternalLinks from './src/plugins/rehype-external-links.js';
 import rehypeFigure from './src/plugins/rehype-figure.js';
+import rehypeImageLoading from './src/plugins/rehype-image-loading.js';
 import rehypeOgpCard from './src/plugins/rehype-ogp-card.js';
 import rehypeTwitter from './src/plugins/rehype-twitter.js';
 import rehypeYoutube from './src/plugins/rehype-youtube.js';
@@ -52,7 +53,7 @@ export default defineConfig({
 	site: 'https://neko4.dev',
 	base: '/blog',
 	trailingSlash: 'never',
-	build: { format: 'file' },
+	build: { format: 'file', inlineStylesheets: 'always' },
 	integrations: [
 		sitemap({
 			filter: (page) =>
@@ -65,6 +66,6 @@ export default defineConfig({
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
 		remarkPlugins: [remarkExcerpt, remarkBtn, remarkDirective, remarkDirectives],
-		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeOgpCard, rehypeFigure, rehypeExternalLinks],
+		rehypePlugins: [rehypeYoutube, rehypeTwitter, rehypeOgpCard, rehypeFigure, rehypeImageLoading, rehypeExternalLinks],
 	},
 });
