@@ -238,8 +238,10 @@ a:hover { text-decoration: underline; }
 .banner-wall p > a { display: block; flex: none; line-height: 0; text-decoration: none; }
 .banner-wall p > a:hover { outline: 1px solid var(--faint); }
 .prose .banner-wall img { flex: none; image-rendering: pixelated; }
-.prose figure { margin: 1.5rem 0; }
-.prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
+/* figure を画像の幅に縮め、キャプションを画像に対して中央にそろえる。
+   キャプションは contain で幅の計算から外し、画像より長ければ折り返させる */
+.prose figure { margin: 1.5rem 0; width: fit-content; }
+.prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; contain: inline-size; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
 .prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
