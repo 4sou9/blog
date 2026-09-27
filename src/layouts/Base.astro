@@ -135,8 +135,8 @@ const ogImage = slug
             css.rel = 'stylesheet';
             css.href = base + '/pagefind/pagefind-ui.css';
             // サイト CSS（global.css）の pagefind 上書きは同詳細度の後勝ちに依存しているため、
-            // 既存の stylesheet より前に挿入してカスケード順を静的読み込み時代と同じに保つ
-            document.head.insertBefore(css, document.querySelector('link[rel="stylesheet"]'));
+            // head の先頭に置いてサイト CSS（インライン <style>）より前にする
+            document.head.prepend(css);
           }
           const s = document.createElement('script');
           s.src = base + '/pagefind/pagefind-ui.js';
