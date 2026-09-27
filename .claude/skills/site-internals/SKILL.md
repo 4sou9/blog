@@ -7,7 +7,7 @@ description: サイト実装の詳細（プラグイン、unlisted の除外箇�
 
 **プラグイン**（`src/plugins/`）:
 - `rehype-youtube.js` / `rehype-twitter.js` — 埋め込み
-- `rehype-ogp-card.js` — bare URL → OGPカード。取得結果は `ogp-cache.json`（コミットする）に貯め、未知の URL だけ fetch する。失敗時は警告を出して裸リンクのまま。取り直すには該当エントリを消して再ビルド
+- `rehype-ogp-card.js` — bare URL → OGPカード。取得結果は `ogp-cache.json`（コミットする）に貯め、未知の URL だけ fetch する。失敗時は警告を出して裸リンクのまま。取り直すには該当エントリを消して再ビルド。カード画像は 600×315 の WebP に縮めて `public/ogp-card/`（コミットする。名前は画像 URL の sha1 先頭12桁）に置き、`<img loading="lazy">` で出す。画像だけ取れなかったときは警告を出して相手の URL を直接使うので、再ビルドで取り直す。画像を作り直すにはそのファイルを消す
 - `rehype-figure.js` — 画像 → `<figure>` + キャプション
 - `rehype-external-links.js` — 外部リンクに `target="_blank"` + `rel`
 - `remark-btn.js` — `"btn"` タイトル → ボタン
