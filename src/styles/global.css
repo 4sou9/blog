@@ -237,7 +237,7 @@ a:hover { text-decoration: underline; }
    バナーをリンクにすると flex の対象が a に変わるので、a にも同じ指定が要る */
 .banner-wall p > a { display: block; flex: none; line-height: 0; text-decoration: none; }
 .banner-wall p > a:hover { outline: 1px solid var(--faint); }
-.prose .banner-wall img { display: block; flex: none; margin: 0; image-rendering: pixelated; }
+.prose .banner-wall img { flex: none; image-rendering: pixelated; }
 .prose figure { margin: 1.5rem 0; }
 .prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
