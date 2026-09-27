@@ -230,7 +230,7 @@ a:hover { text-decoration: underline; }
 .prose h1 { font-size: 1.5rem; margin: 0 0 0.4rem; }
 .prose h2 { font-size: 1.4rem; font-weight: normal; margin: 5rem 0 0.4rem; }
 .prose h3 { font-size: 1.2rem; font-weight: normal; margin: 1.5rem 0 0.4rem; }
-.prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0; }
 /* バナーの壁。原寸のまま隙間なく並べたいので、prose の img 既定（block + auto margin）を打ち消す */
 .banner-wall p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0.8rem 0; }
 /* flex の既定（伸縮 + stretch）で原寸が崩れるため、縮めも伸ばしもさせない。
