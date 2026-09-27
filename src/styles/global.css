@@ -243,7 +243,7 @@ a:hover { text-decoration: underline; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
 .prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
-.prose pre { padding: 1rem; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
+.prose pre { padding: 1rem; font-size: 0.72rem; line-height: 1.6; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
 .copy-btn { position: absolute; top: 0.5rem; right: 1rem; padding: 0.15rem 0.5rem; font-size: 0.72rem; background: var(--faint); color: var(--bg); border: none; cursor: pointer; opacity: 0; transition: opacity 0.15s; z-index: 1; }
 .code-wrapper:hover .copy-btn { opacity: 1; }
 .code-lang { position: absolute; top: 0.5rem; left: 0.75rem; font-size: 0.7rem; color: #8b949e; pointer-events: none; user-select: none; }
