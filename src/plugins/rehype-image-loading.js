@@ -13,9 +13,12 @@ export default function rehypeImageLoading() {
       if (typeof src !== 'string' || /^(https?:)?\/\//.test(src)) return;
       // OGP カードの画像は rehype-ogp-card が縮めて lazy にしてある
       if ([].concat(node.properties.className ?? []).includes('ogp-image')) return;
+      // Astro の既定の decoding="async" だと、更新ボタンで開き直したとき Chrome が画像抜きのページを
+      // 1 コマ描いてから画像を描き足し、冒頭の画像が点滅して見える。最初の画像は展開を待ってから描かせる
       if (first) {
         node.properties.loading = 'eager';
         node.properties.fetchpriority = 'high';
+        node.properties.decoding = 'sync';
         first = false;
       }
       const inBannerWall = ancestors.some((a) =>
