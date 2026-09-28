@@ -41,6 +41,12 @@
     "image": "https://repository-images.githubusercontent.com/307843105/73d2a8af-40d3-4fce-b9a3-3cfd1a24112a",
     "siteName": "GitHub"
   },
+  "https://patches.nekonyansoft.com/": {
+    "title": "NekoNyan Patches",
+    "description": "",
+    "image": "",
+    "siteName": ""
+  },
   "https://rufus.ie/ja/": {
     "title": "Rufus - 起動可能なUSBドライブを簡単に作成できます",
     "description": "Rufus: Create bootable USB drives the easy way",
