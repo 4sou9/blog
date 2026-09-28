@@ -18,7 +18,7 @@ import sharp from 'sharp';
 const SKIP_RE = /youtube\.com|youtu\.be|twitter\.com|x\.com/;
 const CACHE_PATH = join(process.cwd(), 'ogp-cache.json');
 const IMAGE_DIR = 'ogp-card';
-// カードは最大 520px（global.css の .ogp-card）。少し余裕を持たせ、OGP 標準の 1200:630 で切る
+// カードの右端に幅 14rem（global.css の .ogp-image）で置く。高解像度の画面でもぼやけないよう、OGP 標準の 1200:630 で大きめに切る
 const IMAGE_WIDTH = 600;
 const IMAGE_HEIGHT = 315;
 
@@ -145,7 +145,7 @@ async function resolveOgp(url) {
   return ogp;
 }
 
-// X・Facebook・Discord と同じく、画像を上に置き、その下にドメイン・タイトル・説明を並べる
+// note と同じく、左にタイトル・説明・ドメインを縦に並べ、右に画像を置く
 // 画面外のカードが多いので画像は lazy。width/height で読み込み前から場所を確保する
 function makeCard(href, ogp, imageSrc) {
   let hostname = href;
@@ -156,6 +156,31 @@ function makeCard(href, ogp, imageSrc) {
     tagName: 'a',
     properties: { href, className: ['ogp-card'], target: '_blank', rel: 'noopener noreferrer' },
     children: [
+      {
+        type: 'element',
+        tagName: 'div',
+        properties: { className: ['ogp-content'] },
+        children: [
+          {
+            type: 'element',
+            tagName: 'div',
+            properties: { className: ['ogp-title'] },
+            children: [{ type: 'text', value: ogp.title || href }],
+          },
+          ...(ogp.description ? [{
+            type: 'element',
+            tagName: 'div',
+            properties: { className: ['ogp-desc'] },
+            children: [{ type: 'text', value: ogp.description }],
+          }] : []),
+          {
+            type: 'element',
+            tagName: 'div',
+            properties: { className: ['ogp-url'] },
+            children: [{ type: 'text', value: hostname }],
+          },
+        ],
+      },
       ...(imageSrc ? [{
         type: 'element',
         tagName: 'img',
@@ -170,31 +195,6 @@ function makeCard(href, ogp, imageSrc) {
         },
         children: [],
       }] : []),
-      {
-        type: 'element',
-        tagName: 'div',
-        properties: { className: ['ogp-content'] },
-        children: [
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['ogp-url'] },
-            children: [{ type: 'text', value: hostname }],
-          },
-          {
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['ogp-title'] },
-            children: [{ type: 'text', value: ogp.title || href }],
-          },
-          ...(ogp.description ? [{
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['ogp-desc'] },
-            children: [{ type: 'text', value: ogp.description }],
-          }] : []),
-        ],
-      },
     ],
   };
 }
