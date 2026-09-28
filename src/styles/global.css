@@ -219,7 +219,9 @@ a:hover { text-decoration: underline; }
 
 .post-list { list-style: none; padding: 0; margin: 0; }
 .post-list li { margin-bottom: 1.6rem; }
-.post-date { font-size: 0.8rem; color: var(--faint); font-variant-numeric: tabular-nums; }
+/* 行の高さを固定する。記事では .prose（行の高さ 2）の中に入るので、指定しないとトップより文字が 1.6px 下がり、
+   ページを行き来したときに日付が動いて見える */
+.post-date { font-size: 0.8rem; line-height: 1.75; color: var(--faint); font-variant-numeric: tabular-nums; }
 .post-title { font-size: 1rem; font-weight: 500; }
 /* 記事名は白。水色はホバーしたときだけにして、アクセント色を特別なものに保つ（トップと同じ） */
 .post-list .post-title { color: var(--fg); }
