@@ -245,6 +245,9 @@ a:hover { text-decoration: underline; }
 .prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
 .prose pre { padding: 1rem; font-size: 0.72rem; line-height: 1.6; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
+/* 言語名のラベル（.code-lang）の場所。ラベルは Base.astro のスクリプトが描画後に付けるので、
+   余白をそこで広げるとコードブロックが伸びて下の本文がずれる。最初から CSS で空けておく */
+.prose pre[data-language] { padding-top: 2rem; }
 .copy-btn { position: absolute; top: 0.5rem; right: 1rem; padding: 0.15rem 0.5rem; font-size: 0.72rem; background: var(--faint); color: var(--bg); border: none; cursor: pointer; opacity: 0; transition: opacity 0.15s; z-index: 1; }
 .code-wrapper:hover .copy-btn { opacity: 1; }
 .code-lang { position: absolute; top: 0.5rem; left: 0.75rem; font-size: 0.7rem; color: #8b949e; pointer-events: none; user-select: none; }
