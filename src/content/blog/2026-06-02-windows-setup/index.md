@@ -71,11 +71,8 @@ foreach ($packageId in $packageIds) {
 ## winget で入らないソフトを手動でインストール
 
 winget に無かったり、winget 経由だとうまく動かなかったりするドライバやソフトは個別に入れます。
-
 [**Nvidia App**](https://www.nvidia.com/ja-jp/software/nvidia-app/) - GeForce ドライバと Nvidia Broadcast を入れます。
-
 [**Aqua Voice**](https://aquavoice.com/download) - 音声入力ツール。
-
 [**MOTU M Series**](https://motu.com/en-us/download/product/408/#3110) - オーディオインターフェースのドライバ。
 
 ## サウンド設定
@@ -98,7 +95,6 @@ winget configure -f $config --accept-configuration-agreements --disable-interact
 ```
 
 これで入るものは次のとおりです。
-
 - PowerShell 7
 - Git
 - GitHub CLI
@@ -115,16 +111,12 @@ winget configure -f $config --accept-configuration-agreements --disable-interact
 - WSL + Ubuntu
 
 :::warn
-WSL を有効化する途中で、一度再起動が入ります。
-再起動したら PowerShell を開き直し、同じコマンドをもう一度実行してください。
-残りの構成が続きから進みます。
-WSL の初期化に失敗する場合は、BIOS/UEFI でハードウェア仮想化を有効にする。
+WSL を有効化する途中で、一度再起動が入ります。再起動したら PowerShell を開き直し、同じコマンドをもう一度実行してください。残りの構成が続きから進みます。WSL の初期化に失敗する場合は、BIOS/UEFI でハードウェア仮想化を有効にする。
 :::
 
 ## 不要なアプリの削除と設定変更
 
-Windows は仕様がよく変わるので、手作業で追うより、オープンソースで継続的に保守されているツールに任せたほうがいいです。
-ここでは Win11Debloat を使います。
+Windows は仕様がよく変わるので、手作業で追うより、オープンソースで継続的に保守されているツールに任せたほうがいいです。ここでは Win11Debloat を使います。
 
 https://github.com/Raphire/Win11Debloat
 
