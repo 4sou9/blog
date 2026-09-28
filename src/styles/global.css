@@ -225,11 +225,20 @@ a:hover { text-decoration: underline; }
 .post-list .post-title { color: var(--fg); }
 .post-list .post-title:hover { color: var(--link); }
 
-.prose { margin-top: 2rem; }
-.prose p { margin: 0.4em 0; }
-.prose h1 { font-size: 1.5rem; margin: 0 0 2rem; }
-.prose h2 { font-size: 1.4rem; font-weight: normal; margin: 3rem 0 0.4rem; }
-.prose h3 { font-size: 1.2rem; font-weight: normal; margin: 1.5rem 0 0.4rem; }
+/* 本文の余白は note の記事にならい、本文 1 行の高さ（--line = 16px × 2 = 2rem）を単位にそろえる。
+   段落・画像・コード・表・カードなどのブロックの間は 1 行分。見出しは上を 1.5 行分空けて前の話と切り、
+   下は 0.5 行分に詰めて続く本文とつなげる。上下の margin は重なって大きいほうだけが効くので、
+   ブロックの間はどの組み合わせでも 1 行分になる */
+.prose { --line: 2rem; margin-top: 2rem; line-height: 2; }
+.prose p { margin: var(--line) 0; }
+.prose h1 { font-size: 1.5rem; line-height: 1.5; margin: 0 0 calc(var(--line) * 1.5); }
+.prose h2 { font-size: 1.4rem; font-weight: normal; line-height: 1.5; margin: calc(var(--line) * 1.5) 0 calc(var(--line) * 0.5); }
+.prose h3 { font-size: 1.2rem; font-weight: normal; line-height: 1.5; margin: calc(var(--line) * 1.25) 0 calc(var(--line) * 0.25); }
+.prose :is(ul, ol) { margin: var(--line) 0; padding-left: 1.5rem; }
+/* 箇条書きの項目は note と同じく本文より行を詰め、項目どうしの間で区切る */
+.prose li { line-height: 1.5; margin: 0.5rem 0; }
+.prose li > p { margin: 0; }
+.prose blockquote { margin: var(--line) 0; }
 .prose img:not(.ogp-image) { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 /* バナーの壁。原寸のまま隙間なく横に並べる */
 .banner-wall p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0.8rem 0; }
@@ -239,12 +248,12 @@ a:hover { text-decoration: underline; }
 .banner-wall p > a:hover { outline: 1px solid var(--faint); }
 /* 上の margin: 0 auto が flex の中では余白を吸って並びを崩すため、0 に戻す */
 .prose .banner-wall img { flex: none; margin: 0; image-rendering: pixelated; }
-.prose figure { margin: 1.5rem 0; }
+.prose figure { margin: var(--line) 0; }
 .prose figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.2rem; }
 /* widgets.js が読み込まれるまでの代替表示。長い URL がそのまま出るため折り返す */
 .prose .twitter-tweet { overflow-wrap: anywhere; }
 .code-wrapper { position: relative; }
-.prose pre { padding: 1rem; font-size: 0.72rem; line-height: 1.6; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
+.prose pre { margin: var(--line) 0; padding: 1rem; font-size: 0.72rem; line-height: 1.6; overflow-x: auto; max-height: 40rem; overflow-y: auto; }
 /* 言語名のラベル（.code-lang）の場所。ラベルは Base.astro のスクリプトが描画後に付けるので、
    余白をそこで広げるとコードブロックが伸びて下の本文がずれる。最初から CSS で空けておく */
 .prose pre[data-language] { padding-top: 2rem; }
@@ -258,7 +267,13 @@ a:hover { text-decoration: underline; }
 .prose th { background: var(--surface); font-weight: 600; letter-spacing: 0.02em; }
 .prose tbody tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.035); }
 .prose tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.08); }
-.prose > table { margin: 1.25rem 0; border: 1px solid var(--border); }
+.prose > table { margin: var(--line) 0; border: 1px solid var(--border); }
+
+/* 見出しの直後のブロックは上の margin（1 行分）が見出しの下の余白より大きく、重なると勝ってしまうので消す。
+   .prose pre や .prose > table と詳細度が同じなので、それらより後ろに置く。
+   コードブロックは描画後に .code-wrapper で包まれるので、包まれた後の形にも同じ指定が要る（無いと包んだ瞬間にずれる） */
+.prose :is(h1, h2, h3) + *,
+.prose :is(h1, h2, h3) + .code-wrapper > pre { margin-top: 0; }
 
 .btn-link {
   display: inline-block;
@@ -273,7 +288,7 @@ a:hover { text-decoration: underline; }
 /* 左に文字・右に画像を置いた横長の低いカード。幅は本文の列いっぱいにそろえる。
    枠はアラートと同じ 2px、色はリンクと同じ水色（--link）。背景は情報のアラート（.alert-info）と同じ水色がかった色で、ホバーで明るくする。
    タイトルは白、ドメインは灰色 */
-.ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; overflow: hidden; margin: 1rem 0; color: #fff; text-decoration: none; transition: background 0.15s; }
+.ogp-card { display: flex; border: 2px solid var(--link); background: #323c4a; overflow: hidden; margin: var(--line) 0; color: #fff; text-decoration: none; transition: background 0.15s; }
 .ogp-card:hover { background: #3d4b5e; text-decoration: none; }
 .ogp-content { flex: 1; min-width: 0; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.2rem; }
 .ogp-title { font-size: 0.95rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
@@ -321,7 +336,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 /* ===== Custom Components（:::ディレクティブ） ===== */
 
 /* Alert */
-.alert { display: flex; align-items: flex-start; gap: 0.75rem; margin: 1.25rem 0; padding: 0.85rem 1rem; border: 2px solid; }
+.alert { display: flex; align-items: flex-start; gap: 0.75rem; margin: var(--line) 0; padding: 0.85rem 1rem; border: 2px solid; }
 .alert > .alert-icon { flex: 0 0 auto; width: 1.4rem; height: 1.4rem; margin-top: 0.1rem; -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
 .alert > p:first-of-type { margin-top: 0; }
 .alert > p:last-child { margin-bottom: 0; }
@@ -335,7 +350,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .alert-tip    > .alert-icon { background: #3ba55d; --icon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202a10%2010%200%20100%2020%2010%2010%200%20000-20zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z'/%3E%3C/svg%3E"); }
 
 /* Collapsible（<details>） */
-.collapsible { background: #27292d; margin: 1.5rem 0; overflow: hidden; }
+.collapsible { background: #27292d; margin: var(--line) 0; overflow: hidden; }
 .collapsible > .collapsible-summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 0.75rem; padding: 1rem 1.25rem; }
 .collapsible > .collapsible-summary::-webkit-details-marker { display: none; }
 .collapsible-title { grid-column: 1; grid-row: 1; font-size: 1.1rem; font-weight: 600; }
@@ -348,7 +363,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .collapsible > *:not(.collapsible-summary):last-child { margin-bottom: 1rem; }
 
 /* Tabs */
-.tabs { margin: 1.5rem 0; }
+.tabs { margin: var(--line) 0; }
 .tab-list { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
 .tab-list::-webkit-scrollbar { display: none; }
 .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 0.5rem 0.9rem; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
@@ -359,7 +374,7 @@ pre.astro-code span[style*="color:#6A737D"] { color: #8b949e !important; }
 .tab-panel > :first-child { margin-top: 0; }
 
 /* Changelog */
-.changelog { margin: 1.5rem 0; }
+.changelog { margin: var(--line) 0; }
 .release { position: relative; margin-left: 0.75rem; padding-left: 2rem; padding-bottom: 1.6rem; border-left: 2px solid rgba(88, 101, 242, 0.35); }
 .release:last-child { padding-bottom: 0; border-left-color: transparent; }
 .release::before { content: ''; position: absolute; left: -9px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
