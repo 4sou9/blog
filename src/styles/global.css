@@ -297,8 +297,9 @@ a:hover { text-decoration: underline; }
 /* ドメインはカードの下端に寄せる */
 .ogp-url { margin-top: auto; font-size: 0.75rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 画像は切り抜かずに OGP 画像の標準比率（1200×630）のまま右端に置く。
-   画像の文字が途中で切れた絵にならないよう、狭い画面では比率を保ったまま小さくする */
-.ogp-image { flex: none; display: block; width: 14rem; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; background-color: var(--faint); }
+   画像の文字が途中で切れた絵にならないよう、狭い画面では比率を保ったまま小さくする。
+   読み込み中の下地は塗らず、カードの背景色（ホバー中はホバーの色）をそのまま見せて、明るい四角が一瞬出ないようにする */
+.ogp-image { flex: none; display: block; width: 14rem; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; }
 @media (max-width: 640px) {
   /* 小さな画像をカードの右上に、タイトルの行の高さから置く */
   .ogp-image { width: 7rem; align-self: flex-start; margin: 0.8rem 0.8rem 0.8rem 0; }
