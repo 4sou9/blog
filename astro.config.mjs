@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import { fileURLToPath } from 'node:url';
 import { assertUnlistedExcluded, unlistedSlugs } from './src/lib/unlisted.mjs';
+import remarkBreaks from 'remark-breaks';
 import remarkDirective from 'remark-directive';
 import remarkBtn from './src/plugins/remark-btn.js';
 import remarkDirectives from './src/plugins/remark-directives.js';
@@ -65,7 +66,8 @@ export default defineConfig({
 	],
 	markdown: {
 		shikiConfig: { theme: 'github-dark' },
-		remarkPlugins: [remarkExcerpt, remarkBtn, remarkDirective, remarkDirectives],
+		// remarkBreaks：記事は一文ごとに改行して書くので、その改行を画面でもそのまま改行にする（note と同じ見え方）
+		remarkPlugins: [remarkExcerpt, remarkBtn, remarkDirective, remarkDirectives, remarkBreaks],
 		rehypePlugins: [rehypeYoutube, rehypeTwitter, [rehypeOgpCard, { base: '/blog' }], rehypeFigure, rehypeImageLoading, rehypeExternalLinks],
 	},
 });
