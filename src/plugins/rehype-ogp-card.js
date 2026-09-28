@@ -145,7 +145,7 @@ async function resolveOgp(url) {
   return ogp;
 }
 
-// note と同じく、左にタイトル・説明・ドメインを縦に並べ、右に画像を置く
+// 左にタイトルとドメインを縦に並べ、右に画像を置く。説明（description）はキャッシュには残すが出さない
 // 画面外のカードが多いので画像は lazy。width/height で読み込み前から場所を確保する
 function makeCard(href, ogp, imageSrc) {
   let hostname = href;
@@ -167,12 +167,6 @@ function makeCard(href, ogp, imageSrc) {
             properties: { className: ['ogp-title'] },
             children: [{ type: 'text', value: ogp.title || href }],
           },
-          ...(ogp.description ? [{
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['ogp-desc'] },
-            children: [{ type: 'text', value: ogp.description }],
-          }] : []),
           {
             type: 'element',
             tagName: 'div',
