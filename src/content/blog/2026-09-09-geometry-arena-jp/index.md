@@ -2,7 +2,7 @@
 title: 'Geometry Arena v1.1.0 の日本語化MODを作りました'
 pubDate: '2026-09-09'
 ---
-[![Geometry Arena v1.1.0](./header.jpg)](https://store.steampowered.com/app/1255650/)
+https://store.steampowered.com/app/1255650/
 
 ## 使い方
 
