@@ -6,7 +6,7 @@ pubDate: '2026-09-16'
 
 ## 使い方
 
-1. 起動したまま放置したいゲームにチェックを入れる
+1. 放置したいゲームにチェックを入れる
 2. 左上の再生ボタンを押す
 
 [ダウンロード (v0.1.0)](https://github.com/4sou9/Discord_Idle_Picker/releases/download/v0.1.0/Discord.Idle.Picker_0.1.0_x64-setup.exe "btn")
